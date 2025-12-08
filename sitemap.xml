@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/</loc>
+      <priority>1.00</priority>
+   </url>
+   <!-- Agar aapke paas aur pages hain, unko bhi add karo -->
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/about.html</loc>
+      <priority>0.80</priority>
+   </url>
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/contact.html</loc>
+      <priority>0.80</priority>
+   </url>
+</urlset>
