@@ -29,6 +29,7 @@ body{
   background-size:cover;
   background-attachment:fixed;
   transition: background-position 0.1s;
+  overflow-x:hidden;
 }
 
 /* ===== HEADER ===== */
@@ -39,6 +40,7 @@ header{
   color:white;
   position:relative;
   z-index:1;
+  overflow:hidden;
 }
 
 /* Logo */
@@ -52,6 +54,7 @@ header{
   left:20px;
   box-shadow:0 4px 12px rgba(0,0,0,0.4);
   cursor:pointer;
+  z-index:2;
 }
 
 /* Header Text */
@@ -59,11 +62,15 @@ header h1{
   font-size:45px;
   font-weight:800;
   text-shadow:3px 3px 8px rgba(0,0,0,0.7);
+  position:relative;
+  z-index:2;
 }
 header p{
   font-size:20px;
   margin-top:10px;
   text-shadow:2px 2px 5px rgba(0,0,0,0.6);
+  position:relative;
+  z-index:2;
 }
 
 /* Responsive Header */
@@ -243,7 +250,6 @@ footer{
   cursor:pointer;
   font-weight:bold;
 }
-
 </style>
 </head>
 
@@ -349,11 +355,10 @@ footer{
   <img src="images/dlogo.jpeg" alt="Logo">
 </div>
 
-<!-- SCRIPTS -->
 <script>
-// Open logo popup
-function openLogo(){ document.getElementById("logoPopup").style.display = "flex"; }
-function closeLogo(){ document.getElementById("logoPopup").style.display = "none"; }
+// Logo popup
+function openLogo(){ document.getElementById("logoPopup").style.display="flex"; }
+function closeLogo(){ document.getElementById("logoPopup").style.display="none"; }
 
 /* Scroll Animation */
 const boxes = document.querySelectorAll(".box");
@@ -366,22 +371,28 @@ window.addEventListener("scroll", () => {
 
 /* Customer Review System */
 function addReview(){
-  let name = document.getElementById("name").value;
-  let review = document.getElementById("review").value;
-  if(name.trim()=="" || review.trim()==""){ alert("Please fill both fields!"); return; }
-  let container = document.createElement("div");
-  container.className = "review-box";
-  container.innerHTML = `<b>${name}</b><br>${review}`;
+  let name=document.getElementById("name").value;
+  let review=document.getElementById("review").value;
+  if(name.trim()==""||review.trim()==""){ alert("Please fill both fields!"); return; }
+  let container=document.createElement("div");
+  container.className="review-box";
+  container.innerHTML=`<b>${name}</b><br>${review}`;
   document.getElementById("reviewList").prepend(container);
-  document.getElementById("name").value = "";
-  document.getElementById("review").value = "";
+  document.getElementById("name").value="";
+  document.getElementById("review").value="";
 }
 
 /* ===== MOVABLE BACKGROUND ON MOUSE ===== */
-document.addEventListener('mousemove', function(e){
-  const x = e.clientX / window.innerWidth;
-  const y = e.clientY / window.innerHeight;
-  document.body.style.backgroundPosition = `${x*50}px ${y*50}px`;
+document.addEventListener('mousemove',function(e){
+  const x=e.clientX/window.innerWidth;
+  const y=e.clientY/window.innerHeight;
+  document.body.style.backgroundPosition=`${x*50}px ${y*50}px`;
+});
+
+/* ===== PARALLAX SCROLL EFFECT ===== */
+window.addEventListener('scroll',function(){
+  const scrollY=window.scrollY;
+  document.body.style.backgroundPosition=`50% ${scrollY*0.3}px`;
 });
 </script>
 
