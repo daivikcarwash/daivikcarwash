@@ -21,13 +21,14 @@
   font-family:'Poppins', sans-serif;
 }
 
+/* Responsive Body */
 body{
   background:#f2f6fc;
   color:#222;
   scroll-behavior:smooth;
 }
 
-/* Header with Logo */
+/* Header */
 header{
   background:url('images/header.jpg') center/cover no-repeat;
   padding:120px 20px 150px;
@@ -54,6 +55,17 @@ header p{
   text-shadow:2px 2px 5px #000;
 }
 
+/* Mobile Responsive Header */
+@media (max-width:600px){
+  header h1{ font-size:32px; }
+  header p{ font-size:16px; }
+  .logo{
+    width:80px;
+    top:15px;
+    left:15px;
+  }
+}
+
 /* Navigation */
 nav{
   position:sticky;
@@ -62,8 +74,9 @@ nav{
   background:#004c97;
   display:flex;
   justify-content:center;
-  gap:30px;
-  padding:15px;
+  gap:25px;
+  padding:12px;
+  flex-wrap:wrap;
 }
 nav a{
   color:white;
@@ -74,16 +87,16 @@ nav a:hover{
   color:#ffdf00;
 }
 
-/* Sections */
+/* Responsive Sections */
 section{
-  padding:60px 20px;
+  padding:55px 20px;
   max-width:1100px;
   margin:auto;
 }
 
 .box{
   background:white;
-  padding:35px;
+  padding:30px;
   border-radius:15px;
   margin-bottom:50px;
   box-shadow:0 5px 25px rgba(0,0,0,0.12);
@@ -96,7 +109,6 @@ section{
   transform:translateY(0);
 }
 
-/* Heading */
 h2{
   text-align:center;
   font-size:30px;
@@ -105,6 +117,13 @@ h2{
   margin-bottom:20px;
 }
 
+/* Responsive Text */
+@media (max-width:600px){
+  h2{ font-size:24px; }
+  .box{ padding:20px; }
+}
+
+/* Items */
 .service-item, .price-item{
   background:#e9f1ff;
   padding:15px;
@@ -119,7 +138,7 @@ h2{
   color:#004c97;
 }
 
-/* Button */
+/* Buttons */
 .btn{
   display:block;
   width:fit-content;
@@ -137,7 +156,7 @@ h2{
   background:#0f6ddb;
 }
 
-/* Reviews Section */
+/* Reviews */
 .review-box{
   background:#eef5ff;
   padding:15px;
@@ -146,7 +165,7 @@ h2{
   margin-top:15px;
 }
 
-/* WhatsApp Button */
+/* WhatsApp Floating Button */
 .whatsapp{
   position:fixed;
   bottom:20px;
@@ -184,8 +203,8 @@ footer{
   <a href="#about">About</a>
   <a href="#services">Services</a>
   <a href="#pricing">Pricing</a>
-  <a href="#reviews">Reviews</a>
   <a href="#contact">Contact</a>
+  <a href="#reviews">Reviews</a>
 </nav>
 
 <!-- ABOUT -->
@@ -231,23 +250,6 @@ footer{
   <a href="YOUR_GOOGLE_FORM_LINK" class="btn">Book Now</a>
 </section>
 
-<!-- REVIEWS PAGE -->
-<section id="reviews" class="box">
-  <h2>Customer Reviews</h2>
-
-  <!-- Review Form -->
-  <div>
-    <h3 style="text-align:center;">Give Your Review</h3><br>
-    <input id="name" type="text" placeholder="Your Name" style="width:100%; padding:10px; margin-bottom:10px;">
-    <textarea id="review" rows="4" placeholder="Write your review..." style="width:100%; padding:10px;"></textarea>
-
-    <button onclick="addReview()" class="btn">Submit Review</button>
-  </div>
-
-  <h3 style="margin-top:30px;">All Reviews</h3>
-  <div id="reviewList"></div>
-</section>
-
 <!-- CONTACT -->
 <section id="contact" class="box">
   <h2>Contact Us</h2>
@@ -265,6 +267,22 @@ footer{
   <a href="YOUR_GOOGLE_FORM_LINK" class="btn">Book Service</a>
 </section>
 
+<!-- REVIEWS (LAST SECTION) -->
+<section id="reviews" class="box">
+  <h2>Customer Reviews</h2>
+
+  <div>
+    <h3 style="text-align:center;">Give Your Review</h3><br>
+    <input id="name" type="text" placeholder="Your Name" style="width:100%; padding:10px; margin-bottom:10px;">
+    <textarea id="review" rows="4" placeholder="Write your review..." style="width:100%; padding:10px;"></textarea>
+
+    <button onclick="addReview()" class="btn">Submit Review</button>
+  </div>
+
+  <h3 style="margin-top:30px;">All Reviews</h3>
+  <div id="reviewList"></div>
+</section>
+
 <footer>
   © 2025 Daivik Doorstep Car Wash • Haridwar • Designed by Manu Sonker
 </footer>
@@ -272,7 +290,7 @@ footer{
 <!-- WhatsApp Button -->
 <a class="whatsapp" href="https://wa.me/7906199445">💬</a>
 
-<!-- SCRIPTS -->
+<!-- SCRIPT -->
 <script>
 /* Scroll Animation */
 const boxes = document.querySelectorAll(".box");
