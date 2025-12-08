@@ -191,6 +191,47 @@ footer{
   padding:20px;
   text-align:center;
 }
+/* ===== Logo Zoom Popup ===== */
+.logo-popup{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(4px);
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+
+.logo-popup img{
+  width:300px;
+  height:300px;
+  border-radius:50%;
+  object-fit:cover;
+  border:5px solid #fff;
+  box-shadow:0 4px 20px rgba(255,255,255,0.6);
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn{
+  from{ transform:scale(0.4); opacity:0; }
+  to{ transform:scale(1); opacity:1; }
+}
+
+.close-btn{
+  position:absolute;
+  top:25px;
+  right:30px;
+  font-size:35px;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+
 </style>
 </head>
 
@@ -297,6 +338,16 @@ footer{
 
 <!-- SCRIPT -->
 <script>
+// Open logo popup
+function openLogo(){
+  document.getElementById("logoPopup").style.display = "flex";
+}
+
+// Close popup
+function closeLogo(){
+  document.getElementById("logoPopup").style.display = "none";
+}
+
 /* Scroll Animation */
 const boxes = document.querySelectorAll(".box");
 window.addEventListener("scroll", () => {
@@ -328,6 +379,10 @@ function addReview(){
   document.getElementById("review").value = "";
 }
 </script>
-
+<!-- Logo Popup -->
+<div id="logoPopup" class="logo-popup">
+  <span class="close-btn" onclick="closeLogo()">×</span>
+  <img src="images/dlogo.jpeg" alt="Logo">
+</div>
 </body>
 </html>
