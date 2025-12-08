@@ -1,0 +1,3 @@
+Sitemap: https://daivikcarwash.github.io/daivikcarwash/sitemap.xml
+User-agent: *
+Disallow:
