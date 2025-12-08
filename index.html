@@ -21,21 +21,39 @@
   font-family:'Poppins', sans-serif;
 }
 
-/* Responsive Body */
+/* ===== MOVABLE BACKGROUND ===== */
 body{
-  background:#f2f6fc;
+  background:url('images/dback.jpeg') center/cover no-repeat fixed;
+  animation: moveBg 22s linear infinite;
   color:#222;
   scroll-behavior:smooth;
 }
 
+@keyframes moveBg {
+  0% { background-position: center top; }
+  50% { background-position: center bottom; }
+  100% { background-position: center top; }
+}
+
+/* Dark overlay for readability */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.25);
+  z-index:-1;
+}
+
 /* Header */
 header{
-  background:url('images/header.jpg') center/cover no-repeat;
+  background:rgba(0,0,0,0.5);
   padding:120px 20px 150px;
   text-align:center;
   color:white;
   position:relative;
+  backdrop-filter:blur(3px);
 }
+
 .logo{
   width:200px;
   height:200px;
@@ -45,7 +63,9 @@ header{
   top:20px;
   left:20px;
   box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  border:4px solid white;
 }
+
 header h1{
   font-size:45px;
   font-weight:800;
@@ -62,13 +82,11 @@ header p{
   header h1{ font-size:32px; }
   header p{ font-size:16px; }
   .logo{
-  width:110px;
-  height:110px;
-  border-radius:50%;
-  object-fit:cover;
-  top:15px;
-  left:15px;
-}
+    width:110px;
+    height:110px;
+    top:15px;
+    left:15px;
+  }
 }
 
 /* Navigation */
@@ -76,7 +94,8 @@ nav{
   position:sticky;
   top:0;
   z-index:999;
-  background:#004c97;
+  background:#004c97d9;
+  backdrop-filter:blur(3px);
   display:flex;
   justify-content:center;
   gap:25px;
@@ -92,7 +111,7 @@ nav a:hover{
   color:#ffdf00;
 }
 
-/* Responsive Sections */
+/* Sections */
 section{
   padding:55px 20px;
   max-width:1100px;
@@ -109,6 +128,7 @@ section{
   transform:translateY(40px);
   transition:all 0.8s ease;
 }
+
 .show{
   opacity:1;
   transform:translateY(0);
@@ -122,12 +142,6 @@ h2{
   margin-bottom:20px;
 }
 
-/* Responsive Text */
-@media (max-width:600px){
-  h2{ font-size:24px; }
-  .box{ padding:20px; }
-}
-
 /* Items */
 .service-item, .price-item{
   background:#e9f1ff;
@@ -136,14 +150,13 @@ h2{
   border-radius:10px;
   border-left:6px solid #004c97;
 }
-
 .price-item span{
   float:right;
   font-weight:700;
   color:#004c97;
 }
 
-/* Buttons */
+/* Button */
 .btn{
   display:block;
   width:fit-content;
@@ -161,7 +174,7 @@ h2{
   background:#0f6ddb;
 }
 
-/* Reviews */
+/* Review Box */
 .review-box{
   background:#eef5ff;
   padding:15px;
@@ -191,6 +204,7 @@ footer{
   padding:20px;
   text-align:center;
 }
+
 /* ===== Logo Zoom Popup ===== */
 .logo-popup{
   display:none;
@@ -205,7 +219,6 @@ footer{
   align-items:center;
   z-index:99999;
 }
-
 .logo-popup img{
   width:300px;
   height:300px;
@@ -215,12 +228,10 @@ footer{
   box-shadow:0 4px 20px rgba(255,255,255,0.6);
   animation: zoomIn 0.3s ease;
 }
-
 @keyframes zoomIn{
   from{ transform:scale(0.4); opacity:0; }
   to{ transform:scale(1); opacity:1; }
 }
-
 .close-btn{
   position:absolute;
   top:25px;
@@ -230,8 +241,6 @@ footer{
   cursor:pointer;
   font-weight:bold;
 }
-
-
 </style>
 </head>
 
@@ -306,14 +315,14 @@ footer{
 
   <h3 style="text-align:center;margin-top:20px;">Follow us</h3>
   <p style="text-align:center;">
-    <a href="YOUR_FB_LINK">Facebook</a> |
-    <a href="YOUR_INSTA_LINK">Instagram</a>
+    <a href="#">Facebook</a> |
+    <a href="#">Instagram</a>
   </p>
 
   <a href="YOUR_GOOGLE_FORM_LINK" class="btn">Book Service</a>
 </section>
 
-<!-- REVIEWS (LAST SECTION) -->
+<!-- REVIEWS -->
 <section id="reviews" class="box">
   <h2>Customer Reviews</h2>
 
@@ -338,17 +347,15 @@ footer{
 
 <!-- SCRIPT -->
 <script>
-// Open logo popup
+// Logo Popup
 function openLogo(){
   document.getElementById("logoPopup").style.display = "flex";
 }
-
-// Close popup
 function closeLogo(){
   document.getElementById("logoPopup").style.display = "none";
 }
 
-/* Scroll Animation */
+// Scroll Animation
 const boxes = document.querySelectorAll(".box");
 window.addEventListener("scroll", () => {
   boxes.forEach(box => {
@@ -359,7 +366,7 @@ window.addEventListener("scroll", () => {
   });
 });
 
-/* Customer Review System */
+// Review System
 function addReview(){
   let name = document.getElementById("name").value;
   let review = document.getElementById("review").value;
@@ -379,10 +386,12 @@ function addReview(){
   document.getElementById("review").value = "";
 }
 </script>
+
 <!-- Logo Popup -->
 <div id="logoPopup" class="logo-popup">
   <span class="close-btn" onclick="closeLogo()">×</span>
   <img src="images/dlogo.jpeg" alt="Logo">
 </div>
+
 </body>
 </html>
