@@ -27,11 +27,21 @@ body{
   scroll-behavior:smooth;
 }
 
+/* Header with Logo */
 header{
   background:url('images/header.jpg') center/cover no-repeat;
-  padding:120px 20px;
+  padding:120px 20px 150px;
   text-align:center;
   color:white;
+  position:relative;
+}
+.logo{
+  width:110px;
+  position:absolute;
+  top:20px;
+  left:20px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
 }
 header h1{
   font-size:45px;
@@ -44,6 +54,7 @@ header p{
   text-shadow:2px 2px 5px #000;
 }
 
+/* Navigation */
 nav{
   position:sticky;
   top:0;
@@ -63,6 +74,7 @@ nav a:hover{
   color:#ffdf00;
 }
 
+/* Sections */
 section{
   padding:60px 20px;
   max-width:1100px;
@@ -84,6 +96,7 @@ section{
   transform:translateY(0);
 }
 
+/* Heading */
 h2{
   text-align:center;
   font-size:30px;
@@ -106,6 +119,7 @@ h2{
   color:#004c97;
 }
 
+/* Button */
 .btn{
   display:block;
   width:fit-content;
@@ -121,6 +135,15 @@ h2{
 }
 .btn:hover{
   background:#0f6ddb;
+}
+
+/* Reviews Section */
+.review-box{
+  background:#eef5ff;
+  padding:15px;
+  border-left:5px solid #004c97;
+  border-radius:10px;
+  margin-top:15px;
 }
 
 /* WhatsApp Button */
@@ -151,6 +174,7 @@ footer{
 
 <!-- HEADER -->
 <header>
+  <img src="images/dlogo.jpeg" class="logo" alt="Logo">
   <h1>Daivik Doorstep Car Wash</h1>
   <p>Haridwar's Premium Home Car Washing Service</p>
 </header>
@@ -160,6 +184,7 @@ footer{
   <a href="#about">About</a>
   <a href="#services">Services</a>
   <a href="#pricing">Pricing</a>
+  <a href="#reviews">Reviews</a>
   <a href="#contact">Contact</a>
 </nav>
 
@@ -191,19 +216,36 @@ footer{
 <section id="pricing" class="box">
   <h2>Pricing</h2>
 
-  <div class="price-item">Interior Vacuum & Dash <span>₹149</span></div>
-  <div class="price-item">Exterior Ceramic Foam Wash <span>₹249</span></div>
-  <div class="price-item">Interior + Exterior Wash <span>₹349</span></div>
-  <div class="price-item">Foam Wash + Interior Vacuum <span>₹399</span></div>
-  <div class="price-item">Deep Cleaning + Foam Wash <span>₹649</span></div>
-  <div class="price-item">Premium Spa + Polish <span>₹749</span></div>
-  <div class="price-item">Monthly Package (8 Washes) <span>₹1050</span></div>
+  <div class="price-item">Interior Vacuum & Dash <span>₹199</span></div>
+  <div class="price-item">Exterior Ceramic Foam Wash <span>₹299</span></div>
+  <div class="price-item">Interior + Exterior Wash <span>₹399</span></div>
+  <div class="price-item">Foam Wash + Interior Vacuum <span>₹449</span></div>
+  <div class="price-item">Deep Cleaning + Foam Wash <span>₹699</span></div>
+  <div class="price-item">Premium Spa + Polish <span>₹799</span></div>
+  <div class="price-item">Monthly Package (8 Washes) <span>₹1100</span></div>
 
   <h2>Bike Wash</h2>
   <div class="price-item">Normal Bike Ceramic Wash <span>₹149</span></div>
   <div class="price-item">Premium Bike Ceramic Wash <span>₹199</span></div>
 
   <a href="YOUR_GOOGLE_FORM_LINK" class="btn">Book Now</a>
+</section>
+
+<!-- REVIEWS PAGE -->
+<section id="reviews" class="box">
+  <h2>Customer Reviews</h2>
+
+  <!-- Review Form -->
+  <div>
+    <h3 style="text-align:center;">Give Your Review</h3><br>
+    <input id="name" type="text" placeholder="Your Name" style="width:100%; padding:10px; margin-bottom:10px;">
+    <textarea id="review" rows="4" placeholder="Write your review..." style="width:100%; padding:10px;"></textarea>
+
+    <button onclick="addReview()" class="btn">Submit Review</button>
+  </div>
+
+  <h3 style="margin-top:30px;">All Reviews</h3>
+  <div id="reviewList"></div>
 </section>
 
 <!-- CONTACT -->
@@ -230,8 +272,9 @@ footer{
 <!-- WhatsApp Button -->
 <a class="whatsapp" href="https://wa.me/7906199445">💬</a>
 
-<!-- SCROLL ANIMATION SCRIPT -->
+<!-- SCRIPTS -->
 <script>
+/* Scroll Animation */
 const boxes = document.querySelectorAll(".box");
 window.addEventListener("scroll", () => {
   boxes.forEach(box => {
@@ -241,6 +284,26 @@ window.addEventListener("scroll", () => {
     }
   });
 });
+
+/* Customer Review System */
+function addReview(){
+  let name = document.getElementById("name").value;
+  let review = document.getElementById("review").value;
+
+  if(name.trim()=="" || review.trim()==""){
+    alert("Please fill both fields!");
+    return;
+  }
+
+  let container = document.createElement("div");
+  container.className = "review-box";
+  container.innerHTML = `<b>${name}</b><br>${review}`;
+
+  document.getElementById("reviewList").prepend(container);
+
+  document.getElementById("name").value = "";
+  document.getElementById("review").value = "";
+}
 </script>
 
 </body>
