@@ -5,52 +5,276 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daivik Doorstep Car Wash | Haridwar</title>
 
+<!-- SEO -->
+<meta name="description" content="Daivik Doorstep Car Wash Haridwar — Premium doorstep car wash, bike wash, foam wash, interior cleaning, polishing & detailing. 100% Home Service. Book online.">
+<meta name="keywords" content="Daivik Doorstep Car Wash Haridwar, Haridwar car wash, doorstep car wash Haridwar, foam wash Haridwar, bike wash Haridwar, Manu Sonker">
+<meta name="author" content="Manu Sonker">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
 <style>
-/* BASIC CSS SHORT FOR HERE — YOUR ORIGINAL CSS WORKS */
-/* REVIEW BOX */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins', sans-serif;
+}
+
+/* Responsive Body */
+body{
+  background:#f2f6fc;
+  color:#222;
+  scroll-behavior:smooth;
+}
+
+/* Header */
+header{
+  background:url('images/header.jpg') center/cover no-repeat;
+  padding:120px 20px 150px;
+  text-align:center;
+  color:white;
+  position:relative;
+}
+.logo{
+  width:110px;
+  position:absolute;
+  top:20px;
+  left:20px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+}
+header h1{
+  font-size:45px;
+  font-weight:800;
+  text-shadow:3px 3px 8px #000;
+}
+header p{
+  font-size:20px;
+  margin-top:10px;
+  text-shadow:2px 2px 5px #000;
+}
+
+/* Mobile Responsive Header */
+@media (max-width:600px){
+  header h1{ font-size:32px; }
+  header p{ font-size:16px; }
+  .logo{
+    width:80px;
+    top:15px;
+    left:15px;
+  }
+}
+
+/* Navigation */
+nav{
+  position:sticky;
+  top:0;
+  z-index:999;
+  background:#004c97;
+  display:flex;
+  justify-content:center;
+  gap:25px;
+  padding:12px;
+  flex-wrap:wrap;
+}
+nav a{
+  color:white;
+  text-decoration:none;
+  font-weight:600;
+}
+nav a:hover{
+  color:#ffdf00;
+}
+
+/* Responsive Sections */
+section{
+  padding:55px 20px;
+  max-width:1100px;
+  margin:auto;
+}
+
+.box{
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  margin-bottom:50px;
+  box-shadow:0 5px 25px rgba(0,0,0,0.12);
+  opacity:0;
+  transform:translateY(40px);
+  transition:all 0.8s ease;
+}
+.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+h2{
+  text-align:center;
+  font-size:30px;
+  font-weight:700;
+  color:#004c97;
+  margin-bottom:20px;
+}
+
+/* Responsive Text */
+@media (max-width:600px){
+  h2{ font-size:24px; }
+  .box{ padding:20px; }
+}
+
+/* Items */
+.service-item, .price-item{
+  background:#e9f1ff;
+  padding:15px;
+  margin:12px 0;
+  border-radius:10px;
+  border-left:6px solid #004c97;
+}
+
+.price-item span{
+  float:right;
+  font-weight:700;
+  color:#004c97;
+}
+
+/* Buttons */
+.btn{
+  display:block;
+  width:fit-content;
+  margin:25px auto 0;
+  padding:12px 30px;
+  font-size:18px;
+  font-weight:600;
+  background:#004c97;
+  color:white;
+  text-decoration:none;
+  border-radius:30px;
+  transition:0.3s;
+}
+.btn:hover{
+  background:#0f6ddb;
+}
+
+/* Reviews */
 .review-box{
   background:#eef5ff;
   padding:15px;
   border-left:5px solid #004c97;
   border-radius:10px;
   margin-top:15px;
-  position:relative;
 }
-.delete-btn{
-  position:absolute;
-  top:10px;
-  right:10px;
-  background:#ff3b3b;
+
+/* WhatsApp Floating Button */
+.whatsapp{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#25d366;
   color:white;
-  border:none;
-  padding:5px 10px;
-  border-radius:6px;
-  cursor:pointer;
+  padding:14px 18px;
+  border-radius:50%;
+  font-size:28px;
+  text-decoration:none;
+  box-shadow:0 3px 15px rgba(0,0,0,0.3);
 }
-.star{
-  color:#ff9800;
-  font-size:20px;
+
+/* Footer */
+footer{
+  background:#004c97;
+  color:white;
+  padding:20px;
+  text-align:center;
 }
 </style>
 </head>
+
 <body>
 
+<!-- HEADER -->
+<header>
+  <img src="images/dlogo.jpeg" class="logo" alt="Logo">
+  <h1>Daivik Doorstep Car Wash</h1>
+  <p>Haridwar's Premium Home Car Washing Service</p>
+</header>
+
+<!-- NAV -->
+<nav>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#contact">Contact</a>
+  <a href="#reviews">Reviews</a>
+</nav>
+
+<!-- ABOUT -->
+<section id="about" class="box">
+  <h2>About Us</h2>
+  <p>
+    Daivik Doorstep Car Wash brings premium car cleaning directly to your home in Haridwar.
+    We offer foam washing, interior vacuuming, dashboard cleaning, tyre shine, polishing and detailing —
+    with fast online booking.
+    <br><br>
+    100% Reliable · Best Price · Professional Team · Home Service
+  </p>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="box">
+  <h2>Our Services</h2>
+
+  <div class="service-item">🚗 Exterior Foam Wash</div>
+  <div class="service-item">🧽 Interior Vacuum Cleaning</div>
+  <div class="service-item">✨ Dashboard Polishing</div>
+  <div class="service-item">🛞 Alloy Cleaning + Tyre Shine</div>
+  <div class="service-item">💧 Deep Interior Cleaning</div>
+  <div class="service-item">🔥 Full Body Polishing</div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="box">
+  <h2>Pricing</h2>
+
+  <div class="price-item">Interior Vacuum & Dash <span>₹199</span></div>
+  <div class="price-item">Exterior Ceramic Foam Wash <span>₹299</span></div>
+  <div class="price-item">Interior + Exterior Wash <span>₹399</span></div>
+  <div class="price-item">Foam Wash + Interior Vacuum <span>₹449</span></div>
+  <div class="price-item">Deep Cleaning + Foam Wash <span>₹699</span></div>
+  <div class="price-item">Premium Spa + Polish <span>₹799</span></div>
+  <div class="price-item">Monthly Package (8 Washes) <span>₹1100</span></div>
+
+  <h2>Bike Wash</h2>
+  <div class="price-item">Normal Bike Ceramic Wash <span>₹149</span></div>
+  <div class="price-item">Premium Bike Ceramic Wash <span>₹199</span></div>
+
+  <a href="YOUR_GOOGLE_FORM_LINK" class="btn">Book Now</a>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="box">
+  <h2>Contact Us</h2>
+
+  <p><b>Phone:</b> 7906199445</p>
+  <p><b>Location:</b> Haridwar, Uttarakhand</p>
+  <p><b>Email:</b> daivikcarwash@gmail.com</p>
+
+  <h3 style="text-align:center;margin-top:20px;">Follow us</h3>
+  <p style="text-align:center;">
+    <a href="YOUR_FB_LINK">Facebook</a> |
+    <a href="YOUR_INSTA_LINK">Instagram</a>
+  </p>
+
+  <a href="YOUR_GOOGLE_FORM_LINK" class="btn">Book Service</a>
+</section>
+
+<!-- REVIEWS (LAST SECTION) -->
 <section id="reviews" class="box">
   <h2>Customer Reviews</h2>
 
   <div>
     <h3 style="text-align:center;">Give Your Review</h3><br>
-
-    <input id="name" type="text" placeholder="Your Name"
-      style="width:100%; padding:10px; margin-bottom:10px;">
-
-    <!-- STAR RATING -->
-    <div id="rating" style="font-size:26px; text-align:center; margin-bottom:10px; cursor:pointer;">
-      ★★★★★
-    </div>
-
-    <textarea id="review" rows="4" placeholder="Write your review..."
-      style="width:100%; padding:10px;"></textarea>
+    <input id="name" type="text" placeholder="Your Name" style="width:100%; padding:10px; margin-bottom:10px;">
+    <textarea id="review" rows="4" placeholder="Write your review..." style="width:100%; padding:10px;"></textarea>
 
     <button onclick="addReview()" class="btn">Submit Review</button>
   </div>
@@ -59,79 +283,45 @@
   <div id="reviewList"></div>
 </section>
 
-<script>
-let selectedRating = 5;
-const API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_DEPLOY_URL_HERE";
+<footer>
+  © 2025 Daivik Doorstep Car Wash • Haridwar • Designed by Manu Sonker
+</footer>
 
-// ⭐ STAR RATING SELECTOR
-document.getElementById("rating").addEventListener("click", function(e){
-  if(e.target.innerText === "★"){
-    selectedRating = [...this.innerText].indexOf("★", [...this.innerText].indexOf(e.target.innerText)) + 1;
-    this.innerHTML = "★★★★★".slice(0, selectedRating) + "☆☆☆☆☆".slice(0, 5 - selectedRating);
-  }
+<!-- WhatsApp Button -->
+<a class="whatsapp" href="https://wa.me/7906199445">💬</a>
+
+<!-- SCRIPT -->
+<script>
+/* Scroll Animation */
+const boxes = document.querySelectorAll(".box");
+window.addEventListener("scroll", () => {
+  boxes.forEach(box => {
+    const top = box.getBoundingClientRect().top;
+    if(top < window.innerHeight - 100){
+      box.classList.add("show");
+    }
+  });
 });
 
-// ⭐ LOAD REVIEWS FROM GOOGLE SHEET
-async function loadReviews(){
-  const res = await fetch(API_URL);
-  const data = await res.json();
-
-  document.getElementById("reviewList").innerHTML = "";
-
-  data.reverse().forEach(r => {
-    addReviewToDOM(r.id, r.name, r.rating, r.review);
-  });
-}
-
-// ⭐ ADD REVIEW FUNCTION (POST to Google Sheet)
-async function addReview(){
+/* Customer Review System */
+function addReview(){
   let name = document.getElementById("name").value;
   let review = document.getElementById("review").value;
 
   if(name.trim()=="" || review.trim()==""){
-    alert("Please fill all fields!");
+    alert("Please fill both fields!");
     return;
   }
 
-  await fetch(API_URL, {
-    method:"POST",
-    body:JSON.stringify({
-      name:name,
-      rating:selectedRating,
-      review:review
-    })
-  });
+  let container = document.createElement("div");
+  container.className = "review-box";
+  container.innerHTML = `<b>${name}</b><br>${review}`;
+
+  document.getElementById("reviewList").prepend(container);
 
   document.getElementById("name").value = "";
   document.getElementById("review").value = "";
-  selectedRating = 5;
-  document.getElementById("rating").innerHTML = "★★★★★";
-
-  loadReviews();
 }
-
-// ⭐ Add Review to Page
-function addReviewToDOM(id, name, rating, review){
-  let container = document.createElement("div");
-  container.className = "review-box";
-
-  container.innerHTML = `
-    <b>${name}</b><br>
-    <span class="star">${"★".repeat(rating)}${"☆".repeat(5-rating)}</span><br>
-    ${review}
-    <button class="delete-btn" onclick="deleteReview(${id})">Delete</button>
-  `;
-
-  document.getElementById("reviewList").prepend(container);
-}
-
-// ⭐ DELETE REVIEW
-async function deleteReview(id){
-  await fetch(API_URL + "?delete=" + id);
-  loadReviews();
-}
-
-loadReviews();
 </script>
 
 </body>
