@@ -442,33 +442,7 @@ window.addEventListener("scroll", () => {
     if(top < window.innerHeight - 100){ box.classList.add("show"); }
   });
 });
-/* ===== GOOGLE REVIEWS FETCH ===== */
-/* NOTE: Add your Google API KEY */
 
-async function loadGoogleReviews() {
-    const placeId = "ChIJt0pRKhA3CTkR3heXDBlnNzA";  
-    const apiKey = "YOUR_GOOGLE_API_KEY"; 
-
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews,rating,user_ratings_total&key=${apiKey}`;
-
-    const response = await fetch(`https://cors.isomorphic-git.org/${url}`);
-    const data = await response.json();
-
-    const reviews = data.result.reviews;
-    let html = "";
-
-    reviews.forEach(r => {
-        html += `
-        <div class="review-box">
-            <b>${r.author_name}</b> ⭐ ${r.rating}<br>
-            <p>${r.text}</p>
-        </div>`;
-    });
-
-    document.getElementById("googleReviews").innerHTML = html;
-}
-
-loadGoogleReviews();
 
 
 /* ===== MOVABLE BACKGROUND ON MOUSE ===== */
