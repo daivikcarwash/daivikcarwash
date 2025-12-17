@@ -1,7 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+
+   <!-- Homepage -->
    <url>
       <loc>https://daivikcarwash.github.io/daivikcarwash/</loc>
       <priority>1.00</priority>
    </url>
+
+   <!-- Sections (Single Page Anchors) -->
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/#about</loc>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/#services</loc>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/#pricing</loc>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/#monthly</loc>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/#contact</loc>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://daivikcarwash.github.io/daivikcarwash/#reviews</loc>
+      <priority>0.8</priority>
+   </url>
+
 </urlset>
