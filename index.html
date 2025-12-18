@@ -9,25 +9,16 @@
 
 <meta name="google-site-verification" content="googlec9158aeb59146ba8" />
 
-<!-- Primary SEO -->
-<meta name="description" content="Daivik Doorstep Car Wash Haridwar,UK — Premium doorstep car wash, bike wash, foam wash, interior cleaning, polishing & detailing. 100% Home Service. Book online.">
-<meta name="keywords" content="Daivik Doorstep Car Wash Haridwar, Haridwar car wash, doorstep car wash Haridwar, foam wash Haridwar, bike wash Haridwar, Manu Sonker">
+<!-- SEO -->
+<meta name="description" content="Daivik Doorstep Car Wash Haridwar — Premium doorstep car & bike wash, foam wash, interior cleaning, polishing & detailing. 100% Home Service.">
+<meta name="keywords" content="Daivik Doorstep Car Wash Haridwar, doorstep car wash Haridwar, foam wash Haridwar">
 <meta name="author" content="Manu Sonker">
 <meta name="robots" content="index, follow">
 
-<!-- Open Graph -->
-<meta property="og:title" content="Daivik Doorstep Car Wash | Haridwar">
-<meta property="og:description" content="Premium doorstep car cleaning in Haridwar. Foam wash, interior vacuum, polishing & detailing.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://daivikcarwash.github.io/daivikcarwash/">
-<meta property="og:image" content="https://daivikcarwash.github.io/daivikcarwash/images/dlogo.jpeg">
-
-<meta name="twitter:card" content="summary_large_image">
-
 <link rel="canonical" href="https://daivikcarwash.github.io/daivikcarwash/">
-<link rel="icon" href="https://daivikcarwash.github.io/daivikcarwash/images/dlogo.jpeg">
+<link rel="icon" href="images/dlogo.jpeg">
 
-<!-- Fonts -->
+<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -39,63 +30,54 @@
 }
 
 :root{
-  --royal-blue:#0b2c4d;
+  --royal:#0b2c4d;
   --gold:#d4af37;
-  --light:#f5f7fb;
 }
 
 /* BODY */
 body{
+  background:url('images/dback.jpeg') center/cover fixed;
   color:#1f2933;
-  background:
-    linear-gradient(to bottom, rgba(11,44,77,0.85), rgba(11,44,77,0.85)),
-    url('images/dback.jpeg') center/cover fixed;
   scroll-behavior:smooth;
   overflow-x:hidden;
 }
 
 /* HEADER */
 header{
+  position:relative;
   padding:140px 20px 160px;
   text-align:center;
-  color:white;
-  position:relative;
-}
-
-header::after{
-  content:'';
-  position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:120px;
-  background:linear-gradient(to bottom, transparent, #f5f7fb);
+  color:#fff;
+  background:linear-gradient(
+    to bottom,
+    rgba(11,44,77,0.9),
+    rgba(11,44,77,0.7)
+  );
 }
 
 .logo{
   width:180px;
   height:180px;
   border-radius:50%;
-  object-fit:cover;
   position:absolute;
   top:30px;
   left:30px;
+  object-fit:cover;
   border:4px solid var(--gold);
-  box-shadow:0 15px 35px rgba(0,0,0,0.5);
+  box-shadow:0 12px 30px rgba(0,0,0,0.5);
   cursor:pointer;
 }
 
 header h1{
-  font-size:48px;
+  font-size:46px;
   font-weight:800;
-  letter-spacing:1px;
-  text-shadow:0 6px 25px rgba(0,0,0,0.7);
+  text-shadow:0 6px 20px rgba(0,0,0,0.7);
 }
 
 header p{
-  margin-top:12px;
+  margin-top:10px;
   font-size:20px;
-  color:#f1f5f9;
+  opacity:0.95;
 }
 
 /* NAV */
@@ -103,12 +85,12 @@ nav{
   position:sticky;
   top:0;
   z-index:999;
-  background:rgba(11,44,77,0.95);
-  backdrop-filter:blur(8px);
+  background:var(--royal);
   display:flex;
   justify-content:center;
-  gap:28px;
+  gap:26px;
   padding:14px;
+  flex-wrap:wrap;
 }
 
 nav a{
@@ -135,21 +117,20 @@ nav a:hover::after{
 
 /* SECTIONS */
 section{
-  padding:70px 20px;
+  padding:65px 20px;
   max-width:1100px;
   margin:auto;
 }
 
 .box{
-  background:rgba(255,255,255,0.97);
-  backdrop-filter:blur(6px);
+  background:#fff;
   padding:35px;
   border-radius:18px;
   margin-bottom:55px;
-  box-shadow:0 20px 50px rgba(0,0,0,0.12);
+  box-shadow:0 18px 45px rgba(0,0,0,0.12);
   opacity:0;
-  transform:translateY(50px);
-  transition:all 0.8s ease;
+  transform:translateY(40px);
+  transition:0.8s ease;
 }
 
 .show{
@@ -161,35 +142,33 @@ h2{
   text-align:center;
   font-size:32px;
   font-weight:800;
-  color:var(--royal-blue);
+  color:var(--royal);
   margin-bottom:25px;
-  position:relative;
 }
 
 h2::after{
   content:'';
+  display:block;
   width:70px;
   height:4px;
   background:var(--gold);
-  display:block;
   margin:10px auto 0;
   border-radius:5px;
 }
 
 /* ITEMS */
 .service-item,.price-item{
-  background:linear-gradient(135deg,#eef3ff,#ffffff);
+  background:#f1f5ff;
   padding:16px;
   margin:14px 0;
   border-radius:12px;
-  border-left:6px solid var(--royal-blue);
-  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+  border-left:6px solid var(--royal);
 }
 
 .price-item span{
   float:right;
   font-weight:700;
-  color:var(--royal-blue);
+  color:var(--royal);
 }
 
 /* BUTTON */
@@ -199,7 +178,7 @@ h2::after{
   padding:14px 38px;
   font-size:18px;
   font-weight:700;
-  background:linear-gradient(135deg,var(--royal-blue),#0f6ddb);
+  background:linear-gradient(135deg,var(--royal),#0f6ddb);
   color:white;
   border-radius:40px;
   text-decoration:none;
@@ -213,9 +192,9 @@ h2::after{
 
 /* FOOTER */
 footer{
-  background:var(--royal-blue);
+  background:var(--royal);
   color:#e5e7eb;
-  padding:25px;
+  padding:22px;
   text-align:center;
 }
 
@@ -228,8 +207,8 @@ footer{
   padding:16px;
   border-radius:50%;
   font-size:28px;
-  color:white;
-  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  color:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
 }
 
 /* LOGO POPUP */
@@ -263,6 +242,7 @@ footer{
 /* MOBILE */
 @media(max-width:600px){
   header h1{font-size:32px;}
+  header p{font-size:16px;}
   .logo{width:120px;height:120px;}
 }
 </style>
@@ -270,8 +250,35 @@ footer{
 
 <body>
 
-<!-- ⚠️ BODY CONTENT SAME AS YOUR ORIGINAL -->
-<!-- ❌ Kuch bhi text / section / link change nahi kiya -->
+<header>
+  <img src="images/dlogo.jpeg" class="logo" onclick="openLogo()">
+  <h1>Daivik Doorstep Car Wash</h1>
+  <p>Haridwar's Premium Home Car Washing Service</p>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#monthly">Monthly Packages</a>
+  <a href="#contact">Contact</a>
+  <a href="#reviews">Reviews</a>
+</nav>
+
+<!-- ⚠️ BAQI TERA POORA CONTENT SAME RAHEGA -->
+<!-- About, Services, Pricing, Monthly, Contact, Reviews -->
+<!-- Tu apna existing body yahin paste rehne de -->
+
+<footer>
+  © 2025 Daivik Doorstep Car Wash • Haridwar
+</footer>
+
+<a class="whatsapp" href="https://wa.me/7906199445">💬</a>
+
+<div id="logoPopup" class="logo-popup">
+  <span class="close-btn" onclick="closeLogo()">×</span>
+  <img src="images/dlogo.jpeg">
+</div>
 
 <script>
 const boxes=document.querySelectorAll(".box");
