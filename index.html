@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daivik Doorstep Car Wash | Haridwar, Uttarakhand</title>
+<title>Daivik Doorstep Car Wash | Haridwar, Uttrakhand</title>
 <meta name="google-site-verification" content="googlec9158aeb59146ba8" />
 
 <!-- Primary SEO -->
@@ -63,7 +63,7 @@
   },
   "priceRange": "₹50-₹1100",
   "sameAs": [
-    "https://www.facebook.com/profile.php?id=61584516316968",
+    "YOUR_FB_LINK",
     "YOUR_INSTA_LINK"
   ]
 }
@@ -80,26 +80,27 @@
   font-family:'Poppins', sans-serif;
 }
 
-/* ===== PREMIUM 3D GOLDEN-SILVER GRADIENT BACKGROUND ===== */
+/* ===== PREMIUM GOLDEN-SILVER METALLIC BODY ===== */
 body{
   color:#2c1810;
   scroll-behavior:smooth;
-  background: linear-gradient(135deg, #0f0700 0%, #1a0d00 20%, #2d1b00 40%, #c0c0c0 60%, #ffd700 80%, #b8860b 100%);
-  background-size:500% 500%;
-  animation: premiumGoldenGradient 20s ease infinite;
+  min-height:100vh;
+  background: 
+    radial-gradient(ellipse at top, #ffd700 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, #c0c0c0 0%, transparent 50%),
+    linear-gradient(135deg, #1a0d00 0%, #2d1b00 30%, #4a3626 60%, #8b7355 100%);
+  background-size: 100% 100%, 100% 100%, 400% 400%;
+  animation: premiumGradient 20s ease infinite;
   overflow-x:hidden;
   position: relative;
-  min-height: 100vh;
 }
 
-@keyframes premiumGoldenGradient {
-  0%, 100% { background-position: 0% 50%; }
-  25% { background-position: 100% 0%; }
-  50% { background-position: 100% 100%; }
-  75% { background-position: 0% 100%; }
+@keyframes premiumGradient {
+  0%, 100% { background-position: 0% 50%, 100% 50%, 0% 50%; }
+  50% { background-position: 100% 50%, 0% 50%, 100% 50%; }
 }
 
-/* Enhanced 3D Golden + Silver particles */
+/* Premium metallic particles */
 body::before {
   content: '';
   position: fixed;
@@ -108,58 +109,143 @@ body::before {
   width: 100%;
   height: 100%;
   background-image: 
-    radial-gradient(3px 3px at 20px 30px, #ffd700, transparent),
+    radial-gradient(2px 2px at 20px 30px, #ffd700, transparent),
     radial-gradient(2px 2px at 40px 70px, #c0c0c0, transparent),
-    radial-gradient(2px 2px at 90px 40px, #ffed4e, transparent),
+    radial-gradient(1px 1px at 90px 40px, #ffed4e, transparent),
     radial-gradient(1px 1px at 130px 80px, #d3d3d3, transparent),
-    radial-gradient(2px 2px at 160px 120px, #ffd700, transparent);
+    radial-gradient(3px 3px at 200px 120px, rgba(255,215,0,0.6), transparent);
   background-repeat: repeat;
   background-size: 250px 120px;
-  animation: sparkle3D 25s linear infinite;
+  animation: sparkle 25s linear infinite;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.8;
+  z-index: 0;
 }
 
-@keyframes sparkle3D {
-  from { transform: translateY(0px) rotate(0deg) scale(1); }
-  to { transform: translateY(-120px) rotate(360deg) scale(1.1); }
+@keyframes sparkle {
+  from { transform: translateY(0px) rotate(0deg); }
+  to { transform: translateY(-120px) rotate(360deg); }
 }
 
-/* ===== FIXED NAVIGATION (TOP) ===== */
-nav{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: linear-gradient(135deg, rgba(15,7,0,0.98), rgba(192,192,192,0.85), rgba(139,69,19,0.95));
+/* ===== FIXED PREMIUM HEADER ===== */
+header{
+  background: linear-gradient(135deg, 
+    rgba(26,13,0,0.9), 
+    rgba(192,192,192,0.7), 
+    rgba(139,69,19,0.85));
   backdrop-filter: blur(25px) saturate(180%);
+  padding:140px 20px 180px;
+  text-align:center;
+  color:#fff;
+  position:relative;
+  z-index:10;
+  overflow:hidden;
+  border-bottom: 5px solid transparent;
+  background-clip: padding-box;
+  border-image: linear-gradient(90deg, #ffd700, #c0c0c0, #ffd700) 1;
+}
+
+/* Premium Logo */
+.logo{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  object-fit:cover;
+  position:absolute;
+  top:25px;
+  left:25px;
+  box-shadow: 
+    0 20px 60px rgba(255,215,0,0.6), 
+    0 0 40px rgba(192,192,192,0.5),
+    inset 0 2px 10px rgba(255,255,255,0.3);
+  border:5px solid #ffd700;
+  cursor:pointer;
+  z-index:15;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.logo:hover {
+  transform: scale(1.08) rotate(360deg);
+  box-shadow: 
+    0 30px 80px rgba(255,215,0,0.9), 
+    0 0 60px rgba(192,192,192,0.8),
+    inset 0 4px 20px rgba(255,255,255,0.4);
+}
+
+/* Premium Header Text */
+header h1{
+  font-size:56px;
+  font-weight:800;
+  background: linear-gradient(45deg, #ffd700, #fff8dc, #c0c0c0, #ffd700);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow:0 10px 30px rgba(0,0,0,0.7);
+  position:relative;
+  z-index:12;
+  letter-spacing: 3px;
+  animation: textShine 4s ease-in-out infinite;
+}
+
+@keyframes textShine {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+header p{
+  font-size:24px;
+  margin-top:20px;
+  background: linear-gradient(45deg, #fff, #ffd700, #c0c0c0, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow:0 6px 20px rgba(0,0,0,0.6);
+  font-weight: 600;
+}
+
+/* ===== PERFECT SCROLL NAVIGATION ===== */
+nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+  background: linear-gradient(135deg, 
+    rgba(26,13,0,0.98), 
+    rgba(192,192,192,0.75), 
+    rgba(139,69,19,0.95));
+  backdrop-filter: blur(30px) saturate(200%);
   display:flex;
   justify-content:center;
-  gap:20px;
-  padding:15px 20px;
+  gap:25px;
+  padding:20px 20px;
   flex-wrap:wrap;
-  border-bottom: 4px solid #ffd700;
-  box-shadow: 
-    0 12px 40px rgba(255,215,0,0.4), 
-    0 8px 32px rgba(192,192,192,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.2);
+  border-bottom: 4px solid transparent;
+  background-clip: padding-box;
+  border-image: linear-gradient(90deg, #ffd700, #c0c0c0) 1;
+  box-shadow: 0 10px 40px rgba(255,215,0,0.4);
+  transition: all 0.4s ease;
+}
+
+nav.scrolled {
+  padding:15px 20px;
+  backdrop-filter: blur(40px);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.3);
 }
 
 nav a{
   color:#fff;
   text-decoration:none;
   font-weight:700;
-  font-size:15px;
-  padding:12px 25px;
+  font-size:16px;
+  padding:12px 28px;
   border-radius:30px;
-  border: 2px solid rgba(255,215,0,0.4);
+  border: 3px solid rgba(255,215,0,0.6);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 nav a::before {
@@ -170,7 +256,8 @@ nav a::before {
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,215,0,0.5), rgba(192,192,192,0.4), transparent);
-  transition: left 0.6s;
+  transition: left 0.7s;
+  z-index: -1;
 }
 
 nav a:hover::before {
@@ -180,116 +267,40 @@ nav a:hover::before {
 nav a:hover{
   color:#2c1810;
   background: linear-gradient(135deg, #ffd700, #c0c0c0);
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 
-    0 15px 40px rgba(255,215,0,0.5),
-    0 5px 20px rgba(192,192,192,0.3);
-  border-color: #ffd700;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(255,215,0,0.6);
+  border-color: #fff;
 }
 
-/* ===== HEADER (Reduced padding, proper z-index) ===== */
-header{
-  background: linear-gradient(135deg, rgba(15,7,0,0.9), rgba(192,192,192,0.75), rgba(139,69,19,0.95));
-  backdrop-filter: blur(25px) saturate(180%);
-  padding: 120px 20px 100px; /* Reduced bottom padding */
-  text-align:center;
-  color:#fff;
-  position: relative;
-  z-index: 10;
-  margin-top: 80px; /* Space for fixed nav */
-  overflow: hidden;
-  border-bottom: 5px solid #ffd700;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-}
-
-/* Logo FIXED - No overlap */
-.logo{
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  object-fit: cover;
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 20;
-  box-shadow: 
-    0 20px 60px rgba(255,215,0,0.6), 
-    0 0 40px rgba(192,192,192,0.5),
-    inset 0 2px 10px rgba(255,255,255,0.3);
-  border: 5px solid #ffd700;
-  border-image: linear-gradient(45deg, #ffd700, #c0c0c0) 1;
-  cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: perspective(1000px) rotateY(0deg);
-}
-
-.logo:hover {
-  transform: perspective(1000px) rotateY(10deg) scale(1.08);
-  box-shadow: 
-    0 30px 80px rgba(255,215,0,0.8), 
-    0 0 60px rgba(192,192,192,0.7),
-    inset 0 4px 20px rgba(255,255,255,0.4);
-}
-
-/* Header Text */
-header h1{
-  font-size: 48px;
-  font-weight: 900;
-  background: linear-gradient(45deg, #ffd700, #fff, #c0c0c0, #ffed4e, #ffd700);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 
-    0 8px 30px rgba(0,0,0,0.7),
-    2px 2px 0 rgba(255,215,0,0.3);
-  position: relative;
-  z-index: 15;
-  letter-spacing: 2px;
-  animation: glowText 3s ease-in-out infinite alternate;
-}
-
-@keyframes glowText {
-  from { filter: drop-shadow(0 0 20px #ffd700); }
-  to { filter: drop-shadow(0 0 30px #c0c0c0); }
-}
-
-header p{
-  font-size: 22px;
-  margin-top: 20px;
-  background: linear-gradient(45deg, #fff, #ffd700, #c0c0c0, #ffed4e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.6);
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-/* ===== SECTIONS ===== */
+/* ===== SECTIONS WITH PROPER SPACING ===== */
 section{
-  padding: 80px 20px;
-  max-width: 1200px;
-  margin: 0 auto 0;
+  padding:100px 20px;
+  max-width:1300px;
+  margin:0 auto 80px;
   position: relative;
   z-index: 5;
+  min-height: 100vh;
 }
 
 .box{
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(30px) saturate(180%);
-  padding: 50px;
-  border-radius: 30px;
-  margin-bottom: 80px;
+  background: linear-gradient(145deg, 
+    rgba(255,255,255,0.98), 
+    rgba(248,248,248,0.95));
+  backdrop-filter: blur(30px) saturate(150%);
+  padding:60px;
+  border-radius:35px;
+  margin-bottom:80px;
   box-shadow: 
-    0 30px 80px rgba(0,0,0,0.25),
-    0 0 0 1px rgba(255,215,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,1),
-    0 20px 40px rgba(255,215,0,0.1);
-  opacity: 0;
-  transform: translateY(60px) rotateX(5deg);
-  transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border: 3px solid rgba(255,215,0,0.3);
+    0 35px 80px rgba(0,0,0,0.2),
+    0 0 0 2px rgba(255,215,0,0.4),
+    inset 0 2px 20px rgba(255,255,255,0.9),
+    inset 0 -2px 10px rgba(192,192,192,0.3);
+  opacity:0;
+  transform:translateY(80px) scale(0.95);
+  transition:all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-image: linear-gradient(45deg, #ffd700, #c0c0c0) 1;
   position: relative;
   overflow: hidden;
 }
@@ -301,41 +312,40 @@ section{
   left: 0;
   right: 0;
   height: 6px;
-  background: linear-gradient(90deg, #ffd700, #c0c0c0, #ffed4e, #ffd700, #c0c0c0);
+  background: linear-gradient(90deg, #ffd700, #c0c0c0, #ffd700, #c0c0c0);
   background-size: 400% 100%;
-  animation: shimmer3D 4s infinite;
+  animation: premiumShimmer 4s infinite;
 }
 
-@keyframes shimmer3D {
-  0% { background-position: 0% 0; transform: scaleX(1); }
-  50% { background-position: 100% 0; transform: scaleX(1.05); }
-  100% { background-position: 0% 0; transform: scaleX(1); }
+@keyframes premiumShimmer {
+  0%, 100% { background-position: 0% 0; }
+  50% { background-position: 100% 0; }
 }
 
-.box.show {
-  opacity: 1;
-  transform: translateY(0) rotateX(0deg);
+.show{
+  opacity:1;
+  transform:translateY(0) scale(1);
 }
 
 h2{
-  text-align: center;
-  font-size: 42px;
-  font-weight: 900;
-  background: linear-gradient(45deg, #b8860b, #ffd700, #c0c0c0, #ffed4e, #ffd700);
+  text-align:center;
+  font-size:42px;
+  font-weight:900;
+  background: linear-gradient(45deg, #ffd700, #c0c0c0, #ffed4e, #d3d3d3);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 30px;
-  letter-spacing: 1.5px;
-  position: relative;
-  text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  margin-bottom:35px;
+  letter-spacing: 2px;
+  animation: textShine 5s ease-in-out infinite;
+  text-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
 h2::after {
   content: '';
   display: block;
-  width: 100px;
+  width: 120px;
   height: 6px;
   background: linear-gradient(90deg, #ffd700, #c0c0c0, #ffd700);
   margin: 20px auto 0;
@@ -343,90 +353,98 @@ h2::after {
   box-shadow: 0 4px 15px rgba(255,215,0,0.5);
 }
 
-/* ===== ITEMS ===== */
+@media (max-width:768px){
+  h2{ font-size:32px; letter-spacing: 1px; }
+  .box{ padding:40px 25px; }
+  section{ padding:80px 15px; }
+}
+
+/* ===== PREMIUM SERVICE ITEMS ===== */
 .service-item, .price-item{
-  background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(192,192,192,0.18));
-  padding: 25px;
-  margin: 20px 0;
-  border-radius: 25px;
-  border-left: 8px solid #ffd700;
-  border-right: 3px solid rgba(192,192,192,0.5);
+  background: linear-gradient(135deg, 
+    rgba(255,215,0,0.12), 
+    rgba(192,192,192,0.18));
+  padding:30px;
+  margin:20px 0;
+  border-radius:25px;
+  border-left:8px solid #ffd700;
+  border-right: 4px solid rgba(192,192,192,0.5);
   box-shadow: 
-    0 12px 35px rgba(255,215,0,0.2),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+    0 12px 35px rgba(255,215,0,0.25),
+    inset 0 2px 10px rgba(255,255,255,0.6);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   backdrop-filter: blur(15px);
-  transform: perspective(1000px) rotateX(2deg);
+  position: relative;
+  overflow: hidden;
+}
+
+.service-item::before, .price-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ffd700, #c0c0c0);
 }
 
 .service-item:hover, .price-item:hover {
-  transform: perspective(1000px) rotateX(0deg) translateY(-8px) scale(1.02);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: 
-    0 25px 60px rgba(255,215,0,0.35),
-    0 15px 40px rgba(192,192,192,0.25);
+    0 25px 60px rgba(255,215,0,0.4),
+    0 0 30px rgba(192,192,192,0.3);
 }
 
 .price-item span{
-  float: right;
-  font-weight: 900;
-  background: linear-gradient(45deg, #ffd700, #c0c0c0, #ffed4e);
+  float:right;
+  font-weight:900;
+  font-size:24px;
+  background: linear-gradient(45deg, #ffd700, #c0c0c0, #ffd700);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: 24px;
-  text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  text-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
 
-/* ===== PREMIUM 3D BUTTONS ===== */
-.btn, .call-btn, .review-btn, .social-link {
-  display: inline-block;
-  padding: 18px 45px;
-  font-size: 20px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #ffd700, #c0c0c0, #ffed4e, #ffd700);
-  background-size: 300% 300%;
-  color: #2c1810 !important;
-  text-decoration: none;
-  border-radius: 50px;
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* ===== ULTRA PREMIUM BUTTONS ===== */
+.btn, .call-btn, .review-btn {
+  display:inline-block;
+  padding:20px 50px;
+  font-size:22px;
+  font-weight:800;
+  background: linear-gradient(135deg, #ffd700, #fff8dc, #c0c0c0);
+  color:#2c1810 !important;
+  text-decoration:none;
+  border-radius:50px;
+  transition:all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 
-    0 15px 45px rgba(255,215,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+    0 20px 50px rgba(255,215,0,0.6),
+    0 0 0 3px rgba(255,215,0,0.4),
+    inset 0 2px 10px rgba(255,255,255,0.8);
   border: 4px solid #ffd700;
-  cursor: pointer;
+  cursor:pointer;
   position: relative;
   overflow: hidden;
-  margin: 12px;
-  transform: perspective(1000px) rotateX(5deg);
-  animation: buttonGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes buttonGlow {
-  from { box-shadow: 0 15px 45px rgba(255,215,0,0.5); }
-  to { box-shadow: 0 20px 60px rgba(255,215,0,0.7); }
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin:15px;
 }
 
 .btn {
-  display: block;
-  width: fit-content;
-  margin: 40px auto 0;
+  display:block;
+  width:fit-content;
+  margin:40px auto 0;
 }
 
 .call-btn {
-  padding: 20px 50px;
-  font-size: 22px;
+  padding:22px 55px;
+  font-size:24px;
 }
 
 .review-btn {
   background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05);
   border: 4px solid #4285F4;
-  color: #fff !important;
-}
-
-.social-link {
-  padding: 15px 30px;
-  font-size: 16px;
-  margin: 8px;
+  color:#fff !important;
 }
 
 .btn::before, .call-btn::before, .review-btn::before {
@@ -436,44 +454,45 @@ h2::after {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
   transition: left 0.8s;
+  z-index: -1;
 }
 
 .btn:hover::before, .call-btn:hover::before, .review-btn:hover::before {
   left: 100%;
 }
 
-.btn:hover, .call-btn:hover, .review-btn:hover, .social-link:hover {
-  transform: perspective(1000px) rotateX(0deg) translateY(-5px) scale(1.05);
+.btn:hover, .call-btn:hover, .review-btn:hover {
+  transform: translateY(-6px) scale(1.08);
   box-shadow: 
-    0 30px 80px rgba(255,215,0,0.7),
-    0 20px 50px rgba(192,192,192,0.4);
+    0 30px 70px rgba(255,215,0,0.8),
+    0 0 0 4px rgba(192,192,192,0.5);
+  border-color: #c0c0c0;
 }
 
-/* ===== WHATSAPP 3D BUTTON ===== */
+/* ===== WHATSAPP BUTTON ===== */
 .whatsapp{
-  position: fixed;
-  bottom: 40px;
-  right: 40px;
+  position:fixed;
+  bottom:40px;
+  right:40px;
   background: linear-gradient(135deg, #25d366, #128c7e, #25d366);
-  color: white;
-  padding: 22px 26px;
-  border-radius: 50%;
-  font-size: 36px;
-  text-decoration: none;
+  color:white;
+  padding:25px;
+  border-radius:50%;
+  font-size:36px;
+  text-decoration:none;
   box-shadow: 
     0 20px 60px rgba(37,211,102,0.6),
     0 0 40px rgba(37,211,102,0.4),
     inset 0 2px 10px rgba(255,255,255,0.3);
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  z-index: 1001;
+  transition: all 0.5s ease;
+  z-index: 1000;
   border: 4px solid rgba(255,255,255,0.4);
-  transform: perspective(1000px) rotateX(10deg);
 }
 
 .whatsapp:hover {
-  transform: perspective(1000px) rotateX(0deg) scale(1.15) rotate(360deg);
+  transform: scale(1.15) rotate(360deg);
   box-shadow: 
     0 30px 80px rgba(37,211,102,0.8),
     0 0 60px rgba(37,211,102,0.6);
@@ -481,186 +500,114 @@ h2::after {
 
 /* ===== FOOTER ===== */
 footer{
-  background: linear-gradient(135deg, rgba(15,7,0,0.98), rgba(192,192,192,0.85), rgba(139,69,19,0.95));
-  backdrop-filter: blur(25px);
-  color: #ffd700;
-  padding: 40px 20px;
-  text-align: center;
-  border-top: 5px solid #ffd700;
+  background: linear-gradient(135deg, 
+    rgba(26,13,0,0.98), 
+    rgba(192,192,192,0.8), 
+    rgba(139,69,19,0.95));
+  backdrop-filter: blur(30px);
+  color:#ffd700;
+  padding:50px 20px;
+  text-align:center;
+  border-top: 6px solid transparent;
+  background-clip: padding-box;
+  border-image: linear-gradient(90deg, #ffd700, #c0c0c0) 1;
   font-weight: 700;
-  box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
-  margin-top: 60px;
+  font-size:18px;
+  margin-top:100px;
 }
 
-/* ===== LOGO ZOOM POPUP ===== */
+/* ===== LOGO POPUP ===== */
 .logo-popup{
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15,7,0,0.98);
-  backdrop-filter: blur(30px);
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(26,13,0,0.98);
+  backdrop-filter:blur(40px);
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
 }
 
 .logo-popup img{
-  width: 450px;
-  height: 450px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 8px solid #ffd700;
+  width:450px;
+  height:450px;
+  border-radius:50%;
+  object-fit:cover;
+  border:8px solid #ffd700;
   box-shadow: 
-    0 40px 120px rgba(255,215,0,0.9),
+    0 40px 100px rgba(255,215,0,0.9),
     0 0 80px rgba(192,192,192,0.8),
-    inset 0 4px 20px rgba(255,255,255,0.4);
-  animation: premiumZoomIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: perspective(1000px) rotateY(0deg);
+    inset 0 4px 20px rgba(255,255,255,0.5);
+  animation: premiumZoom 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-@keyframes premiumZoomIn{
-  from{ 
-    transform: perspective(1000px) rotateY(180deg) scale(0.2); 
-    opacity: 0; 
-  }
-  to{ 
-    transform: perspective(1000px) rotateY(0deg) scale(1); 
-    opacity: 1; 
-  }
+@keyframes premiumZoom{
+  from{ transform:scale(0.2) rotate(-180deg); opacity:0; }
+  to{ transform:scale(1) rotate(0deg); opacity:1; }
 }
 
 .close-btn{
-  position: absolute;
-  top: 50px;
-  right: 50px;
-  font-size: 50px;
-  color: #ffd700;
-  cursor: pointer;
-  font-weight: 900;
-  background: rgba(255,255,255,0.15);
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(15px);
+  position:absolute;
+  top:50px;
+  right:50px;
+  font-size:50px;
+  color:#ffd700;
+  cursor:pointer;
+  font-weight:900;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(192,192,192,0.3));
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter: blur(20px);
   transition: all 0.4s ease;
   border: 3px solid #ffd700;
-  transform: perspective(1000px) rotateX(10deg);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
 .close-btn:hover {
-  background: rgba(255,215,0,0.3);
-  transform: perspective(1000px) rotateX(0deg) rotate(180deg) scale(1.1);
-  box-shadow: 0 15px 40px rgba(255,215,0,0.6);
+  background: linear-gradient(135deg, #ffd700, #c0c0c0);
+  color:#2c1810;
+  transform: rotate(180deg) scale(1.1);
 }
 
+/* ===== RESPONSIVE PERFECTION ===== */
+@media (max-width:768px){
+  .logo{ width:160px; height:160px; top:20px; left:20px; }
+  header{ padding:120px 15px 150px; }
+  header h1{ font-size:42px; }
+  header p{ font-size:20px; }
+  nav{ gap:10px; padding:15px; flex-direction:column; }
+  nav a{ font-size:15px; padding:12px 20px; width:220px; text-align:center; }
+  section{ padding:70px 15px; min-height: auto; }
+  .box{ padding:35px 20px; margin-bottom:60px; }
+  .btn, .call-btn{ padding:18px 35px; font-size:20px; }
+  .whatsapp{ bottom:30px; right:30px; padding:20px; font-size:32px; }
+}
+
+@media (max-width:480px){
+  header h1{ font-size:36px; }
+  h2{ font-size:28px; }
+  .service-item, .price-item{ padding:25px 20px; }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Extra premium h3 */
 h3 {
-  background: linear-gradient(45deg, #ffd700, #c0c0c0, #ffed4e);
+  background: linear-gradient(45deg, #ffd700, #c0c0c0, #ffd700);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 800;
-  font-size: 24px;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 768px) {
-  header {
-    padding: 100px 15px 70px;
-    margin-top: 70px;
-  }
-  
-  .logo {
-    width: 140px;
-    height: 140px;
-    top: 15px;
-    left: 15px;
-  }
-  
-  header h1 {
-    font-size: 36px;
-    letter-spacing: 1px;
-  }
-  
-  header p {
-    font-size: 18px;
-  }
-  
-  nav {
-    gap: 10px;
-    padding: 12px 15px;
-  }
-  
-  nav a {
-    font-size: 13px;
-    padding: 10px 18px;
-  }
-  
-  section {
-    padding: 60px 15px;
-  }
-  
-  .box {
-    padding: 30px 25px;
-    margin-bottom: 60px;
-  }
-  
-  h2 {
-    font-size: 32px;
-  }
-  
-  .btn, .call-btn {
-    padding: 16px 35px;
-    font-size: 18px;
-  }
-  
-  .whatsapp {
-    bottom: 25px;
-    right: 25px;
-    padding: 18px 22px;
-    font-size: 30px;
-  }
-  
-  .logo-popup img {
-    width: 300px;
-    height: 300px;
-  }
-}
-
-@media (max-width: 480px) {
-  nav {
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 15px;
-  }
-  
-  nav a {
-    width: 220px;
-    text-align: center;
-  }
-  
-  .logo-popup img {
-    width: 250px;
-    height: 250px;
-  }
-  
-  .close-btn {
-    top: 30px;
-    right: 30px;
-    width: 55px;
-    height: 55px;
-    font-size: 40px;
-  }
-}
-
-/* Smooth scrolling fix */
-html {
-  scroll-padding-top: 80px;
 }
 </style>
 </head>
@@ -669,19 +616,19 @@ html {
 
 <!-- HEADER -->
 <header>
-  <img src="images/dlogo.jpeg" class="logo" alt="Daivik Doorstep Car Wash Logo" onclick="openLogo()">
+  <img src="images/dlogo.jpeg" class="logo" alt="Logo" onclick="openLogo()">
   <h1>Daivik Doorstep Car Wash</h1>
   <p>Haridwar's Premium Home Car Washing Service</p>
 </header>
 
 <!-- FIXED NAV -->
-<nav>
-  <a href="#about" class="nav-link">About</a>
-  <a href="#services" class="nav-link">Services</a>
-  <a href="#pricing" class="nav-link">Pricing</a>
-  <a href="#monthly" class="nav-link">Monthly Packages</a>
-  <a href="#contact" class="nav-link">Contact</a>
-  <a href="#reviews" class="nav-link">Reviews</a>
+<nav id="mainNav">
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#monthly">Monthly</a>
+  <a href="#contact">Contact</a>
+  <a href="#reviews">Reviews</a>
 </nav>
 
 <!-- ABOUT -->
@@ -717,7 +664,7 @@ html {
   <div class="price-item">Deep Cleaning + Foam Wash <span>₹699</span></div>
   <div class="price-item">Premium Spa + Body Polish <span>₹799</span></div>
 
-  <h2 style="margin-top: 50px;">Bike Wash</h2>
+  <h2 style="margin-top:50px;">Bike Wash</h2>
   <div class="price-item">Normal Bike Ceramic Wash <span>₹149</span></div>
   <div class="price-item">Premium Bike Ceramic Wash <span>₹199</span></div>
 
@@ -730,7 +677,7 @@ html {
 <section id="monthly" class="box">
   <h2>Monthly Car Wash Plans</h2>
 
-  <p style="text-align:center; margin-bottom:40px; font-size: 18px;">
+  <p style="text-align:center; margin-bottom:40px; font-size:18px;">
     Doorstep service • Paint-safe process • Fixed time slots  
     <br>
     <b>No daily wash</b> – safe for paint & clear coat
@@ -756,7 +703,7 @@ html {
     <b>💡 Per wash cost starts from approx. ₹110 only</b>
   </p>
 
-  <hr style="margin:40px 0; border: none; height: 3px; background: linear-gradient(90deg, transparent, #ffd700, #c0c0c0, #ffd700, transparent); box-shadow: 0 2px 10px rgba(255,215,0,0.5);">
+  <hr style="margin:40px 0; border: none; height: 4px; background: linear-gradient(90deg, transparent, #ffd700, #c0c0c0, transparent);">
 
   <!-- PREMIUM CARE -->
   <h3 style="color:#b8860b;">🔴 Premium Care – 16 Washes / Month</h3>
@@ -776,7 +723,7 @@ html {
     <b>💡 Priority service with same staff</b>
   </p>
 
-  <hr style="margin:40px 0; border: none; height: 3px; background: linear-gradient(90deg, transparent, #ffd700, #c0c0c0, #ffd700, transparent); box-shadow: 0 2px 10px rgba(255,215,0,0.5);">
+  <hr style="margin:40px 0; border: none; height: 4px; background: linear-gradient(90deg, transparent, #ffd700, #c0c0c0, transparent);">
 
   <!-- BASIC CARE -->
   <h3 style="color:#b8860b;">🟢 Basic Care – 8 Washes / Month (Budget)</h3>
@@ -806,12 +753,12 @@ html {
 <!-- CONTACT -->
 <section id="contact" class="box">
   <h2>Contact Us</h2>
-  <p><b>📞 Phone:</b> <a href="tel:7906199445" style="color:#2c1810;">7906199445</a></p>
-  <p><b>📍 Location:</b> Haridwar, Uttarakhand</p>
-  <p><b>✉️ Email:</b> <a href="mailto:daivikcarwash@gmail.com" style="color:#2c1810;">daivikcarwash@gmail.com</a></p>
+  <p style="font-size:18px;"><b>📞 Phone:</b> 7906199445</p>
+  <p style="font-size:18px;"><b>📍 Location:</b> Haridwar, Uttarakhand</p>
+  <p style="font-size:18px;"><b>✉️ Email:</b> daivikcarwash@gmail.com</p>
 
-  <div style="text-align:center; margin-top:35px;">
-    <p style="font-size:20px; font-weight:800; color:#2c1810; margin-bottom:20px;">
+  <div style="text-align:center; margin-top:40px;">
+    <p style="font-size:22px; font-weight:800; color:#2c1810; margin-bottom:25px;">
       For more enquiry call now
     </p>
     <a href="tel:7906199445" class="call-btn">
@@ -819,10 +766,10 @@ html {
     </a>
   </div>
 
-  <h3 style="text-align:center;margin-top:40px;">Follow us</h3>
-  <p style="text-align:center;">
-    <a href="https://www.facebook.com/profile.php?id=61584516316968" class="social-link" target="_blank">Facebook</a> |
-    <a href="YOUR_INSTA_LINK" class="social-link" target="_blank">Instagram</a>
+  <h3 style="text-align:center;margin:50px 0 20px;">Follow us</h3>
+  <p style="text-align:center; font-size:18px;">
+    <a href="https://www.facebook.com/profile.php?id=61584516316968" style="color:#4267B2; font-weight:700; text-decoration:none; margin:0 15px;">Facebook</a> |
+    <a href="YOUR_INSTA_LINK" style="color:#E4405F; font-weight:700; text-decoration:none; margin:0 15px;">Instagram</a>
   </p>
 </section>
 
@@ -830,13 +777,13 @@ html {
 <section id="reviews" class="box">
   <h2>Customer Reviews</h2>
 
-  <div style="text-align:center; margin-bottom:30px;">
+  <div style="text-align:center; margin-bottom:40px;">
     <a href="https://g.page/r/CYf950D1mxKyEBM/review" target="_blank" class="review-btn">
       ⭐ Write a Google Review
     </a>
   </div>
 
-  <p style="text-align:center; margin-top:25px; font-size:20px; color:#2c1810; font-weight:600;">
+  <p style="text-align:center; margin-top:30px; font-size:20px; color:#2c1810;">
     See our reviews directly on Google by clicking the button above.
   </p>
 </section>
@@ -846,56 +793,45 @@ html {
 </footer>
 
 <!-- WhatsApp Button -->
-<a class="whatsapp" href="https://wa.me/7906199445" target="_blank">💬</a>
+<a class="whatsapp" href="https://wa.me/7906199445">💬</a>
 
 <!-- Logo Popup -->
 <div id="logoPopup" class="logo-popup">
   <span class="close-btn" onclick="closeLogo()">×</span>
-  <img src="images/dlogo.jpeg" alt="Daivik Doorstep Car Wash Logo">
+  <img src="images/dlogo.jpeg" alt="Logo">
 </div>
 
 <script>
-// Logo popup functions
-function openLogo() { 
-  document.getElementById("logoPopup").style.display = "flex"; 
-  document.body.style.overflow = "hidden";
-}
-function closeLogo() { 
-  document.getElementById("logoPopup").style.display = "none"; 
-  document.body.style.overflow = "auto";
-}
+// Logo popup
+function openLogo(){ document.getElementById("logoPopup").style.display="flex"; }
+function closeLogo(){ document.getElementById("logoPopup").style.display="none"; }
 
-// Enhanced scroll animation with better performance
+// Premium Scroll Animations
 const boxes = document.querySelectorAll(".box");
-let ticking = false;
-
-function updateScroll() {
-  boxes.forEach(box => {
-    const rect = box.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 120 && rect.bottom > 0) {
-      box.classList.add("show");
-    }
-  });
-  ticking = false;
-}
+const nav = document.getElementById("mainNav");
 
 window.addEventListener("scroll", () => {
-  if (!ticking) {
-    requestAnimationFrame(updateScroll);
-    ticking = true;
+  // Box animations
+  boxes.forEach((box, index) => {
+    const top = box.getBoundingClientRect().top;
+    if(top < window.innerHeight - 100){
+      setTimeout(() => box.classList.add("show"), index * 200);
+    }
+  });
+  
+  // Nav scroll effect
+  if(window.scrollY > 100){
+    nav.classList.add("scrolled");
+  } else {
+    nav.classList.remove("scrolled");
   }
 });
 
-// Premium parallax + mouse move effect
-document.addEventListener('mousemove', function(e) {
+// Premium mouse parallax
+document.addEventListener('mousemove', function(e){
   const x = e.clientX / window.innerWidth * 0.03;
   const y = e.clientY / window.innerHeight * 0.03;
-  document.body.style.backgroundPosition = `${50 + x * 15}% ${50 + y * 15}%`;
-});
-
-window.addEventListener('scroll', function() {
-  const scrollY = window.scrollY * 0.15;
-  document.querySelector('header').style.transform = `translateY(${scrollY * 0.5}px)`;
+  document.body.style.backgroundPosition = `${50 + x*30}% ${50 + y*30}%`;
 });
 
 // Smooth scroll for nav links
@@ -903,18 +839,10 @@ document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {
     e.preventDefault();
     const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+    if(target){
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
-});
-
-// Close popup on outside click
-document.getElementById('logoPopup').addEventListener('click', function(e) {
-  if (e.target === this) closeLogo();
 });
 </script>
 
