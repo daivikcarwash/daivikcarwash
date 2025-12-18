@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Daivik Doorstep Car Wash | Haridwar, Uttrakhand</title>
-
 <meta name="google-site-verification" content="googlec9158aeb59146ba8" />
-
 
 <!-- Primary SEO -->
 <meta name="description" content="Daivik Doorstep Car Wash Haridwar,UK — Premium doorstep car wash, bike wash, foam wash, interior cleaning, polishing & detailing. 100% Home Service. Book online.">
@@ -74,7 +70,7 @@
 </script> 
 
 <!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 *{
@@ -84,114 +80,219 @@
   font-family:'Poppins', sans-serif;
 }
 
-/* ===== BODY & MOVABLE BACKGROUND ===== */
+/* ===== BODY & GOLDEN GRADIENT BACKGROUND ===== */
 body{
-  color:#222;
+  color:#2c1810;
   scroll-behavior:smooth;
-  background:url('images/dback.jpeg') repeat;
-  background-size:cover;
-  background-attachment:fixed;
-  transition: background-position 0.1s;
+  background: linear-gradient(135deg, #1a0d00 0%, #2d1b00 25%, #4a2c00 50%, #663800 75%, #8b4513 100%);
+  background-size:400% 400%;
+  animation: goldenGradient 15s ease infinite;
   overflow-x:hidden;
+  position: relative;
+}
+
+@keyframes goldenGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Golden particles effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #ffd700, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,215,0,0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #ffed4e, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255,215,0,0.6), transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes sparkle {
+  from { transform: translateY(0px) rotate(0deg); }
+  to { transform: translateY(-100px) rotate(360deg); }
 }
 
 /* ===== HEADER ===== */
 header{
-  background:transparent;
-  padding:120px 20px 150px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(139,69,19,0.8));
+  backdrop-filter: blur(15px);
+  padding:140px 20px 180px;
   text-align:center;
-  color:white;
+  color:#fff;
   position:relative;
-  z-index:1;
+  z-index:2;
   overflow:hidden;
+  border-bottom: 4px solid #ffd700;
 }
 
 /* Logo */
 .logo{
-  width:200px;
-  height:200px;
+  width:220px;
+  height:220px;
   border-radius:50%;
   object-fit:cover;
   position:absolute;
-  top:20px;
-  left:20px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  top:25px;
+  left:25px;
+  box-shadow:0 12px 40px rgba(255,215,0,0.6), 0 0 30px rgba(255,215,0,0.3);
+  border:4px solid #ffd700;
   cursor:pointer;
-  z-index:2;
+  z-index:3;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.logo:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow:0 20px 60px rgba(255,215,0,0.8), 0 0 50px rgba(255,215,0,0.5);
 }
 
 /* Header Text */
 header h1{
-  font-size:45px;
+  font-size:52px;
   font-weight:800;
-  text-shadow:3px 3px 8px rgba(0,0,0,0.7);
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffb347);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow:0 8px 25px rgba(0,0,0,0.6);
   position:relative;
-  z-index:2;
+  z-index:3;
+  letter-spacing: 2px;
 }
+
 header p{
-  font-size:20px;
-  margin-top:10px;
-  text-shadow:2px 2px 5px rgba(0,0,0,0.6);
+  font-size:22px;
+  margin-top:15px;
+  background: linear-gradient(45deg, #fff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow:0 4px 15px rgba(0,0,0,0.5);
   position:relative;
-  z-index:2;
+  z-index:3;
+  font-weight: 500;
 }
 
 /* Responsive Header */
 @media (max-width:600px){
   .logo{
-    width:110px;
-    height:110px;
-    top:15px;
-    left:15px;
+    width:130px;
+    height:130px;
+    top:20px;
+    left:20px;
   }
-  header h1{ font-size:32px; }
-  header p{ font-size:16px; }
+  header h1{ font-size:38px; letter-spacing: 1px; }
+  header p{ font-size:18px; }
 }
-@media (min-width:601px){
-  .logo{
-    width:150px;
-    height:150px;
-  }
+@media (min-width:601px) and (max-width:900px){
+  .logo{ width:180px; height:180px; }
 }
 
 /* ===== NAVIGATION ===== */
 nav{
   position:sticky;
   top:0;
-  z-index:999;
-  background:#004c97;
+  z-index:1000;
+  background: linear-gradient(135deg, rgba(26,13,0,0.95), rgba(139,69,19,0.9));
+  backdrop-filter: blur(20px);
   display:flex;
   justify-content:center;
-  gap:25px;
-  padding:12px;
+  gap:30px;
+  padding:18px 20px;
   flex-wrap:wrap;
+  border-bottom: 3px solid #ffd700;
+  box-shadow: 0 8px 32px rgba(255,215,0,0.3);
 }
+
 nav a{
-  color:white;
+  color:#fff;
   text-decoration:none;
   font-weight:600;
+  font-size:16px;
+  padding:10px 20px;
+  border-radius:25px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
+
+nav a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.4), transparent);
+  transition: left 0.5s;
+}
+
+nav a:hover::before {
+  left: 100%;
+}
+
 nav a:hover{
-  color:#ffdf00;
+  color:#ffd700;
+  background: rgba(255,215,0,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255,215,0,0.4);
 }
 
 /* ===== SECTIONS ===== */
 section{
-  padding:55px 20px;
-  max-width:1100px;
+  padding:70px 20px;
+  max-width:1200px;
   margin:auto;
+  position: relative;
+  z-index: 2;
 }
 
 .box{
-  background:white;
-  padding:30px;
-  border-radius:15px;
-  margin-bottom:50px;
-  box-shadow:0 5px 25px rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  padding:40px;
+  border-radius:25px;
+  margin-bottom:60px;
+  box-shadow: 
+    0 25px 50px rgba(0,0,0,0.15),
+    0 0 0 1px rgba(255,215,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.8);
   opacity:0;
-  transform:translateY(40px);
-  transition:all 0.8s ease;
+  transform:translateY(50px);
+  transition:all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 2px solid rgba(255,215,0,0.2);
+  position: relative;
+  overflow: hidden;
 }
+
+.box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ffd700, #ffed4e, #ffb347, #ffd700);
+  background-size: 300% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 0; }
+  50% { background-position: 100% 0; }
+  100% { background-position: 0% 0; }
+}
+
 .show{
   opacity:1;
   transform:translateY(0);
@@ -199,79 +300,141 @@ section{
 
 h2{
   text-align:center;
-  font-size:30px;
-  font-weight:700;
-  color:#004c97;
-  margin-bottom:20px;
+  font-size:36px;
+  font-weight:800;
+  background: linear-gradient(45deg, #b8860b, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom:25px;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  margin: 15px auto 0;
+  border-radius: 2px;
 }
 
 @media (max-width:600px){
-  h2{ font-size:24px; }
-  .box{ padding:20px; }
+  h2{ font-size:28px; }
+  .box{ padding:25px; }
+  section{ padding:50px 15px; }
 }
 
 /* ===== ITEMS ===== */
 .service-item, .price-item{
-  background:#e9f1ff;
-  padding:15px;
-  margin:12px 0;
-  border-radius:10px;
-  border-left:6px solid #004c97;
+  background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,237,78,0.15));
+  padding:20px;
+  margin:15px 0;
+  border-radius:20px;
+  border-left:6px solid #ffd700;
+  border-right: 2px solid rgba(255,215,0,0.3);
+  box-shadow: 0 8px 25px rgba(255,215,0,0.15);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.service-item:hover, .price-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(255,215,0,0.25);
 }
 
 .price-item span{
   float:right;
-  font-weight:700;
-  color:#004c97;
+  font-weight:800;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 20px;
 }
 
 /* ===== BUTTONS ===== */
 .btn{
   display:block;
   width:fit-content;
-  margin:25px auto 0;
-  padding:12px 30px;
-  font-size:18px;
-  font-weight:600;
-  background:#004c97;
-  color:white;
+  margin:30px auto 0;
+  padding:16px 40px;
+  font-size:20px;
+  font-weight:700;
+  background: linear-gradient(135deg, #ffd700, #ffed4e, #ffb347);
+  color:#2c1810;
   text-decoration:none;
-  border-radius:30px;
-  transition:0.3s;
+  border-radius:50px;
+  transition:all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 12px 35px rgba(255,215,0,0.4);
+  border: 2px solid rgba(255,255,255,0.3);
+  position: relative;
+  overflow: hidden;
 }
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.6s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
 .btn:hover{
-  background:#0f6ddb;
+  transform: translateY(-3px);
+  box-shadow: 0 20px 50px rgba(255,215,0,0.6);
+  color:#2c1810;
 }
 
 /* ===== REVIEWS ===== */
 .review-box{
-  background:#eef5ff;
-  padding:15px;
-  border-left:5px solid #004c97;
-  border-radius:10px;
-  margin-top:15px;
+  background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,237,78,0.1));
+  padding:20px;
+  border-left:6px solid #ffd700;
+  border-radius:20px;
+  margin-top:20px;
+  border-right: 2px solid rgba(255,215,0,0.2);
 }
 
 /* ===== WHATSAPP ===== */
 .whatsapp{
   position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#25d366;
+  bottom:30px;
+  right:30px;
+  background: linear-gradient(135deg, #25d366, #128c7e);
   color:white;
-  padding:14px 18px;
+  padding:18px 22px;
   border-radius:50%;
-  font-size:28px;
+  font-size:32px;
   text-decoration:none;
-  box-shadow:0 3px 15px rgba(0,0,0,0.3);
+  box-shadow:0 12px 40px rgba(37,211,102,0.5), 0 0 30px rgba(37,211,102,0.3);
+  transition: all 0.4s ease;
+  z-index: 1000;
+}
+
+.whatsapp:hover {
+  transform: scale(1.1) rotate(10deg);
+  box-shadow:0 20px 60px rgba(37,211,102,0.7);
 }
 
 /* ===== FOOTER ===== */
 footer{
-  background:#004c97;
-  color:white;
-  padding:20px;
+  background: linear-gradient(135deg, rgba(26,13,0,0.95), rgba(139,69,19,0.9));
+  backdrop-filter: blur(20px);
+  color:#ffd700;
+  padding:30px 20px;
   text-align:center;
+  border-top: 4px solid #ffd700;
+  font-weight: 600;
 }
 
 /* ===== LOGO ZOOM POPUP ===== */
@@ -282,51 +445,73 @@ footer{
   left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.8);
-  backdrop-filter:blur(4px);
+  background:rgba(26,13,0,0.95);
+  backdrop-filter:blur(25px);
   justify-content:center;
   align-items:center;
   z-index:99999;
 }
 
 .logo-popup img{
-  width:300px;
-  height:300px;
+  width:400px;
+  height:400px;
   border-radius:50%;
   object-fit:cover;
-  border:5px solid #fff;
-  box-shadow:0 4px 20px rgba(255,255,255,0.6);
-  animation: zoomIn 0.3s ease;
+  border:6px solid #ffd700;
+  box-shadow:0 25px 80px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.6);
+  animation: zoomIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 @keyframes zoomIn{
-  from{ transform:scale(0.4); opacity:0; }
+  from{ transform:scale(0.3); opacity:0; }
   to{ transform:scale(1); opacity:1; }
 }
 
 .close-btn{
   position:absolute;
-  top:25px;
-  right:30px;
-  font-size:35px;
-  color:#fff;
+  top:40px;
+  right:40px;
+  font-size:45px;
+  color:#ffd700;
   cursor:pointer;
-  font-weight:bold;
+  font-weight:800;
+  background: rgba(255,255,255,0.1);
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255,215,0,0.2);
+  transform: rotate(90deg);
 }
 
 /* ===== MOBILE IMPROVEMENTS ===== */
 @media (max-width:600px){
-  #monthly h3 { font-size:18px; margin-top:15px; }
-  #monthly p { font-size:13px; }
-  .whatsapp { bottom:30px; right:20px; }
+  #monthly h3 { font-size:20px; margin-top:20px; }
+  #monthly p { font-size:14px; }
+  .whatsapp { bottom:35px; right:25px; padding:16px 20px; font-size:28px; }
+  nav { gap:15px; padding:15px 15px; }
+  nav a { font-size:14px; padding:8px 15px; }
 }
-
 
 #pricing h2, #monthly h2 {
-  margin-bottom:30px;
+  margin-bottom:35px;
 }
 
-
+/* Extra premium touch for h3 */
+h3 {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
 </style>
 </head>
 
@@ -371,6 +556,7 @@ footer{
   <div class="service-item">💧 Deep Interior Cleaning</div>
   <div class="service-item">🔥 Full Body Polishing</div>
 </section>
+
 <!-- PRICING -->
 <section id="pricing" class="box">
   <h2>One-Time Services</h2>
@@ -394,16 +580,16 @@ footer{
 <section id="monthly" class="box">
   <h2>Monthly Car Wash Plans</h2>
 
-  <p style="text-align:center; margin-bottom:25px;">
+  <p style="text-align:center; margin-bottom:30px;">
     Doorstep service • Paint-safe process • Fixed time slots  
     <br>
     <b>No daily wash</b> – safe for paint & clear coat
   </p>
 
   <!-- STANDARD CARE -->
-  <h3 style="color:#004c97;">
+  <h3 style="color:#b8860b;">
     🔵 Standard Care – 12 Washes / Month  
-    <span style="font-size:14px;color:#ff4d4d;">(⭐ Most Popular)</span>
+    <span style="font-size:15px;color:#ff4d4d;">(⭐ Most Popular)</span>
   </h3>
 
   <div class="price-item">Hatchback <span>₹1,299</span></div>
@@ -412,7 +598,7 @@ footer{
   <div class="price-item">Mid SUV <span>₹1,599</span></div>
   <div class="price-item">Full Size SUV <span>₹1,799</span></div>
 
-  <p style="margin-top:10px; font-size:14px;">
+  <p style="margin-top:15px; font-size:15px;">
     ✔ Exterior ceramic foam wash  
     <br>✔ Tyre & rim cleaning  
     <br>✔ Interior vacuum <b>(2 times / month)</b>  
@@ -420,10 +606,10 @@ footer{
     <b>💡 Per wash cost starts from approx. ₹110 only</b>
   </p>
 
-  <hr style="margin:25px 0;">
+  <hr style="margin:30px 0; border: none; height: 2px; background: linear-gradient(90deg, transparent, #ffd700, transparent);">
 
   <!-- PREMIUM CARE -->
-  <h3 style="color:#004c97;">🔴 Premium Care – 16 Washes / Month</h3>
+  <h3 style="color:#b8860b;">🔴 Premium Care – 16 Washes / Month</h3>
 
   <div class="price-item">Hatchback <span>₹1,699</span></div>
   <div class="price-item">Sedan <span>₹1,899</span></div>
@@ -431,7 +617,7 @@ footer{
   <div class="price-item">Mid SUV <span>₹2,299</span></div>
   <div class="price-item">Full Size SUV <span>₹2,499</span></div>
 
-  <p style="margin-top:10px; font-size:14px;">
+  <p style="margin-top:15px; font-size:15px;">
     ✔ Exterior foam wash  
     <br>✔ Interior vacuum <b>(4 times)</b>  
     <br>✔ Glass cleaning  
@@ -440,10 +626,10 @@ footer{
     <b>💡 Priority service with same staff</b>
   </p>
 
-  <hr style="margin:25px 0;">
+  <hr style="margin:30px 0; border: none; height: 2px; background: linear-gradient(90deg, transparent, #ffd700, transparent);">
 
   <!-- BASIC CARE -->
-  <h3 style="color:#004c97;">🟢 Basic Care – 8 Washes / Month (Budget)</h3>
+  <h3 style="color:#b8860b;">🟢 Basic Care – 8 Washes / Month (Budget)</h3>
 
   <div class="price-item">Hatchback <span>₹899</span></div>
   <div class="price-item">Sedan <span>₹999</span></div>
@@ -451,7 +637,7 @@ footer{
   <div class="price-item">Mid SUV <span>₹1,199</span></div>
   <div class="price-item">Full Size SUV <span>₹1,399</span></div>
 
-  <p style="margin-top:10px; font-size:14px;">
+  <p style="margin-top:15px; font-size:15px;">
     ✔ Exterior wash • Tyre cleaning  
     <br>❌ Interior cleaning not included
   </p>
@@ -460,15 +646,12 @@ footer{
     🎁 Book FREE Demo (Monthly)
   </a>
 
-  <p style="text-align:center;font-size:14px;margin-top:10px;">
+  <p style="text-align:center;font-size:15px;margin-top:15px;">
     ⏱ Limited slots per area • Fixed timing • Quality focused  
     <br>
     Once slots are full, new bookings are paused
   </p>
 </section>
-
-
-
 
 <!-- CONTACT -->
 <section id="contact" class="box">
@@ -477,42 +660,40 @@ footer{
   <p><b>Location:</b> Haridwar, Uttarakhand</p>
   <p><b>Email:</b> daivikcarwash@gmail.com</p>
 
-
-<div style="text-align:center;
-margin-top:20px;">
-<p style="font-size:16px; font-weight:600;">
+<div style="text-align:center; margin-top:25px;">
+<p style="font-size:18px; font-weight:700; color:#2c1810;">
   For more enquiry call now
 </p>
 
-<a href="tel:7906199445" style="display:inline-block; margin-top:10px; padding:14px 30px; background:#004c97; color:#fff; font-size:18px; font-weight:700; border-radius:30px; text-decoration:none;">
+<a href="tel:7906199445" style="display:inline-block; margin-top:15px; padding:18px 40px; background:linear-gradient(135deg, #ffd700, #ffed4e); color:#2c1810; font-size:20px; font-weight:800; border-radius:50px; text-decoration:none; box-shadow:0 15px 45px rgba(255,215,0,0.5); border:2px solid rgba(255,255,255,0.4);">
   📞 Call Now – 7906199445
 </a>
 </div>
 
-
-  <h3 style="text-align:center;margin-top:20px;">Follow us</h3>
+  <h3 style="text-align:center;margin-top:30px;">Follow us</h3>
   <p style="text-align:center;">
-    <a href="https://www.facebook.com/profile.php?id=61584516316968">Facebook</a> |
-    <a href="YOUR_INSTA_LINK">Instagram</a>
+    <a href="https://www.facebook.com/profile.php?id=61584516316968" style="color:#ffd700; font-weight:600; text-decoration:none;">Facebook</a> |
+    <a href="YOUR_INSTA_LINK" style="color:#ffd700; font-weight:600; text-decoration:none;">Instagram</a>
   </p>
-
 </section>
+
 <!-- REVIEWS -->
 <section id="reviews" class="box">
   <h2>Customer Reviews</h2>
 
-  <div style="text-align:center; margin-bottom:20px;">
+  <div style="text-align:center; margin-bottom:25px;">
     <a href="https://g.page/r/CYf950D1mxKyEBM/review"
        target="_blank"
-       style="display:inline-block; padding:12px 25px; background:#4285F4; color:#fff; font-size:18px; font-weight:600; border-radius:8px; text-decoration:none;">
+       style="display:inline-block; padding:16px 35px; background:linear-gradient(135deg, #4285F4, #34A853); color:#fff; font-size:20px; font-weight:700; border-radius:15px; text-decoration:none; box-shadow:0 15px 45px rgba(66,133,244,0.4);">
       ⭐ Write a Google Review
     </a>
   </div>
 
-  <p style="text-align:center; margin-top:15px; font-size:16px;">
+  <p style="text-align:center; margin-top:20px; font-size:18px; color:#2c1810;">
     See our reviews directly on Google by clicking the button above.
   </p>
 </section>
+
 <footer>
   © 2025 Daivik Doorstep Car Wash • Haridwar • Premium Car Cleaning at Your Doorstep
 </footer>
@@ -540,19 +721,17 @@ window.addEventListener("scroll", () => {
   });
 });
 
-
-
-/* ===== MOVABLE BACKGROUND ON MOUSE ===== */
+/* ===== ENHANCED MOVABLE BACKGROUND ===== */
 document.addEventListener('mousemove',function(e){
-  const x=e.clientX/window.innerWidth;
-  const y=e.clientY/window.innerHeight;
-  document.body.style.backgroundPosition=`${x*50}px ${y*50}px`;
+  const x=e.clientX/window.innerWidth * 0.05;
+  const y=e.clientY/window.innerHeight * 0.05;
+  document.body.style.backgroundPosition=`${50 + x*20}% ${50 + y*20}%`;
 });
 
-/* ===== PARALLAX SCROLL EFFECT ===== */
+/* ===== ENHANCED PARALLAX SCROLL EFFECT ===== */
 window.addEventListener('scroll',function(){
-  const scrollY=window.scrollY;
-  document.body.style.backgroundPosition=`50% ${scrollY*0.3}px`;
+  const scrollY=window.scrollY * 0.2;
+  document.body.style.backgroundPosition=`50% ${50 + scrollY}px`;
 });
 </script>
 
