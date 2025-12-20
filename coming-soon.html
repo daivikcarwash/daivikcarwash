@@ -24,11 +24,12 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  height: 100vh;
+  min-height: 100vh;  /* ✅ CHANGED: 100vh → min-height: 100vh */
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 40%, #1a365d 80%);
   color: #fff;
-  overflow: hidden;
+  overflow-x: hidden;  /* ✅ CHANGED: hidden → overflow-x: hidden */
   position: relative;
+  padding-bottom: 50px;  /* ✅ NEW: Extra mobile padding */
 }
 
 body::before {
@@ -52,24 +53,25 @@ body::before {
 .container {
   max-width: 900px;
   margin: 0 auto;
-  height: 100vh;
+  min-height: 100vh;  /* ✅ CHANGED */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0 20px;
+  padding: 20px 15px;  /* ✅ BETTER mobile padding */
   position: relative;
   z-index: 2;
 }
 
 .logo-section {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;  /* ✅ REDUCED for mobile */
+  flex-shrink: 0;
 }
 
 .logo {
-  width: 180px;
-  height: 180px;
+  width: clamp(120px, 25vw, 180px);  /* ✅ RESPONSIVE SIZE */
+  height: clamp(120px, 25vw, 180px);
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--glass-border);
@@ -77,7 +79,7 @@ body::before {
     0 0 0 1px rgba(212,175,55,0.3),
     0 25px 50px -12px rgba(0,0,0,0.5),
     0 0 40px rgba(212,175,55,0.3);
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   animation: logoFloat 6s ease-in-out infinite;
   cursor: pointer;
   transition: all 0.4s ease;
@@ -95,18 +97,18 @@ body::before {
 
 .main-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(42px, 8vw, 72px);
+  font-size: clamp(32px, 8vw, 72px);  /* ✅ SMALLER mobile */
   font-weight: 700;
   background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #ffd700 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   line-height: 1.1;
 }
 
 .subtitle {
-  font-size: clamp(20px, 4vw, 28px);
+  font-size: clamp(16px, 4vw, 28px);
   font-weight: 300;
   opacity: 0.9;
   margin-bottom: 10px;
@@ -114,10 +116,10 @@ body::before {
 }
 
 .location-tag {
-  font-size: 18px;
+  font-size: clamp(14px, 3vw, 18px);  /* ✅ RESPONSIVE */
   color: var(--gold);
   font-weight: 500;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
 .launch-card {
@@ -125,14 +127,15 @@ body::before {
   backdrop-filter: blur(25px);
   border: 1px solid var(--glass-border);
   border-radius: 25px;
-  padding: 50px;
+  padding: clamp(25px, 5vw, 50px);  /* ✅ RESPONSIVE PADDING */
   max-width: 700px;
   width: 100%;
   text-align: center;
   box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .launch-card::before {
@@ -145,23 +148,23 @@ body::before {
 
 .launch-title {
   font-family: 'Playfair Display', serif;
-  font-size: 32px;
+  font-size: clamp(24px, 5vw, 32px);
   color: var(--gold);
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   font-weight: 600;
 }
 
 .launch-subtitle {
-  font-size: 18px;
-  margin-bottom: 40px;
+  font-size: clamp(14px, 3.5vw, 18px);
+  margin-bottom: 30px;
   opacity: 0.9;
 }
 
 .countdown-container {
   display: flex;
-  gap: 25px;
+  gap: clamp(10px, 3vw, 25px);
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   flex-wrap: wrap;
 }
 
@@ -169,9 +172,9 @@ body::before {
   background: rgba(212,175,55,0.15);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(212,175,55,0.3);
-  padding: 25px 20px;
+  padding: clamp(15px, 4vw, 25px) 15px;
   border-radius: 20px;
-  min-width: 100px;
+  min-width: clamp(70px, 18vw, 100px);
   transition: all 0.3s ease;
 }
 
@@ -181,7 +184,7 @@ body::before {
 }
 
 .count-number {
-  font-size: 42px;
+  font-size: clamp(24px, 7vw, 42px);
   font-weight: 700;
   color: var(--gold);
   font-family: 'Playfair Display', serif;
@@ -189,7 +192,7 @@ body::before {
 }
 
 .count-label {
-  font-size: 14px;
+  font-size: clamp(10px, 2.5vw, 14px);
   opacity: 0.8;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -198,26 +201,27 @@ body::before {
 
 .cta-buttons {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .btn {
-  padding: 18px 40px;
-  font-size: 16px;
+  padding: clamp(12px, 3vw, 18px) 30px;
+  font-size: clamp(14px, 3.5vw, 16px);
   font-weight: 600;
   border-radius: 50px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-family: 'Poppins', sans-serif;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   border: none;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;  /* ✅ NEW: Prevent text wrap */
 }
 
 .btn-primary {
@@ -246,23 +250,22 @@ body::before {
 
 .footer-text {
   opacity: 0.7;
-  font-size: 14px;
+  font-size: clamp(12px, 2.5vw, 14px);
   letter-spacing: 0.5px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
-  .container { padding: 20px; }
-  .logo { width: 140px; height: 140px; }
-  .launch-card { padding: 30px 25px; }
-  .countdown-container { gap: 15px; }
-  .countdown-item { min-width: 80px; padding: 20px 15px; }
-  .count-number { font-size: 32px; }
-  .cta-buttons { flex-direction: column; align-items: center; }
-  .btn { width: 100%; max-width: 280px; justify-content: center; }
+@media (max-width: 480px) {
+  .container { padding: 15px 10px; }
+  .cta-buttons { flex-direction: column; align-items: center; width: 100%; }
+  .btn { width: 100%; max-width: 300px; justify-content: center; }
+  .countdown-container { gap: 10px; }
 }
 
+/* ✅ Particles also mobile optimized */
 .particles {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -271,8 +274,8 @@ body::before {
 
 .particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   background: var(--gold);
   border-radius: 50%;
   animation: particleFloat 25s linear infinite;
@@ -289,7 +292,7 @@ body::before {
 
 <body>
   <div class="particles" id="particles"></div>
-  
+
   <div class="container">
     <div class="logo-section">
       <img src="images/dlogo.jpeg" class="logo" alt="Daivik Doorstep Car Wash" onerror="this.src='https://via.placeholder.com/180x180/1E3A5F/D4AF37?text=D'">
@@ -301,12 +304,10 @@ body::before {
     <div class="launch-card">
       <div class="launch-title">Reserve Your Priority Slot</div>
       <div class="launch-subtitle">Be among the first 100 customers to enjoy launch discounts & priority service</div>
-      
-      <div class="countdown-container" id="countdown">
-        <!-- Countdown populated by JS -->
-      </div>
 
-      <div style="font-size: 20px; font-weight: 600; color: var(--gold); margin-bottom: 40px;">
+      <div class="countdown-container" id="countdown"></div>
+
+      <div style="font-size: clamp(16px, 4vw, 20px); font-weight: 600; color: var(--gold); margin-bottom: 30px;">
         Launching January 1, 2026 • 8:00 AM
       </div>
 
@@ -326,10 +327,11 @@ body::before {
   </div>
 
 <script>
-// Floating Particles
+// Floating Particles (FEWER on mobile)
 function createParticles() {
   const particlesContainer = document.getElementById('particles');
-  for(let i = 0; i < 50; i++) {
+  const count = window.innerWidth < 768 ? 20 : 50;  // ✅ LESS on mobile
+  for(let i = 0; i < count; i++) {
     const particle = document.createElement('div');
     particle.className = 'particle';
     particle.style.left = Math.random() * 100 + '%';
@@ -371,14 +373,13 @@ function updateCountdown() {
     `;
   } else {
     document.getElementById('countdown').innerHTML = `
-      <div style="font-size: 28px; color: #4CAF50; font-weight: 700;">
+      <div style="font-size: clamp(20px, 5vw, 28px); color: #4CAF50; font-weight: 700;">
         🎉 LAUNCHED! Book Now
       </div>
     `;
   }
 }
 
-// Initialize
 createParticles();
 updateCountdown();
 setInterval(updateCountdown, 1000);
