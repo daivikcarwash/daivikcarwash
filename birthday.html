@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy Birthday 🎉</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        height: 100vh;
+        background: radial-gradient(circle, #1a002b, #000);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        color: white;
+        text-align: center;
+    }
+
+    .card {
+        position: relative;
+        z-index: 2;
+        background: rgba(0,0,0,0.5);
+        padding: 25px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 350px;
+        box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        animation: pop 1.5s ease;
+    }
+
+    @keyframes pop {
+        from {transform: scale(0.5); opacity: 0;}
+        to {transform: scale(1); opacity: 1;}
+    }
+
+    img {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #fff;
+        margin-bottom: 15px;
+    }
+
+    h1 {
+        font-size: 32px;
+        margin: 10px 0;
+    }
+
+    #quote {
+        font-size: 18px;
+        min-height: 50px;
+        margin-top: 15px;
+        animation: fade 1s ease;
+    }
+
+    @keyframes fade {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="card">
+    <img src="photo.jpg" alt="Birthday Person">
+    <h1>🎂 Happy Birthday 🎉</h1>
+    <div id="quote"></div>
+</div>
+
+<!-- Background Music -->
+<audio autoplay loop>
+    <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* Quotes */
+const quotes = [
+    "🎉 Aaj ka din sirf aapke naam!",
+    "🎂 Bhagwan aapko lambi umar de",
+    "✨ Har din khushiyon se bhara ho",
+    "💖 Aap hamesha muskurate raho",
+    "🥳 Best wishes on your special day!",
+    "🎈 Party hard & stay blessed!"
+];
+
+let i = 0;
+const quoteBox = document.getElementById("quote");
+
+function changeQuote() {
+    quoteBox.style.opacity = 0;
+    setTimeout(() => {
+        quoteBox.innerText = quotes[i];
+        quoteBox.style.opacity = 1;
+        i = (i + 1) % quotes.length;
+    }, 500);
+}
+changeQuote();
+setInterval(changeQuote, 2500);
+
+/* Fireworks */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function firework() {
+    const x = random(0, canvas.width);
+    const y = random(0, canvas.height / 2);
+    const colors = ["#ff004c", "#00eaff", "#ffe600", "#7cff00"];
+
+    for (let i = 0; i < 60; i++) {
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+        ctx.fill();
+    }
+}
+
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (Math.random() < 0.05) firework();
+    requestAnimationFrame(animate);
+}
+animate();
+
+window.onresize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+};
+</script>
+
+</body>
+</html>
