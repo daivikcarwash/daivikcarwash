@@ -40,7 +40,7 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 .section-count{float:right;background:rgba(212,175,55,.13);border:1px solid rgba(212,175,55,.35);color:#e7c85f;border-radius:20px;padding:3px 10px;font-size:12px;margin-right:14px}
 .order{background:linear-gradient(145deg,#0b233c,#091d31);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:17px;margin:11px 0;box-shadow:0 7px 20px rgba(0,0,0,.12)}
 .order b{color:#fff}
-.order select{font-size:13px}.gallery-admin-item{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);margin:8px 0}.gallery-admin-item img,.gallery-admin-item video{width:72px;height:54px;object-fit:cover;border-radius:7px;background:#071b2e}.gallery-admin-item b{font-size:13px}.gallery-admin-item span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.order select{font-size:13px}.gallery-admin-item{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);margin:8px 0}.gallery-admin-item img,.gallery-admin-item video{width:72px;height:54px;object-fit:cover;border-radius:7px;background:#071b2e}.gallery-admin-item b{font-size:13px}.gallery-admin-item span{display:block;color:var(--muted);font-size:11px;margin-top:3px}.gallery-delete{width:34px;height:34px;flex:0 0 34px;border:0;border-radius:8px;background:rgba(220,53,69,.12);color:#e5485d;cursor:pointer;font-size:15px;display:grid;place-items:center}.gallery-delete:hover{background:rgba(220,53,69,.2)}
 @media(max-width:850px){.grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.wrap{padding:16px 12px 40px}.card{padding:18px;border-radius:16px}.grid{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat b{font-size:23px}input{min-width:0;flex:1}.btn{width:auto}.admin-section summary{padding:16px}}
 </style>
@@ -265,7 +265,20 @@ async function loadAdminGallery(){
   if(error){if(msg)msg.textContent="Gallery load failed: "+error.message;return}
   if(document.getElementById("galleryCount"))document.getElementById("galleryCount").textContent=(data||[]).length;
   if(!(data||[]).length){if(box)box.innerHTML='<p class="muted">No gallery items yet.</p>';return}
-  if(box)box.innerHTML=data.map(x=>'<div class="gallery-admin-item">'+(x.media_type==="video"?'<video controls preload="metadata" src="'+esc(x.file_url)+'"></video>':'<img loading="lazy" src="'+esc(x.file_url)+'" alt="Gallery">')+'<div><b>'+esc(x.title||"Service media")+'</b><span>'+esc(x.media_type||"image")+'</span></div></div>').join("");
+  if(box)box.innerHTML=data.map(x=>'<div class="gallery-admin-item">'+(x.media_type==="video"?'<video controls preload="metadata" src="'+esc(x.file_url)+'"></video>':'<img loading="lazy" src="'+esc(x.file_url)+'" alt="Gallery">')+'<div style="flex:1;min-width:0"><b>'+esc(x.title||"Service media")+'</b><span>'+esc(x.media_type||"image")+'</span></div><button class="gallery-delete" title="Delete photo/video" aria-label="Delete photo/video" onclick="deleteAdminGallery(\''+x.id+'\',\''+esc(x.storage_path)+'\')">🗑</button></div>').join("");
+}
+async function deleteAdminGallery(id,path){
+  if(!confirm("Delete this photo/video from Service Gallery?"))return;
+  const pin=prompt("Enter Admin PIN to delete:");
+  if(pin===null)return;
+  const msg=document.getElementById("galleryAdminMsg"); if(msg)msg.textContent="Deleting...";
+  try{
+    const res=await fetch("https://holelzxzhaiefaqezmce.supabase.co/functions/v1/delete-daivik-gallery-item",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin,id,storage_path:path})});
+    const out=await res.json();
+    if(!res.ok)throw new Error(out.error||"Delete failed");
+    if(msg)msg.textContent="Deleted ✓";
+    await loadAdminGallery();
+  }catch(e){console.error(e);if(msg)msg.textContent="Delete failed: "+(e?.message||e);alert("Delete failed. Please try again.");}
 }
 async function uploadAdminGallery(files){
   if(!files||!files.length)return;
