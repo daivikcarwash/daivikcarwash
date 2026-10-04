@@ -90,6 +90,8 @@ function placeOrder(){
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile}
  const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$( "time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
  customer.orders.push(order);saveCustomers(list);
+ // Show the newly created order and its unique Order ID immediately, using the email just entered.
+ renderHistory(customer);
  syncOrderToCloud(order,name,email,mobile);
  if(pay==="UPI"||pay==="ONLINE"){showPayment(order);return}
  confirmBooking(order,name,customer);
