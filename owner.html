@@ -6,16 +6,52 @@
 <title>Daivik Car Wash</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{max-width:1200px;margin:auto;padding:20px}.card{background:#102b49;border:1px solid #31516f;border-radius:18px;padding:20px;margin-bottom:18px}h1{color:#d4af37;margin-top:0}input,select{padding:11px;border-radius:9px;border:1px solid #49657e;background:#081b30;color:#fff}.btn{padding:11px 16px;border:0;border-radius:9px;background:#d4af37;color:#fff;font-weight:bold;cursor:pointer}.homebtn{background:#274a68;text-decoration:none;display:inline-block}.danger{background:#a83232}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#0b2037;padding:16px;border-radius:12px}.stat b{display:block;font-size:24px;color:#d4af37;margin-top:5px}.order{background:#0b2037;border:1px solid #294863;border-radius:14px;padding:15px;margin:10px 0}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.muted{color:#aebbd0;font-size:13px}.error{color:#ff8585}.ok{color:#8ff0a4}@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}.wrap{padding:12px}}
-details.admin-section{background:#0b2037;border:1px solid #294863;border-radius:14px;margin:12px 0;overflow:hidden}.admin-section summary{cursor:pointer;list-style:none;padding:16px;font-weight:700;color:#fff;font-size:17px}.admin-section summary::-webkit-details-marker{display:none}.admin-section summary:after{content:"＋";float:right;color:#d4af37;font-size:22px}.admin-section[open] summary:after{content:"−"}.section-body{padding:0 14px 14px}.section-count{float:right;background:#d4af37;color:#071629;border-radius:20px;padding:3px 9px;font-size:12px;margin-right:12px}</style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+:root{--navy:#061425;--navy2:#0b2139;--panel:#0d2944;--panel2:#102f4d;--gold:#d4af37;--gold2:#b89022;--white:#f7f9fc;--muted:#9eafc2;--line:rgba(255,255,255,.10);--danger:#b94a48;--green:#46b97a}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',Arial,sans-serif;background:linear-gradient(135deg,#04101f 0%,#08213a 52%,#061728 100%);color:var(--white);margin:0;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 10% 0%,rgba(212,175,55,.09),transparent 28%),radial-gradient(circle at 90% 90%,rgba(37,103,158,.10),transparent 32%)}
+.wrap{max-width:1280px;margin:auto;padding:28px 22px 60px;position:relative;z-index:1}
+.card{background:linear-gradient(145deg,rgba(16,47,77,.96),rgba(9,32,54,.96));border:1px solid var(--line);border-radius:20px;padding:24px;margin-bottom:18px;box-shadow:0 18px 55px rgba(0,0,0,.22)}
+h1{font:700 clamp(30px,4vw,42px) 'Playfair Display',serif;color:#fff;margin:0 0 7px;letter-spacing:.2px}
+h2{font:700 24px 'Playfair Display',serif;color:#fff}
+h3{font-weight:700}
+input,select{padding:12px 14px;border-radius:10px;border:1px solid #3c5973;background:#071b2e;color:#fff;font:500 14px 'DM Sans',sans-serif;outline:none}
+input{min-width:230px}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.10)}
+.btn{padding:11px 17px;border:1px solid transparent;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font:700 14px 'DM Sans',sans-serif;cursor:pointer;transition:.2s;box-shadow:0 7px 18px rgba(0,0,0,.16)}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.homebtn{background:#173a59;text-decoration:none;display:inline-block;border-color:#365875}
+.danger{background:#8f3737}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:linear-gradient(145deg,#0c2945,#091f35);padding:18px;border:1px solid var(--line);border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,.14)}
+.stat b{display:block;font-size:27px;color:var(--gold);margin-top:7px;font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted);font-size:13px;line-height:1.55}
+.error{color:#ff8e8b}.ok{color:#87e3ae}
+details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);border-radius:15px;margin:13px 0;overflow:hidden;transition:.2s}
+.admin-section[open]{border-color:rgba(212,175,55,.35)}
+.admin-section summary{cursor:pointer;list-style:none;padding:18px 19px;font-weight:700;color:#fff;font-size:16px;letter-spacing:.1px}
+.admin-section summary::-webkit-details-marker{display:none}
+.admin-section summary:after{content:"+";float:right;color:var(--gold);font-size:20px;font-weight:400}
+.admin-section[open] summary:after{content:"−"}
+.section-body{padding:0 16px 17px}
+.section-count{float:right;background:rgba(212,175,55,.13);border:1px solid rgba(212,175,55,.35);color:#e7c85f;border-radius:20px;padding:3px 10px;font-size:12px;margin-right:14px}
+.order{background:linear-gradient(145deg,#0b233c,#091d31);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:17px;margin:11px 0;box-shadow:0 7px 20px rgba(0,0,0,.12)}
+.order b{color:#fff}
+.order select{font-size:13px}
+@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.wrap{padding:16px 12px 40px}.card{padding:18px;border-radius:16px}.grid{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat b{font-size:23px}input{min-width:0;flex:1}.btn{width:auto}.admin-section summary{padding:16px}}
+</style>
 </head>
 <body>
 <div class="wrap">
 <div class="card">
-<h1>🚗 Daivik Car Wash</h1>
-<p class="muted">All booking orders • Edit • Delete • Status • Export</p>
+<h1>Daivik Car Wash</h1>
+<p class="muted">Owner control centre · Orders · Payments · Status · Reports</p>
 <div class="row">
-<a class="btn homebtn" href="index.html">🏠 Main Website</a>
+<a class="btn homebtn" href="index.html">Main Website</a>
 <input id="pin" type="password" inputmode="numeric" placeholder="Owner PIN" onkeydown="if(event.key==='Enter')login()">
 <button class="btn" onclick="login()">Open Admin</button>
 </div>
@@ -37,39 +73,39 @@ details.admin-section{background:#0b2037;border:1px solid #294863;border-radius:
 </div>
 
 <div class="card">
-<h2 style="color:#d4af37;margin-top:0">🗂️ Admin Orders</h2>
-<p class="muted">Orders are separated clearly so Monthly, One-Time and Morning services stay organized.</p>
+<h2 style="color:#d4af37;margin-top:0">Order Management</h2>
+<p class="muted">Manage customer bookings, monthly plans, payments, service status and staff operations from one professional workspace.</p>
 
 <details class="admin-section">
-<summary>📦 Monthly Packages <span class="section-count" id="monthlyCount">0</span></summary>
+<summary>Monthly Packages <span class="section-count" id="monthlyCount">0</span></summary>
 <div class="section-body">
 <div id="monthlyOrders"><p class="muted">Loading monthly orders...</p></div>
 </div>
 </details>
 
 <details class="admin-section">
-<summary>🚗 One-Time Orders <span class="section-count" id="oneTimeCount">0</span></summary>
+<summary>One-Time Orders <span class="section-count" id="oneTimeCount">0</span></summary>
 <div class="section-body">
 <div class="row">
 <select id="filter" onchange="render()">
 <option value="ALL">All One-Time Orders</option><option>Booking Received</option><option>Confirmed</option><option>On the Way</option><option>Arriving Soon</option><option>Running</option><option>Completed</option><option>Cancelled</option>
 </select>
-<button class="btn" onclick="loadOrders()">↻ Refresh</button>
-<button class="btn" onclick="exportCSV()">⬇ Export CSV</button>
+<button class="btn" onclick="loadOrders()">Refresh</button>
+<button class="btn" onclick="exportCSV()">Export CSV</button>
 </div>
 <div id="orders"></div>
 </div>
 </details>
 
 <details class="admin-section">
-<summary>🌅 Morning Plan <span class="section-count" id="morningCount">0</span></summary>
+<summary>Morning Plan <span class="section-count" id="morningCount">0</span></summary>
 <div class="section-body">
 <div id="morningOrders"><p class="muted">Loading Morning Plan orders...</p></div>
 </div>
 </details>
 
 <div class="row" style="margin-top:14px">
-<a class="btn" href="staff.html" target="_blank" style="text-decoration:none;text-align:center">📍 Open Staff GPS</a>
+<a class="btn" href="staff.html" target="_blank" style="text-decoration:none;text-align:center">Open Staff GPS</a>
 </div>
 </div></div>
 </div>
@@ -142,7 +178,7 @@ function monthlyOrderCard(o){
  ['Pending','Paid','Customer Marked Paid','Refunded'].map(s=>'<option '+(o.payment_status===s?'selected':'')+'>'+s+'</option>').join('')+
  '</select></div>'+
  '<div style="margin-top:9px"><b>Schedule:</b> '+(schedule.length?schedule.map((s,i)=>'Service '+(i+1)+': '+esc(s.date)+' • '+esc(s.time)).join(' &nbsp; | &nbsp; '):'Not scheduled')+'</div>'+
- '<div class="row" style="margin-top:10px"><button class="btn danger" data-id="'+esc(o.order_id)+'" onclick="deleteMonthlyOrder(this.dataset.id)">🗑 Delete</button></div></div>';
+ '<div class="row" style="margin-top:10px"><button class="btn danger" data-id="'+esc(o.order_id)+'" onclick="deleteMonthlyOrder(this.dataset.id)">Delete</button></div></div>';
 }
 function renderMonthlyOrders(){
  const monthlyEl=document.getElementById("monthlyOrders");
@@ -170,12 +206,12 @@ function render(){
   document.getElementById("pendingPay").textContent=orders.filter(o=>!o.payment_status||o.payment_status==="Pending"||o.payment_status==="Customer Marked Paid").length;
   document.getElementById("revenue").textContent="₹"+orders.reduce((sum,o)=>sum+(Number(o.price)||0),0).toLocaleString("en-IN");
   document.getElementById("liveGps").textContent=orders.filter(o=>o.staff_lat!=null&&o.staff_lng!=null&&o.status!=="Completed"&&o.status!=="Cancelled").length;
-  const groups=[["🆕 New / Received",o=>o.status==="Booking Received"||o.status==="Confirmed"],["🚗 Running / Service In Progress",o=>["On the Way","Arriving Soon","Running"].includes(o.status)],["✅ Completed / Closed",o=>o.status==="Completed"],["❌ Cancelled",o=>o.status==="Cancelled"]];
+  const groups=[["New / Received",o=>o.status==="Booking Received"||o.status==="Confirmed"],["Running / Service In Progress",o=>["On the Way","Arriving Soon","Running"].includes(o.status)],["Completed / Closed",o=>o.status==="Completed"],["Cancelled",o=>o.status==="Cancelled"]];
   let html="";
   groups.forEach(([title,test])=>{
     const g=list.filter(test); if(!g.length)return;
     html+="<div style=\"margin:18px 0 8px\"><h3 style=\"color:#d4af37;margin:0\">"+title+" <span class=\"muted\">("+g.length+")</span></h3></div>";
-    html+=g.map(o=>"<div class=\"order\"><b>"+esc(o.order_id)+"</b> — "+esc(o.service)+" — ₹"+esc(o.price)+"<br><span class=\"muted\">"+esc(o.customer_name)+" • "+esc(o.customer_mobile)+" • "+esc(o.customer_email)+"<br>"+esc(o.vehicle)+" • "+esc(o.service_date)+" • "+esc(o.preferred_time||"")+"<br>"+esc(o.address)+"</span><div class=\"row\" style=\"margin-top:10px\"><select data-id=\""+esc(o.order_id)+"\" onchange=\"setStatus(this.dataset.id,this.value)\"><option "+(o.status==="Booking Received"?"selected":"")+">Booking Received</option><option "+(o.status==="Confirmed"?"selected":"")+">Confirmed</option><option "+(o.status==="On the Way"?"selected":"")+">On the Way</option><option "+(o.status==="Arriving Soon"?"selected":"")+">Arriving Soon</option><option "+(o.status==="Running"?"selected":"")+">Running</option><option "+(o.status==="Completed"?"selected":"")+">Completed</option><option "+(o.status==="Cancelled"?"selected":"")+">Cancelled</option></select><label class=\"muted\" style=\"margin:0\">Payment: <select data-id=\""+esc(o.order_id)+"\" onchange=\"setPayment(this.dataset.id,this.value)\"><option "+(o.payment_status==="Pending"?"selected":"")+">Pending</option><option "+(o.payment_status==="Customer Marked Paid"?"selected":"")+">Customer Marked Paid</option><option "+(o.payment_status==="Collected"?"selected":"")+">Collected</option><option "+(o.payment_status==="Refunded"?"selected":"")+">Refunded</option></select></label><button class=\"btn\" data-id=\""+esc(o.order_id)+"\" onclick=\"editOrder(this.dataset.id)\">✏️ Edit</button><button class=\"btn\" style=\"background:#274a68\" data-id=\""+esc(o.order_id)+"\" onclick=\"openStaff(this.dataset.id)\">📍 Staff GPS</button><button class=\"btn danger\" data-id=\""+esc(o.order_id)+"\" onclick=\"deleteOrder(this.dataset.id)\">🗑 Delete</button></div></div>").join("");
+    html+=g.map(o=>"<div class=\"order\"><b>"+esc(o.order_id)+"</b> — "+esc(o.service)+" — ₹"+esc(o.price)+"<br><span class=\"muted\">"+esc(o.customer_name)+" • "+esc(o.customer_mobile)+" • "+esc(o.customer_email)+"<br>"+esc(o.vehicle)+" • "+esc(o.service_date)+" • "+esc(o.preferred_time||"")+"<br>"+esc(o.address)+"</span><div class=\"row\" style=\"margin-top:10px\"><select data-id=\""+esc(o.order_id)+"\" onchange=\"setStatus(this.dataset.id,this.value)\"><option "+(o.status==="Booking Received"?"selected":"")+">Booking Received</option><option "+(o.status==="Confirmed"?"selected":"")+">Confirmed</option><option "+(o.status==="On the Way"?"selected":"")+">On the Way</option><option "+(o.status==="Arriving Soon"?"selected":"")+">Arriving Soon</option><option "+(o.status==="Running"?"selected":"")+">Running</option><option "+(o.status==="Completed"?"selected":"")+">Completed</option><option "+(o.status==="Cancelled"?"selected":"")+">Cancelled</option></select><label class=\"muted\" style=\"margin:0\">Payment: <select data-id=\""+esc(o.order_id)+"\" onchange=\"setPayment(this.dataset.id,this.value)\"><option "+(o.payment_status==="Pending"?"selected":"")+">Pending</option><option "+(o.payment_status==="Customer Marked Paid"?"selected":"")+">Customer Marked Paid</option><option "+(o.payment_status==="Collected"?"selected":"")+">Collected</option><option "+(o.payment_status==="Refunded"?"selected":"")+">Refunded</option></select></label><button class=\"btn\" data-id=\""+esc(o.order_id)+"\" onclick=\"editOrder(this.dataset.id)\">Edit</button><button class=\"btn\" style=\"background:#274a68\" data-id=\""+esc(o.order_id)+"\" onclick=\"openStaff(this.dataset.id)\">Staff GPS</button><button class=\"btn danger\" data-id=\""+esc(o.order_id)+"\" onclick=\"deleteOrder(this.dataset.id)\">Delete</button></div></div>").join("");
   });
   document.getElementById("orders").innerHTML=html||"<p class=\"muted\">No orders found.</p>";
 }
