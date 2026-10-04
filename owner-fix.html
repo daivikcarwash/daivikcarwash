@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daivik Car Wash</title>
+<style>
+body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{background:#102b49;border:1px solid #31516f;border-radius:18px;padding:24px;max-width:520px;width:calc(100% - 40px);box-sizing:border-box}
+h1{color:#d4af37;margin-top:0}p{color:#aebbd0}.btn{padding:12px 18px;border:0;border-radius:9px;background:#d4af37;color:#fff;font-weight:bold;cursor:pointer}.muted{color:#aebbd0;font-size:13px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>🚗 Daivik Car Wash</h1>
+<p>Admin login is being loaded securely...</p>
+<p id="msg" class="muted">Please wait...</p>
+</div>
+<script>
+(async function(){
+  const msg=document.getElementById("msg");
+  try{
+    const r=await fetch("owner.html?fix="+Date.now(),{cache:"no-store"});
+    if(!r.ok)throw new Error("Admin page could not be loaded.");
+    let html=await r.text();
+    html=html.replace(
+      'const list=f==="ALL"?orders:orders.filter(o=>o.status===f);\\n  const oneCount=',
+      'const list=f==="ALL"?orders:orders.filter(o=>o.status===f);\n  const oneCount='
+    );
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(e){
+    msg.textContent="Admin load failed: "+e.message;
+  }
+})();
+</script>
+</body>
+</html>
