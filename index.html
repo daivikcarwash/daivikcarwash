@@ -91,6 +91,7 @@ h2{text-align:left;font-family:'Playfair Display',serif;font-size:clamp(25px,4vw
 .price-item{display:flex;justify-content:space-between;align-items:center;gap:15px;background:#f8fafc;border:1px solid #e5eaf0;border-left:3px solid var(--gold);padding:12px 14px;margin:7px 0;border-radius:11px;font-size:14px;color:#314157}.price-item span{font-weight:800;font-size:16px;color:var(--navy);background:#fff4c7;padding:4px 10px;border-radius:9px;white-space:nowrap}
 #pricing .btn,#monthly .btn{margin:24px auto 0}.btn{display:block;width:fit-content;padding:13px 25px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;text-decoration:none;border-radius:28px;box-shadow:0 7px 20px rgba(212,175,55,.2)}
 #monthly>p{line-height:1.7;color:var(--muted)}#monthly hr{border:none;height:1px!important;background:#e7ebf0!important;margin:25px 0!important}
+.package-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}.package-card{background:#f8fafc;border:1px solid #e3e9f0;border-radius:18px;padding:16px}.package-head{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--navy);font-weight:800;font-size:16px;margin-bottom:10px}.package-head small{font-size:10px;color:var(--gold2);background:#fff4c7;padding:5px 8px;border-radius:10px;white-space:nowrap}.package{background:#fff;border:1px solid #e5eaf0;border-radius:13px;padding:13px;margin-top:9px}.package>div{display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--navy)}.package span{font-weight:800;color:var(--gold2);white-space:nowrap}.package p{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}.package.popular{border:2px solid var(--gold);box-shadow:0 8px 22px rgba(212,175,55,.13)}.package-note{text-align:center;margin-top:16px;padding:11px;border-radius:12px;background:#fff9df;color:#5d5129;font-size:12px}
 #contact p{margin:8px 0;color:#536276}.review-box{background:#f8fafc;padding:18px;border-radius:12px;border-left:3px solid var(--gold)}
 .whatsapp{position:fixed;right:20px;bottom:20px;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#25d366;color:#fff;text-decoration:none;font-size:25px;box-shadow:0 8px 25px rgba(0,0,0,.2);z-index:1000}
 footer{background:var(--navy);color:#dce5ef;text-align:center;padding:24px 15px;font-size:13px}.logo-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);justify-content:center;align-items:center;z-index:99999}.logo-popup img{width:min(340px,75vw);height:min(340px,75vw);border-radius:50%;object-fit:cover;border:5px solid var(--gold)}.close-btn{position:absolute;top:20px;right:25px;font-size:40px;color:#fff;cursor:pointer}
@@ -110,11 +111,11 @@ footer{background:var(--navy);color:#dce5ef;text-align:center;padding:24px 15px;
 
 <!-- NAV -->
 <nav>
-  <a href="#about">About</a>
-  <a href="#services">Services</a>
-  <a href="#contact">Contact</a>
   <a href="owner.html">🔐 Admin Dashboard</a>
+  <a href="#monthly">📦 Monthly Packages</a>
+  <a href="#contact">Contact</a>
   <a href="#reviews">Reviews</a>
+  <a href="#about">About</a>
 </nav>
 
 <!-- ABOUT -->
@@ -138,9 +139,63 @@ footer{background:var(--navy);color:#dce5ef;text-align:center;padding:24px 15px;
   <div class="service-item">🛞 Alloy Cleaning + Tyre Shine</div>
   <div class="service-item">💧 Deep Interior Cleaning</div>
   <div class="service-item">🔥 Full Body Polishing</div>
-  <a href="customer.html" class="btn" style="margin-top:18px;">🧼 View Services & Book Now</a>
 </section>
 
+
+<!-- MONTHLY PACKAGES -->
+<section id="monthly" class="box">
+  <h2>📦 Monthly Car Wash Packages</h2>
+  <p>Save more with regular doorstep cleaning. Choose your vehicle size and the package that fits your routine.</p>
+
+  <div class="package-grid">
+    <div class="package-card">
+      <div class="package-head"><span>🚗 Hatchback / Sedan</span><small>4 Visits / Month</small></div>
+      <div class="package">
+        <div><b>Essential</b><span>₹899 / month</span></div>
+        <p>4 × Exterior Ceramic Foam Wash</p>
+      </div>
+      <div class="package popular">
+        <div><b>Complete ⭐</b><span>₹1,499 / month</span></div>
+        <p>4 × Complete Car Wash (Exterior + Interior)</p>
+      </div>
+      <div class="package">
+        <div><b>Premium</b><span>₹1,999 / month</span></div>
+        <p>2 × Complete Wash + 2 × Premium Spa</p>
+      </div>
+    </div>
+
+    <div class="package-card">
+      <div class="package-head"><span>🚙 SUV</span><small>4 Visits / Month</small></div>
+      <div class="package">
+        <div><b>Essential</b><span>₹1,099 / month</span></div>
+        <p>4 × Exterior Ceramic Foam Wash</p>
+      </div>
+      <div class="package popular">
+        <div><b>Complete ⭐</b><span>₹1,599 / month</span></div>
+        <p>4 × Complete SUV Wash (Exterior + Interior)</p>
+      </div>
+      <div class="package">
+        <div><b>Premium</b><span>₹2,199 / month</span></div>
+        <p>2 × Complete Wash + 2 × Premium Spa</p>
+      </div>
+    </div>
+
+    <div class="package-card">
+      <div class="package-head"><span>🏍️ Bike</span><small>4 Visits / Month</small></div>
+      <div class="package">
+        <div><b>Regular</b><span>₹499 / month</span></div>
+        <p>4 × Normal Bike Ceramic Wash</p>
+      </div>
+      <div class="package popular">
+        <div><b>Premium ⭐</b><span>₹699 / month</span></div>
+        <p>4 × Premium Bike Ceramic Wash</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="package-note">✓ Doorstep service &nbsp; • &nbsp; ✓ Fixed monthly price &nbsp; • &nbsp; ✓ Easy scheduling</div>
+  <a href="customer.html" class="btn" style="margin:22px auto 0;">📅 Choose Service & Book</a>
+</section>
 
 <!-- CONTACT -->
 <section id="contact" class="box">
