@@ -98,21 +98,26 @@ async function loadMonthlyOrders(){
     db.channel("owner-monthly-orders").on("postgres_changes",{event:"*",schema:"public",table:"daivik_monthly_orders"},()=>loadMonthlyOrders()).subscribe();
   }
 }
+function monthlyOrderCard(o){
+ const schedule=Array.isArray(o.schedule)?o.schedule:[];
+ return '<div class="order"><b>'+esc(o.order_id)+'</b> — '+esc(o.package_name)+' — ₹'+esc(o.price)+
+ '<br><span class="muted">'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+' • '+esc(o.customer_email)+
+ '<br>'+esc(o.vehicle)+' • Start: '+esc(o.service_date)+' • '+esc(o.service_time||'')+'<br>'+esc(o.address)+'</span>'+
+ '<div style="margin-top:10px"><span class="muted">Status:</span> <select data-id="'+esc(o.order_id)+'" onchange="setMonthlyStatus(this.dataset.id,this.value)">'+
+ ['Monthly Order Received','Confirmed','Active','Completed','Cancelled'].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join('')+
+ '</select> <span class="muted" style="margin-left:10px">Payment:</span> <select data-id="'+esc(o.order_id)+'" onchange="setMonthlyPayment(this.dataset.id,this.value)">'+
+ ['Pending','Paid','Customer Marked Paid','Refunded'].map(s=>'<option '+(o.payment_status===s?'selected':'')+'>'+s+'</option>').join('')+
+ '</select></div>'+
+ '<div style="margin-top:9px"><b>Schedule:</b> '+(schedule.length?schedule.map((s,i)=>'Service '+(i+1)+': '+esc(s.date)+' • '+esc(s.time)).join(' &nbsp; | &nbsp; '):'Not scheduled')+'</div>'+
+ '<div class="row" style="margin-top:10px"><button class="btn danger" data-id="'+esc(o.order_id)+'" onclick="deleteMonthlyOrder(this.dataset.id)">🗑 Delete</button></div></div>';
+}
 function renderMonthlyOrders(){
- const el=document.getElementById("monthlyOrders"); if(!el)return;
- el.innerHTML=monthlyOrders.map(o=>{
-   const schedule=Array.isArray(o.schedule)?o.schedule:[];
-   return '<div class="order"><b>'+esc(o.order_id)+'</b> — '+esc(o.package_name)+' — ₹'+esc(o.price) +
-   '<br><span class="muted">'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+' • '+esc(o.customer_email)+
-   '<br>'+esc(o.vehicle)+' • Start: '+esc(o.service_date)+' • '+esc(o.service_time||'')+'<br>'+esc(o.address)+'</span>'+
-   '<div style="margin-top:10px"><span class="muted">Status:</span> <select data-id="'+esc(o.order_id)+'" onchange="setMonthlyStatus(this.dataset.id,this.value)">'+
-   ['Monthly Order Received','Confirmed','Active','Completed','Cancelled'].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join('')+
-   '</select> <span class="muted" style="margin-left:10px">Payment:</span> <select data-id="'+esc(o.order_id)+'" onchange="setMonthlyPayment(this.dataset.id,this.value)">'+
-   ['Pending','Paid','Customer Marked Paid','Refunded'].map(s=>'<option '+(o.payment_status===s?'selected':'')+'>'+s+'</option>').join('')+
-   '</select></div>'+
-   '<div style="margin-top:9px"><b>Schedule:</b> '+(schedule.length?schedule.map((s,i)=>'Service '+(i+1)+': '+esc(s.date)+' • '+esc(s.time)).join(' &nbsp; | &nbsp; '):'Not scheduled')+'</div>'+
-   '<div class="row" style="margin-top:10px"><button class="btn danger" data-id="'+esc(o.order_id)+'" onclick="deleteMonthlyOrder(this.dataset.id)">🗑 Delete</button></div></div>';
- }).join('')||"<p class='muted'>No monthly package orders yet.</p>";
+ const el=document.getElementById("monthlyOrders");if(!el)return;
+ const morning=monthlyOrders.filter(o=>o.package_name==="Daily Morning Exterior Dusting");
+ const regular=monthlyOrders.filter(o=>o.package_name!=="Daily Morning Exterior Dusting");
+ const section=(title,list,empty)=>'<div style="margin-top:16px"><h3 style="color:#d4af37;margin:0 0 8px">'+title+'</h3>'+ (list.length?list.map(monthlyOrderCard).join(''):'<p class="muted">'+empty+'</p>')+'</div>';
+ el.innerHTML=section("🌅 Daily Morning Exterior Dusting — ₹500 / Month",morning,"No Morning Plan orders yet.")+
+              section("📦 Other Monthly Package Orders",regular,"No other monthly package orders yet.");
 }
 async function setMonthlyStatus(id,status){const {error}=await db.from("daivik_monthly_orders").update({status,updated_at:new Date().toISOString()}).eq("order_id",id);if(error){alert("Status update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.status=status;renderMonthlyOrders()}
 async function setMonthlyPayment(id,payment_status){const {error}=await db.from("daivik_monthly_orders").update({payment_status,updated_at:new Date().toISOString()}).eq("order_id",id);if(error){alert("Payment update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.payment_status=payment_status;renderMonthlyOrders()}
