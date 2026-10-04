@@ -49,9 +49,9 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <label>Doorstep Address</label><input id="address" placeholder="Where should we come for the service?">
 <h2 style="margin-top:25px">3. Payment</h2>
 <div class="payment">
-<label class="pay"><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
-<label class="pay"><input type="radio" name="pay" value="ONLINE"> Pay Online</label>
-<label class="pay"><input type="radio" name="pay" value="UPI"> UPI</label>
+<label class="pay"><input type="radio" name="pay" value="COD" checked> 💵 Cash on Delivery</label>
+<label class="pay"><input type="radio" name="pay" value="UPI"> 📱 UPI / PhonePe / Google Pay</label>
+<label class="pay"><input type="radio" name="pay" value="BANK"> 🏦 Bank Transfer</label>
 </div>
 <div id="payNote" class="note">You can pay in cash after the service is completed.</div>
 <button id="bookBtn" class="btn" onclick="placeOrder()">Place My Booking</button>
@@ -95,15 +95,19 @@ async function placeOrder(){
  const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
  if(!cloudSaved){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent="We could not save your booking to the server. Please check your internet connection and try again.";return}
  customer.orders.push(order);saveCustomers(list);renderHistory(customer);
- if(pay==="UPI"||pay==="ONLINE"){showPayment(order);btn.disabled=false;btn.textContent="Booking Saved ✓";return}
+ if(pay==="UPI"){showPayment(order);btn.disabled=false;btn.textContent="Booking Saved ✓";return}
+ if(pay==="BANK"){showBankPayment(order);btn.disabled=false;btn.textContent="Booking Saved ✓";return}
  await confirmBooking(order,name,customer);
 }
 function showPayment(order){
- $("payNote").innerHTML='<b>Pay ₹'+order.price+'</b> to <b>7906199445@ybl</b><div style="margin-top:14px;text-align:center"><div id="qr" style="display:inline-block;padding:12px;background:#fff;border-radius:16px"></div><div style="color:#fff;font-size:12px;margin-top:10px">Scan QR with any UPI app</div><button class="btn" style="margin-top:12px" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button></div>';
  const upi="upi://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(order.price.toFixed(2))+"&cu=INR&tn="+encodeURIComponent(order.id);
+ $("payNote").innerHTML='<b>Pay ₹'+order.price+'</b> using UPI / PhonePe / Google Pay<div style="margin-top:12px;display:grid;gap:9px"><button class="btn" style="margin-top:0" onclick="openUPIPayment()">📱 Pay via UPI App</button><button class="btn" style="margin-top:0;background:#274a68" onclick="copyUPI()">Copy UPI ID: 7906199445@ybl</button><div style="text-align:center;margin-top:5px"><div id="qr" style="display:inline-block;padding:12px;background:#fff;border-radius:16px"></div><div style="color:#fff;font-size:12px;margin-top:10px">Scan with PhonePe, Google Pay or any UPI app</div></div><button class="btn" style="margin-top:4px" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button></div>';
  const img=document.createElement("img");img.alt="UPI QR";img.width=220;img.height=220;img.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);$("qr").appendChild(img);
- window.pendingOrder=order;
+ window.pendingOrder=order;window.pendingUpi=upi;
 }
+function showBankPayment(order){window.pendingOrder=order;$("payNote").innerHTML='<b>Bank Transfer for ₹'+order.price+'</b><br><span class="muted">Bank account details are not configured yet.</span><div style="margin-top:10px">Please contact Daivik Doorstep Car Wash on WhatsApp for bank transfer details.</div><button class="btn" style="margin-top:12px" onclick="openWhatsApp(\''+order.id+'\')">WhatsApp Bank Details</button><button class="btn" style="margin-top:8px;background:#274a68" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button>'}
+function openUPIPayment(){if(window.pendingUpi)window.location.href=window.pendingUpi}
+async function copyUPI(){try{await navigator.clipboard.writeText("7906199445@ybl");$("payNote").insertAdjacentHTML("beforeend","<div style='margin-top:8px;color:#8ff0b8'>UPI ID copied ✓</div>")}catch(e){alert("UPI ID: 7906199445@ybl")}}
 async function confirmPaid(){
  const order=window.pendingOrder;if(!order)return;
  const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";await markCloudPayment(order);await confirmBooking(order,customer.name,customer)}
@@ -216,7 +220,9 @@ function renderHistory(c){$("history").classList.remove("hidden");$("orders").in
 async function loadMyOrders(){const email=$("lookupEmail").value.trim().toLowerCase();if(!validEmail(email)){$("lookupMsg").textContent="Enter your email first.";return}$("lookupMsg").textContent="Searching your orders…";$("history").classList.remove("hidden");$("orders").innerHTML="<p class='muted'>Loading your orders…</p>";try{const {data,error}=await db.from("daivik_car_wash_orders").select("order_id,created_at").eq("customer_email",email).order("created_at",{ascending:false});if(error){$("lookupMsg").textContent="Unable to load orders: "+error.message;$("orders").innerHTML="<p class='muted'>Could not load orders. Please try again.</p>";return}if(!data||!data.length){$("lookupMsg").textContent="No orders found for this email.";renderCloudHistory([]);return}$("lookupMsg").textContent=data.length+" order(s) found ✓";renderCloudHistory(data)}catch(e){console.error(e);$("lookupMsg").textContent="Unable to load orders. Please try again.";$("orders").innerHTML="<p class='muted'>Could not load orders. Please try again.</p>"}}
 function renderCloudHistory(rows){$("history").classList.remove("hidden");$("orders").innerHTML=rows.map(data=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${data.order_id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${data.order_id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found.</p>"}
 async function quickTrack(id){$("orderLookupId").value=id;await lookupOrder()}
-document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{$("payNote").textContent=r.value==="COD"?"You can pay in cash after the service is completed.":r.value==="UPI"?"UPI payment will be available after the payment gateway is connected.":"Secure online payment will be available after the payment gateway is connected."}));
+document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{const v=r.value;if(v==="COD")$("payNote").textContent="You can pay in cash after the service is completed.";else if(v==="UPI")showPaymentPreview();else if(v==="BANK")showBankPaymentPreview()}));
+function showPaymentPreview(){$("payNote").innerHTML='<b>UPI / PhonePe / Google Pay</b><br>UPI ID: <b>7906199445@ybl</b><br><span class="muted">QR and Pay button will be shown after booking.</span>'}
+function showBankPaymentPreview(){$("payNote").innerHTML='<b>Bank Transfer</b><br><span class="muted">Bank account details can be added here when you provide the receiving account name, bank name, account number and IFSC.</span>'}
 renderServices();
 </script>
 </body></html>
