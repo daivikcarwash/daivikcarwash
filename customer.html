@@ -363,8 +363,33 @@ function showMonthlyBooking(){
  $("mDate").min=new Date().toISOString().split("T")[0]; $("mDate").value=$("mDate").min;
  $("monthlyBooking").scrollIntoView({behavior:"smooth"});
 }
+function monthlySuccess(orderId,pack,schedule){
+ const html="<div class='success'><h3>✓ Monthly Package Order Successful</h3><p style='margin-top:7px'>Your <b>"+pack.name+"</b> has been booked successfully.</p><p style='margin-top:6px'>Order ID: <b>"+orderId+"</b></p><div class='summary' style='margin-top:12px'><b>📅 Your Service Schedule</b><div class='monthly-schedule'>"+schedule.map((s,i)=>"<div class='monthly-day'><b>Service "+(i+1)+"</b><span>"+formatScheduleDate(s.date)+" • "+s.time+"</span></div>").join("")+"</div></div><p class='muted' style='margin-top:10px'>Please keep this Order ID. Your monthly order is saved separately and will appear in the admin dashboard.</p></div>";
+ $("monthlyBooking").innerHTML=html;window.scrollTo({top:$("monthlyBooking").offsetTop-20,behavior:"smooth"});
+}
+function showMonthlyPayment(orderId,price,pack,schedule){
+ const upi="upi://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(Number(price).toFixed(2))+"&cu=INR&tn="+encodeURIComponent(orderId);
+ const phonePe="phonepe://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(Number(price).toFixed(2))+"&cu=INR&tn="+encodeURIComponent(orderId);
+ const googlePay="tez://upi/pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(Number(price).toFixed(2))+"&cu=INR&tn="+encodeURIComponent(orderId);
+ $("monthlyBooking").innerHTML="<div class='success' style='border-color:rgba(212,175,55,.45);background:rgba(212,175,55,.07)'><h3>💳 Online Payment</h3><p style='margin-top:7px'>Pay <b>₹"+price+"</b> for <b>"+pack.name+"</b></p><div style='margin-top:14px;display:grid;gap:9px'><button class='btn' style='margin-top:0;background:#6b35f5' onclick=\"openMonthlyUPI('phonepe')\">🟣 Pay with PhonePe</button><button class='btn' style='margin-top:0;background:#1683ff' onclick=\"openMonthlyUPI('gpay')\">🔵 Pay with Google Pay</button><button class='btn' style='margin-top:0' onclick=\"openMonthlyUPI('upi')\">📱 Pay with Any UPI App</button><button class='btn' style='margin-top:0;background:#274a68' onclick=\"copyMonthlyUPI()\">Copy UPI ID: 7906199445@ybl</button><div style='text-align:center;margin-top:5px'><div id='monthlyQr' style='display:inline-block;padding:12px;background:#fff;border-radius:16px'></div><div style='color:#fff;font-size:12px;margin-top:10px'>Scan with PhonePe, Google Pay or any UPI app</div></div><button class='btn' style='margin-top:4px' onclick=\"confirmMonthlyPaid()\">I Have Paid ₹"+price+"</button></div><p class='muted' style='margin-top:10px'>After payment, tap “I Have Paid”.</p></div>";
+ const img=document.createElement("img");img.alt="UPI QR";img.width=220;img.height=220;img.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);$("monthlyQr").appendChild(img);
+ window.pendingMonthly={orderId,price,pack,schedule,upi,phonePe,googlePay};
+}
+function openMonthlyUPI(app){
+ const p=window.pendingMonthly;if(!p)return;
+ const base=p.upi,target=app==="phonepe"?p.phonePe:app==="gpay"?p.googlePay:base;
+ window.location.href=target;
+ if(app!=="upi")setTimeout(()=>{if(document.visibilityState==="visible")window.location.href=base},1200);
+}
+async function copyMonthlyUPI(){try{await navigator.clipboard.writeText("7906199445@ybl");$("monthlyBooking").insertAdjacentHTML("beforeend","<p style='text-align:center;color:#8ff0b8;margin-top:8px'>UPI ID copied ✓</p>")}catch(e){alert("UPI ID: 7906199445@ybl")}}
+async function confirmMonthlyPaid(){
+ const p=window.pendingMonthly;if(!p)return;
+ const {error}=await db.from("daivik_monthly_orders").update({payment_status:"Customer Marked Paid",updated_at:new Date().toISOString()}).eq("order_id",p.orderId);
+ if(error){$("monthlyMsg")?.textContent="Payment status could not be updated. Please try again.";return}
+ monthlySuccess(p.orderId,p.pack,p.schedule);
+}
 async function placeMonthlyOrder(){
- const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key],btn=$("monthlyBookBtn"); if(!pack||btn.disabled)return;
+ const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key],btn=$("monthlyBookBtn");if(!pack||btn.disabled)return;
  const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value,address=$("mAddress").value.trim(),pay=document.querySelector('input[name="mpay"]:checked').value;
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("monthlyMsg").textContent="Please complete all details.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
@@ -373,10 +398,10 @@ async function placeMonthlyOrder(){
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
  localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
- const html="<div class='success'><h3>✓ Monthly Package Order Successful</h3><p style='margin-top:7px'>Your <b>"+pack.name+"</b> has been booked successfully.</p><p style='margin-top:6px'>Order ID: <b>"+orderId+"</b></p><div class='summary' style='margin-top:12px'><b>📅 Your Service Schedule</b><div class='monthly-schedule'>"+schedule.map((s,i)=>"<div class='monthly-day'><b>Service "+(i+1)+"</b><span>"+formatScheduleDate(s.date)+" • "+s.time+"</span></div>").join("")+"</div></div><p class='muted' style='margin-top:10px'>Please keep this Order ID. Your monthly order is saved separately and will appear in the admin dashboard.</p></div>";
- $("monthlyBooking").innerHTML=html;
- window.scrollTo({top:$("monthlyBooking").offsetTop-20,behavior:"smooth"});
+ if(pay==="UPI"){showMonthlyPayment(orderId,pack.price,pack,schedule);return}
+ monthlySuccess(orderId,pack,schedule);
 }
+
 window.addEventListener("DOMContentLoaded",showMonthlyBooking);
 </script>
 <style>
