@@ -101,12 +101,25 @@ async function placeOrder(){
 }
 function showPayment(order){
  const upi="upi://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(order.price.toFixed(2))+"&cu=INR&tn="+encodeURIComponent(order.id);
- $("payNote").innerHTML='<b>Pay ₹'+order.price+'</b> using UPI / PhonePe / Google Pay<div style="margin-top:12px;display:grid;gap:9px"><button class="btn" style="margin-top:0" onclick="openUPIPayment()">📱 Pay via UPI App</button><button class="btn" style="margin-top:0;background:#274a68" onclick="copyUPI()">Copy UPI ID: 7906199445@ybl</button><div style="text-align:center;margin-top:5px"><div id="qr" style="display:inline-block;padding:12px;background:#fff;border-radius:16px"></div><div style="color:#fff;font-size:12px;margin-top:10px">Scan with PhonePe, Google Pay or any UPI app</div></div><button class="btn" style="margin-top:4px" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button></div>';
+ const phonePe="phonepe://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(order.price.toFixed(2))+"&cu=INR&tn="+encodeURIComponent(order.id);
+ const googlePay="tez://upi/pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(order.price.toFixed(2))+"&cu=INR&tn="+encodeURIComponent(order.id);
+ $("payNote").innerHTML='<b>Pay ₹'+order.price+'</b><div style="margin-top:12px;display:grid;gap:9px"><button class="btn" style="margin-top:0;background:#6b35f5" onclick="openSpecificUPI('phonepe')">🟣 Pay with PhonePe</button><button class="btn" style="margin-top:0;background:#1683ff" onclick="openSpecificUPI('gpay')">🔵 Pay with Google Pay</button><button class="btn" style="margin-top:0" onclick="openUPIPayment()">📱 Pay with Any UPI App</button><button class="btn" style="margin-top:0;background:#274a68" onclick="copyUPI()">Copy UPI ID: 7906199445@ybl</button><div style="text-align:center;margin-top:5px"><div id="qr" style="display:inline-block;padding:12px;background:#fff;border-radius:16px"></div><div style="color:#fff;font-size:12px;margin-top:10px">Scan with PhonePe, Google Pay or any UPI app</div></div><button class="btn" style="margin-top:4px" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button></div>';
  const img=document.createElement("img");img.alt="UPI QR";img.width=220;img.height=220;img.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);$("qr").appendChild(img);
  window.pendingOrder=order;window.pendingUpi=upi;
 }
 function showBankPayment(order){window.pendingOrder=order;$("payNote").innerHTML='<b>Bank Transfer for ₹'+order.price+'</b><br><span class="muted">Bank account details are not configured yet.</span><div style="margin-top:10px">Please contact Daivik Doorstep Car Wash on WhatsApp for bank transfer details.</div><button class="btn" style="margin-top:12px" onclick="openWhatsApp(\''+order.id+'\')">WhatsApp Bank Details</button><button class="btn" style="margin-top:8px;background:#274a68" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button>'}
 function openUPIPayment(){if(window.pendingUpi)window.location.href=window.pendingUpi}
+function openSpecificUPI(app){
+ const amount=window.pendingOrder?.price||0;
+ const orderId=window.pendingOrder?.id||"";
+ const base="upi://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(Number(amount).toFixed(2))+"&cu=INR&tn="+encodeURIComponent(orderId);
+ const phonePe="phonepe://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(Number(amount).toFixed(2))+"&cu=INR&tn="+encodeURIComponent(orderId);
+ const googlePay="tez://upi/pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(Number(amount).toFixed(2))+"&cu=INR&tn="+encodeURIComponent(orderId);
+ const target=app==="phonepe"?phonePe:googlePay;
+ const fallback=()=>{window.location.href=base};
+ window.location.href=target;
+ setTimeout(()=>{if(document.visibilityState==="visible")fallback()},1200);
+}
 async function copyUPI(){try{await navigator.clipboard.writeText("7906199445@ybl");$("payNote").insertAdjacentHTML("beforeend","<div style='margin-top:8px;color:#8ff0b8'>UPI ID copied ✓</div>")}catch(e){alert("UPI ID: 7906199445@ybl")}}
 async function confirmPaid(){
  const order=window.pendingOrder;if(!order)return;
