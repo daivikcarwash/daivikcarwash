@@ -1,79 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Customer Portal | Daivik Doorstep Car Wash</title>
-<meta name="description" content="Daivik Doorstep Car Wash customer login, booking and payment portal.">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Book a Car Wash | Daivik Doorstep Car Wash</title>
+<meta name="description" content="Book Daivik Doorstep Car Wash at your doorstep.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#D4AF37;--gold2:#B8962E;--navy:#07182f;--navy2:#12345a;--white:#fff;--muted:#aebbd0;--glass:rgba(255,255,255,.09);--border:rgba(255,255,255,.16)}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}
-body{min-height:100vh;color:#fff;background:linear-gradient(135deg,#061326,#102f50);overflow-x:hidden}
-body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 15% 15%,rgba(212,175,55,.18),transparent 30%),radial-gradient(circle at 85% 80%,rgba(30,100,160,.2),transparent 35%);pointer-events:none}
-.top{position:sticky;top:0;z-index:10;background:rgba(5,18,37,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:15px 20px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-family:"Playfair Display";font-size:24px;color:var(--gold)}.back{color:#fff;text-decoration:none;border:1px solid var(--gold);padding:8px 15px;border-radius:22px;font-size:13px}
-.wrap{width:min(1100px,94%);margin:35px auto 60px}.hero{text-align:center;margin-bottom:25px}.hero h1{font-family:"Playfair Display";font-size:38px}.hero p{color:var(--muted);margin-top:7px}
-.card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px);margin-bottom:22px}
-.auth{max-width:470px;margin:0 auto}.tabs{display:flex;gap:8px;margin-bottom:22px}.tabs button{flex:1;background:transparent;color:#fff;border:1px solid var(--border);padding:12px;border-radius:12px;cursor:pointer}.tabs button.active{background:linear-gradient(135deg,var(--gold),var(--gold2));border-color:transparent}
+:root{--gold:#D4AF37;--gold2:#B8962E;--bg:#061326;--bg2:#102f50;--muted:#aebbd0;--glass:rgba(255,255,255,.08);--border:rgba(255,255,255,.15)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}body{min-height:100vh;color:#fff;background:linear-gradient(135deg,var(--bg),var(--bg2));overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 10%,rgba(212,175,55,.18),transparent 30%),radial-gradient(circle at 90% 85%,rgba(30,100,160,.18),transparent 35%);pointer-events:none}
+.top{position:sticky;top:0;z-index:10;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;background:rgba(5,18,37,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.brand{font:700 24px "Playfair Display";color:var(--gold)}.back{color:#fff;text-decoration:none;border:1px solid var(--gold);padding:8px 15px;border-radius:22px;font-size:13px}
+.wrap{width:min(1050px,94%);margin:32px auto 60px}.hero{text-align:center;margin-bottom:24px}.hero h1{font:700 38px "Playfair Display"}.hero p{color:var(--muted);margin-top:6px}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:26px;box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px);margin-bottom:20px}
+h2{font:700 25px "Playfair Display";margin-bottom:17px}.services{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.service{padding:18px;border:1px solid var(--border);border-radius:17px;background:rgba(255,255,255,.045);cursor:pointer;transition:.2s}.service:hover,.service.selected{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 8px 25px rgba(212,175,55,.12)}.service h3{font-size:16px}.service p{font-size:12px;color:var(--muted);margin:4px 0 8px}.price{color:var(--gold);font-weight:700;font-size:18px}
 label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.25);color:#fff;outline:none}select option{color:#111}input:focus,select:focus{border-color:var(--gold)}
-.btn{width:100%;border:0;border-radius:13px;padding:14px;margin-top:17px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-weight:700;font-size:15px;cursor:pointer}.btn.secondary{background:transparent;border:1px solid var(--gold)}.small{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
-.hidden{display:none!important}.dash-head{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.welcome{font-family:"Playfair Display";font-size:27px}.logout{background:transparent;border:1px solid #ff7777;color:#ffb0b0;padding:8px 14px;border-radius:20px;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.stat{padding:18px;border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,.06)}.stat b{display:block;font-size:25px;color:var(--gold);margin-top:4px}
-h2{font-family:"Playfair Display";margin-bottom:18px}.service{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;padding:16px;border:1px solid var(--border);border-radius:16px;margin:10px 0;background:rgba(255,255,255,.05)}.service h3{font-size:16px}.service p{font-size:12px;color:var(--muted);margin-top:4px}.price{color:var(--gold);font-weight:700}.choose{width:auto;padding:9px 15px;margin:0}
-.payment{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pay{border:1px solid var(--border);border-radius:15px;padding:15px;cursor:pointer;background:rgba(255,255,255,.04)}.pay input{width:auto;margin-right:7px}.pay.selected{border-color:var(--gold);box-shadow:0 0 18px rgba(212,175,55,.15)}
-.order{padding:14px 0;border-bottom:1px solid var(--border)}.order:last-child{border:0}.badge{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:var(--gold);font-size:11px}
-.notice{padding:12px;border-radius:12px;background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.25);color:#ffe9a3;font-size:12px;margin-top:14px}
-@media(max-width:700px){.grid,.payment{grid-template-columns:1fr}.hero h1{font-size:30px}.card{padding:20px}.service{grid-template-columns:1fr}.choose{width:100%}}
+.btn{width:100%;border:0;border-radius:13px;padding:14px;margin-top:17px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-weight:700;font-size:15px;cursor:pointer}.btn:disabled{opacity:.5;cursor:not-allowed}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 15px}.payment{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pay{border:1px solid var(--border);border-radius:15px;padding:14px;cursor:pointer;background:rgba(255,255,255,.04);color:#fff}.pay input{width:auto;margin-right:6px}
+.note{padding:11px 13px;border-radius:12px;background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.2);color:#ffe9a3;font-size:12px;margin-top:13px}.success{padding:18px;border:1px solid rgba(83,214,143,.35);background:rgba(83,214,143,.08);border-radius:16px}.success h3{color:#8ff0b8}.order{padding:14px 0;border-bottom:1px solid var(--border)}.order:last-child{border:0}.badge{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:var(--gold);font-size:11px}.muted{color:var(--muted);font-size:12px}.hidden{display:none!important}
+@media(max-width:700px){.services,.payment,.formgrid{grid-template-columns:1fr}.hero h1{font-size:30px}.card{padding:20px}}
 </style>
 </head>
 <body>
-<header class="top"><div class="brand">Daivik Customer</div><a class="back" href="index.html">← Main Website</a></header>
+<header class="top"><div class="brand">Daivik Doorstep Car Wash</div><a class="back" href="index.html">← Home</a></header>
 <main class="wrap">
-<section class="hero"><h1>Customer Portal</h1><p>Login, book your doorstep service and manage your orders.</p></section>
+<section class="hero"><h1>Book Your Car Wash</h1><p>Choose your service, enter your details and place your booking.</p></section>
 
-<section id="authCard" class="card auth">
-<div class="tabs"><button id="loginTab" class="active" onclick="showAuth('login')">Login</button><button id="signupTab" onclick="showAuth('signup')">Create Account</button></div>
-<div id="loginBox">
-<label>Mobile / Email</label><input id="loginId" placeholder="Enter mobile or email" autocomplete="username">
-<label>Password</label><input id="loginPass" type="password" placeholder="Enter password" autocomplete="current-password">
-<button class="btn" onclick="login()">Login to Customer Account</button>
-<p id="loginMsg" class="small"></p>
-</div>
-<div id="signupBox" class="hidden">
-<label>Full Name</label><input id="signName" placeholder="Your name">
-<label>Mobile Number</label><input id="signMobile" inputmode="numeric" placeholder="10-digit mobile">
-<label>Email (optional)</label><input id="signEmail" type="email" placeholder="Email address">
-<label>Create Password</label><input id="signPass" type="password" placeholder="Minimum 6 characters">
-<button class="btn" onclick="signup()">Create Customer Account</button>
-<p id="signMsg" class="small"></p>
-</div>
-<div class="notice">For now this customer portal stores demo account/order data in this browser. For production-level secure login and real online payments, a backend/authentication and payment gateway must be connected.</div>
+<section class="card">
+<h2>1. Choose Your Service</h2>
+<div id="services" class="services"></div>
 </section>
 
-<section id="dashboard" class="hidden">
-<div class="card"><div class="dash-head"><div><div class="welcome" id="welcome"></div><div class="small" style="text-align:left">Manage your Daivik Doorstep Car Wash services.</div></div><button class="logout" onclick="logout()">Logout</button></div></div>
-<div class="grid">
-<div class="stat">Orders<b id="orderCount">0</b></div><div class="stat">Total Spent<b id="spent">₹0</b></div><div class="stat">Payment Mode<b id="lastPay">—</b></div>
+<section class="card">
+<h2>2. Your Booking Details</h2>
+<div class="formgrid">
+<div><label>Full Name</label><input id="name" placeholder="Your name"></div>
+<div><label>Email Address</label><input id="email" type="email" placeholder="yourname@email.com" autocomplete="email"></div>
+<div><label>Mobile Number</label><input id="mobile" inputmode="numeric" placeholder="10-digit mobile number"></div>
+<div><label>Vehicle Number</label><input id="vehicle" placeholder="e.g. UK08AB1234"></div>
+<div><label>Service Date</label><input id="date" type="date"></div>
+<div><label>Preferred Time</label><select id="time"><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>12:00 PM - 2:00 PM</option><option>2:00 PM - 4:00 PM</option><option>4:00 PM - 6:00 PM</option><option>6:00 PM - 8:00 PM</option></select></div>
 </div>
-
-<div class="card"><h2>Book a Service</h2><div id="services"></div>
-<label>Service Date</label><input id="serviceDate" type="date">
-<label>Preferred Time</label><select id="serviceTime"><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>12:00 PM - 2:00 PM</option><option>2:00 PM - 4:00 PM</option><option>4:00 PM - 6:00 PM</option><option>6:00 PM - 8:00 PM</option></select>
-<label>Car / Vehicle Number</label><input id="vehicle" placeholder="e.g. UK08AB1234">
-<label>Address / Service Location</label><input id="address" placeholder="Enter your doorstep address">
-<h2 style="margin-top:25px">Payment</h2>
+<label>Doorstep Address</label><input id="address" placeholder="Where should we come for the service?">
+<h2 style="margin-top:25px">3. Payment</h2>
 <div class="payment">
 <label class="pay"><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label class="pay"><input type="radio" name="pay" value="ONLINE"> Pay Online</label>
 <label class="pay"><input type="radio" name="pay" value="UPI"> UPI</label>
 </div>
-<div id="onlineNotice" class="notice">Online/UPI payment gateway is not connected yet. The order can still be saved, but no money will be charged until a real payment gateway is integrated.</div>
-<button class="btn" onclick="placeOrder()">Confirm Booking</button><p id="orderMsg" class="small"></p>
-</div>
-
-<div class="card"><h2>My Orders</h2><div id="orders"><p class="small">No orders yet.</p></div></div>
+<div id="payNote" class="note">You can pay in cash after the service is completed.</div>
+<button id="bookBtn" class="btn" onclick="placeOrder()">Place My Booking</button>
+<p id="msg" class="muted" style="text-align:center;margin-top:10px"></p>
 </section>
+
+<section id="success" class="card hidden"><div class="success"><h3>✓ Booking Confirmed</h3><p id="successText" style="margin-top:7px"></p><p class="muted" style="margin-top:8px">Your booking details have been saved. We can use your email to recognize your future bookings.</p></div></section>
+
+<section id="history" class="card hidden"><h2>Your Recent Bookings</h2><div id="orders"></div></section>
 </main>
 <script>
 const SERVICES=[
@@ -84,38 +66,27 @@ const SERVICES=[
 {name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149},
 {name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199}
 ];
-let selectedService=null;
-const $=id=>document.getElementById(id);
-function users(){return JSON.parse(localStorage.getItem("daivikCustomers")||"[]")}
-function saveUsers(x){localStorage.setItem("daivikCustomers",JSON.stringify(x))}
-function showAuth(mode){$("loginBox").classList.toggle("hidden",mode!=="login");$("signupBox").classList.toggle("hidden",mode!=="signup");$("loginTab").classList.toggle("active",mode==="login");$("signupTab").classList.toggle("active",mode==="signup")}
-async function hash(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
-async function signup(){
- const name=$("signName").value.trim(),mobile=$("signMobile").value.trim(),email=$("signEmail").value.trim().toLowerCase(),pass=$("signPass").value;
- if(!name||!/^[0-9]{10}$/.test(mobile)||pass.length<6){$("signMsg").textContent="Please enter a valid name, 10-digit mobile and password of 6+ characters.";return}
- const us=users(); if(us.some(u=>u.mobile===mobile||email&&u.email===email)){ $("signMsg").textContent="An account with this mobile/email already exists.";return}
- us.push({id:"CUS"+Date.now(),name,mobile,email,password:await hash(pass),orders:[]});saveUsers(us);
- $("signMsg").textContent="Account created. You can login now.";showAuth("login");$("loginId").value=mobile;
-}
-async function login(){
- const id=$("loginId").value.trim().toLowerCase(),pass=await hash($("loginPass").value),u=users().find(x=>(x.mobile===id||x.email===id)&&x.password===pass);
- if(!u){$("loginMsg").textContent="Invalid ID or password.";return}
- localStorage.setItem("daivikCurrentCustomer",u.id);openDash(u);
-}
-function current(){const id=localStorage.getItem("daivikCurrentCustomer");return users().find(x=>x.id===id)}
-function openDash(u){$("authCard").classList.add("hidden");$("dashboard").classList.remove("hidden");$("welcome").textContent="Welcome, "+u.name+" 👋";renderServices();renderOrders();$("serviceDate").min=new Date().toISOString().split("T")[0]}
-function renderServices(){$("services").innerHTML=SERVICES.map((s,i)=>`<div class="service"><div><h3>${s.name}</h3><p>${s.desc}</p><div class="price">₹${s.price}</div></div><button class="btn choose" onclick="selectService(${i})">Select</button></div>`).join("")}
-function selectService(i){selectedService=SERVICES[i];document.querySelectorAll(".service").forEach((x,n)=>x.style.borderColor=n===i?"#D4AF37":"rgba(255,255,255,.16)");$("orderMsg").textContent=selectedService.name+" selected — ₹"+selectedService.price}
+let selected=null;const $=id=>document.getElementById(id);
+$("date").min=new Date().toISOString().split("T")[0];
+function renderServices(){$("services").innerHTML=SERVICES.map((s,i)=>`<div class="service" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><div class="price">₹${s.price}</div></div>`).join("")}
+function selectService(i){selected=SERVICES[i];document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));$("msg").textContent=selected.name+" selected • ₹"+selected.price}
+function customers(){return JSON.parse(localStorage.getItem("daivikCustomers")||"[]")}
+function saveCustomers(x){localStorage.setItem("daivikCustomers",JSON.stringify(x))}
+function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 function placeOrder(){
- const u=current(),date=$("serviceDate").value,vehicle=$("vehicle").value.trim(),address=$("address").value.trim(),pay=document.querySelector('input[name="pay"]:checked').value;
- if(!selectedService||!date||!vehicle||!address){$("orderMsg").textContent="Please select a service and fill date, vehicle number and address.";return}
- const order={id:"ORD"+Date.now(),service:selectedService.name,price:selectedService.price,date,time:$("serviceTime").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
- u.orders.push(order);const us=users().map(x=>x.id===u.id?u:x);saveUsers(us);$("orderMsg").textContent="Booking received successfully. Order ID: "+order.id;renderOrders();$("vehicle").value="";$("address").value="";
+ const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value,address=$("address").value.trim(),pay=document.querySelector('input[name="pay"]:checked').value;
+ if(!selected){$("msg").textContent="Please choose a service first.";return}
+ if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("msg").textContent="Please complete your name, email, mobile, vehicle, date and address.";return}
+ let list=customers(),customer=list.find(c=>c.email===email);
+ if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile}
+ const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
+ customer.orders.push(order);saveCustomers(list);
+ $("success").classList.remove("hidden");$("successText").textContent="Thank you "+name+"! Your "+selected.name+" booking is confirmed. Order ID: "+order.id+".";
+ $("history").classList.remove("hidden");renderHistory(customer);window.scrollTo({top:$("success").offsetTop-20,behavior:"smooth"});
+ $("bookBtn").textContent="Booking Placed ✓";$("bookBtn").disabled=true;
 }
-function renderOrders(){const u=current();$("orderCount").textContent=u.orders.length;$("spent").textContent="₹"+u.orders.reduce((a,o)=>a+(o.payment==="COD"?0:o.price),0);$("lastPay").textContent=u.orders.length?u.orders[u.orders.length-1].payment:"—";$("orders").innerHTML=u.orders.length?u.orders.slice().reverse().map(o=>`<div class="order"><b>${o.service}</b> — ₹${o.price}<br><span class="badge">${o.status}</span> <span class="small" style="display:inline">${o.payment}</span><br><span class="small" style="text-align:left;display:block">${o.date} • ${o.time} • ${o.vehicle}<br>${o.address}</span></div>`).join(""):'<p class="small">No orders yet.</p>'}
-function logout(){localStorage.removeItem("daivikCurrentCustomer");location.reload()}
-document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{$("onlineNotice").style.display=r.value==="COD"?"none":"block"}));
-const u=current();if(u)openDash(u);
+function renderHistory(c){$("orders").innerHTML=c.orders.slice().reverse().map(o=>`<div class="order"><b>${o.service}</b> — ₹${o.price}<br><span class="badge">${o.status}</span> <span class="muted">${o.payment}</span><div class="muted" style="margin-top:5px">${o.date} • ${o.time} • ${o.vehicle}<br>${o.address}</div></div>`).join("")}
+document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{$("payNote").textContent=r.value==="COD"?"You can pay in cash after the service is completed.":r.value==="UPI"?"UPI payment will be available after the payment gateway is connected.":"Secure online payment will be available after the payment gateway is connected."}));
+renderServices();
 </script>
-</body>
-</html>
+</body></html>
