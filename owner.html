@@ -28,9 +28,16 @@ body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{m
 <div class="stat">On Way<b id="onway">0</b></div>
 <div class="stat">Completed<b id="done">0</b></div>
 </div>
+<div class="grid" style="margin-top:10px">
+<div class="stat">Paid Orders<b id="paid">0</b></div>
+<div class="stat">Pending Payment<b id="pendingPay">0</b></div>
+<div class="stat">Booking Value<b id="revenue">₹0</b></div>
+<div class="stat">Live GPS<b id="liveGps">0</b></div>
+</div>
 
 <div class="card">
 <div class="row">
+<a class="btn" href="staff.html" target="_blank" style="text-decoration:none;text-align:center">📍 Open Staff GPS</a>
 <select id="filter" onchange="render()">
 <option value="ALL">All Orders</option><option>Booking Received</option><option>Confirmed</option><option>On the Way</option><option>Arriving Soon</option><option>Completed</option><option>Cancelled</option>
 </select>
@@ -81,6 +88,10 @@ function render(){
   document.getElementById("received").textContent=orders.filter(o=>o.status==="Booking Received").length;
   document.getElementById("onway").textContent=orders.filter(o=>o.status==="On the Way"||o.status==="Arriving Soon").length;
   document.getElementById("done").textContent=orders.filter(o=>o.status==="Completed").length;
+  document.getElementById("paid").textContent=orders.filter(o=>o.payment_status==="Paid"||o.payment_status==="Customer Marked Paid").length;
+  document.getElementById("pendingPay").textContent=orders.filter(o=>!o.payment_status||o.payment_status==="Pending").length;
+  document.getElementById("revenue").textContent="₹"+orders.reduce((sum,o)=>sum+(Number(o.price)||0),0).toLocaleString("en-IN");
+  document.getElementById("liveGps").textContent=orders.filter(o=>o.staff_lat!=null&&o.staff_lng!=null&&o.status!=="Completed"&&o.status!=="Cancelled").length;
   document.getElementById("orders").innerHTML=list.map(o=>`
     <div class="order">
       <b>${esc(o.order_id)}</b> — ${esc(o.service)} — ₹${esc(o.price)}
@@ -96,13 +107,26 @@ function render(){
           <option ${o.status==="Completed"?"selected":""}>Completed</option>
           <option ${o.status==="Cancelled"?"selected":""}>Cancelled</option>
         </select>
-        <span class="muted">Payment: ${esc(o.payment_status||"Pending")}</span>
+        <label class="muted" style="margin:0">Payment:
+          <select data-id="${esc(o.order_id)}" onchange="setPayment(this.dataset.id,this.value)">
+            <option ${o.payment_status==="Pending"?"selected":""}>Pending</option>
+            <option ${o.payment_status==="Customer Marked Paid"?"selected":""}>Customer Marked Paid</option>
+            <option ${o.payment_status==="Paid"?"selected":""}>Paid</option>
+            <option ${o.payment_status==="Refunded"?"selected":""}>Refunded</option>
+          </select>
+        </label>
         <button class="btn" data-id="${esc(o.order_id)}" onclick="editOrder(this.dataset.id)">✏️ Edit</button>
+        <button class="btn" style="background:#274a68" data-id="${esc(o.order_id)}" onclick="openStaff(this.dataset.id)">📍 Staff GPS</button>
         <button class="btn danger" data-id="${esc(o.order_id)}" onclick="deleteOrder(this.dataset.id)">🗑 Delete</button>
       </div>
     </div>`).join("")||"<p class='muted'>No orders found.</p>";
 }
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function setPayment(id,payment_status){
+  const {error}=await db.from("daivik_car_wash_orders").update({payment_status,updated_at:new Date().toISOString()}).eq("order_id",id);
+  if(error){alert("Payment update failed: "+error.message);return}
+  const o=orders.find(x=>x.order_id===id);if(o)o.payment_status=payment_status;render();
+}
 async function setStatus(id,status){
   const {error}=await db.from("daivik_car_wash_orders").update({status,updated_at:new Date().toISOString()}).eq("order_id",id);
   if(error){alert("Status update failed: "+error.message);return}
@@ -124,6 +148,7 @@ async function deleteOrder(id){
   if(error){alert("Delete failed: "+error.message);return}
   orders=orders.filter(o=>o.order_id!==id);render();
 }
+function openStaff(id){window.open("staff.html?order="+encodeURIComponent(id),"_blank")}
 function exportCSV(){
   const rows=[["Order ID","Name","Email","Mobile","Vehicle","Service","Price","Date","Time","Status","Payment","Address"]].concat(orders.map(o=>[o.order_id,o.customer_name,o.customer_email,o.customer_mobile,o.vehicle,o.service,o.price,o.service_date,o.preferred_time,o.status,o.payment_status,o.address]));
   const csv=rows.map(r=>r.map(x=>JSON.stringify(String(x??""))).join(",")).join("\n");
