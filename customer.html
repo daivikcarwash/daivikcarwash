@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--gold:#D4AF37;--gold2:#B8962E;--bg:#061326;--bg2:#102f50;--muted:#aebbd0;--glass:rgba(255,255,255,.08);--border:rgba(255,255,255,.15)}
 *{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}body{min-height:100vh;color:#fff;background:linear-gradient(135deg,var(--bg),var(--bg2));overflow-x:hidden}
@@ -27,6 +28,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <body>
 <header class="top"><div class="brand">Daivik Doorstep Car Wash</div><a class="back" href="index.html">← Home</a></header>
 <main class="wrap">
+<section class="card"><h2>🔎 Track Existing Order</h2><p class="muted">Enter your Order ID and email to see your booking from any phone.</p><div class="formgrid"><div><label>Order ID</label><input id="lookupOrder" placeholder="e.g. ORD123456789"></div><div><label>Email Address</label><input id="lookupEmail" type="email" placeholder="yourname@email.com"></div></div><button class="btn" onclick="lookupOrder()">Find My Order</button><p id="lookupMsg" class="muted" style="text-align:center;margin-top:10px"></p></section>
 <section class="hero"><h1>Book Your Car Wash</h1><p>Choose your service, enter your details and place your booking.</p></section>
 
 <section class="card">
@@ -70,6 +72,9 @@ const SERVICES=[
 {name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149},
 {name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199}
 ];
+const SUPABASE_URL="https://holelzxzhaiefaqezmce.supabase.co";
+const SUPABASE_KEY="sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let selected=null;const $=id=>document.getElementById(id);
 $("date").min=new Date().toISOString().split("T")[0];
 function renderServices(){$("services").innerHTML=SERVICES.map((s,i)=>`<div class="service" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><div class="price">₹${s.price}</div></div>`).join("")}
@@ -85,6 +90,7 @@ function placeOrder(){
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile}
  const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$( "time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
  customer.orders.push(order);saveCustomers(list);
+ syncOrderToCloud(order,name,email,mobile);
  if(pay==="UPI"||pay==="ONLINE"){showPayment(order);return}
  confirmBooking(order,name,customer);
 }
@@ -99,6 +105,28 @@ function confirmPaid(){
  const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";confirmBooking(order,customer.name,customer)}
 }
 let trackingMap=null,routeLine=null,carMarker=null,routeCoords=[],carTimer=null,lastCustomerCoords=null,lastOriginCoords=null;
+async function syncOrderToCloud(order,name,email,mobile){
+ try{
+  const payload={order_id:order.id,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle:order.vehicle,service:order.service,price:order.price,service_date:order.date,preferred_time:order.time,address:order.address,payment_method:order.payment,payment_status:order.status==="Payment Marked by Customer"?"Customer Marked Paid":"Pending",status:order.status,wash_team_lat:WASH_TEAM_LOCATION.lat,wash_team_lng:WASH_TEAM_LOCATION.lng};
+  const {error}=await db.from("daivik_car_wash_orders").insert(payload);
+  if(error)console.error("Cloud order save failed",error);
+ }catch(e){console.error(e)}
+}
+async function lookupOrder(){
+ const oid=$("lookupOrder").value.trim(),email=$("lookupEmail").value.trim().toLowerCase();
+ if(!oid||!validEmail(email)){ $("lookupMsg").textContent="Please enter a valid Order ID and email."; return; }
+ $("lookupMsg").textContent="Finding your order…";
+ const {data,error}=await db.from("daivik_car_wash_orders").select("*").eq("order_id",oid).eq("customer_email",email).maybeSingle();
+ if(error||!data){ $("lookupMsg").textContent="Order not found. Please check Order ID and email."; return; }
+ $("lookupMsg").textContent="Order found ✓";
+ $("tracking").classList.remove("hidden"); $("history").classList.remove("hidden");
+ $("trackVehicle").textContent=data.vehicle; $("trackStatus").textContent=data.status;
+ const found={id:data.order_id,service:data.service,price:Number(data.price),date:data.service_date,time:data.preferred_time,vehicle:data.vehicle,address:data.address,payment:data.payment_method,status:data.status};
+ await startTracking(found,data);
+ $("orders").innerHTML="<div class=\"order\"><b>"+data.service+"</b> — ₹"+data.price+"<br><span class=\"badge\">"+data.status+"</span> <span class=\"muted\">"+data.payment_method+"</span><div class=\"muted\" style=\"margin-top:5px\">"+data.service_date+" • "+data.preferred_time+" • "+data.vehicle+"<br>"+data.address+"</div></div>";
+ $("tracking").scrollIntoView({behavior:"smooth"});
+}
+
 const WASH_TEAM_LOCATION={lat:30.3165,lng:78.0322,name:"Daivik Wash Team"}; // Change these coordinates to your actual starting location.
 async function confirmBooking(order,name,customer){
  $("success").classList.remove("hidden");$("successText").textContent="Thank you "+name+"! Your "+order.service+" booking is confirmed. Order ID: "+order.id+".";
@@ -113,13 +141,13 @@ async function geocodeAddress(address){
  if(!data.length) throw new Error("Customer address could not be found on the map.");
  return {lat:Number(data[0].lat),lng:Number(data[0].lon),label:data[0].display_name};
 }
-async function startTracking(order){
+async function startTracking(order,cloudOrder=null){
  $("tracking").classList.remove("hidden");
  $("trackVehicle").textContent=order.vehicle;
  $("trackStatus").textContent="Finding route…";
  try{
-  const dest=await geocodeAddress(order.address);lastCustomerCoords=dest;lastOriginCoords=WASH_TEAM_LOCATION;
-  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+WASH_TEAM_LOCATION.lng+","+WASH_TEAM_LOCATION.lat+";"+dest.lng+","+dest.lat+"?overview=full&geometries=geojson");
+  const dest=await geocodeAddress(order.address);lastCustomerCoords=dest;lastOriginCoords=cloudOrder&&cloudOrder.wash_team_lat?{lat:Number(cloudOrder.wash_team_lat),lng:Number(cloudOrder.wash_team_lng),name:"Daivik Wash Team"}:WASH_TEAM_LOCATION;
+  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+lastOriginCoords.lng+","+lastOriginCoords.lat+";"+dest.lng+","+dest.lat+"?overview=full&geometries=geojson");
   const routeData=await routeRes.json();
   if(!routeData.routes||!routeData.routes[0]) throw new Error("Route not found.");
   const route=routeData.routes[0];routeCoords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
@@ -152,7 +180,7 @@ function animateCar(coords,minutes){
 }
 function openGoogleMaps(){
  if(!lastCustomerCoords)return;
- window.open("https://www.google.com/maps/dir/?api=1&origin="+WASH_TEAM_LOCATION.lat+","+WASH_TEAM_LOCATION.lng+"&destination="+lastCustomerCoords.lat+","+lastCustomerCoords.lng+"&travelmode=driving","_blank");
+ window.open("https://www.google.com/maps/dir/?api=1&origin="+lastOriginCoords.lat+","+lastOriginCoords.lng+"&destination="+lastCustomerCoords.lat+","+lastCustomerCoords.lng+"&travelmode=driving","_blank");
 }
 function renderHistory(c){$("orders").innerHTML=c.orders.slice().reverse().map(o=>`<div class="order"><b>${o.service}</b> — ₹${o.price}<br><span class="badge">${o.status}</span> <span class="muted">${o.payment}</span><div class="muted" style="margin-top:5px">${o.date} • ${o.time} • ${o.vehicle}<br>${o.address}</div></div>`).join("")}
 document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{$("payNote").textContent=r.value==="COD"?"You can pay in cash after the service is completed.":r.value==="UPI"?"UPI payment will be available after the payment gateway is connected.":"Secure online payment will be available after the payment gateway is connected."}));
