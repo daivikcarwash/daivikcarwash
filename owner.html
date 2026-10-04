@@ -45,7 +45,7 @@ body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{m
 <div class="row">
 <a class="btn" href="staff.html" target="_blank" style="text-decoration:none;text-align:center">📍 Open Staff GPS</a>
 <select id="filter" onchange="render()">
-<option value="ALL">All Orders</option><option>Booking Received</option><option>Confirmed</option><option>On the Way</option><option>Arriving Soon</option><option>Completed</option><option>Cancelled</option>
+<option value="ALL">All Orders</option><option>Booking Received</option><option>Confirmed</option><option>On the Way</option><option>Arriving Soon</option><option>Running</option><option>Completed</option><option>Cancelled</option>
 </select>
 <button class="btn" onclick="loadOrders()">↻ Refresh</button>
 <button class="btn" onclick="exportCSV()">⬇ Export CSV</button>
@@ -127,40 +127,20 @@ function render(){
   const list=f==="ALL"?orders:orders.filter(o=>o.status===f);
   document.getElementById("total").textContent=orders.length;
   document.getElementById("received").textContent=orders.filter(o=>o.status==="Booking Received").length;
-  document.getElementById("onway").textContent=orders.filter(o=>o.status==="On the Way"||o.status==="Arriving Soon").length;
+  document.getElementById("onway").textContent=orders.filter(o=>o.status==="On the Way"||o.status==="Arriving Soon"||o.status==="Running").length;
   document.getElementById("done").textContent=orders.filter(o=>o.status==="Completed").length;
-  document.getElementById("paid").textContent=orders.filter(o=>o.payment_status==="Paid"||o.payment_status==="Customer Marked Paid").length;
-  document.getElementById("pendingPay").textContent=orders.filter(o=>!o.payment_status||o.payment_status==="Pending").length;
+  document.getElementById("paid").textContent=orders.filter(o=>o.payment_status==="Collected").length;
+  document.getElementById("pendingPay").textContent=orders.filter(o=>!o.payment_status||o.payment_status==="Pending"||o.payment_status==="Customer Marked Paid").length;
   document.getElementById("revenue").textContent="₹"+orders.reduce((sum,o)=>sum+(Number(o.price)||0),0).toLocaleString("en-IN");
   document.getElementById("liveGps").textContent=orders.filter(o=>o.staff_lat!=null&&o.staff_lng!=null&&o.status!=="Completed"&&o.status!=="Cancelled").length;
-  document.getElementById("orders").innerHTML=list.map(o=>`
-    <div class="order">
-      <b>${esc(o.order_id)}</b> — ${esc(o.service)} — ₹${esc(o.price)}
-      <br><span class="muted">${esc(o.customer_name)} • ${esc(o.customer_mobile)} • ${esc(o.customer_email)}
-      <br>${esc(o.vehicle)} • ${esc(o.service_date)} • ${esc(o.preferred_time||"")}
-      <br>${esc(o.address)}</span>
-      <div class="row" style="margin-top:10px">
-        <select data-id="${esc(o.order_id)}" onchange="setStatus(this.dataset.id,this.value)">
-          <option ${o.status==="Booking Received"?"selected":""}>Booking Received</option>
-          <option ${o.status==="Confirmed"?"selected":""}>Confirmed</option>
-          <option ${o.status==="On the Way"?"selected":""}>On the Way</option>
-          <option ${o.status==="Arriving Soon"?"selected":""}>Arriving Soon</option>
-          <option ${o.status==="Completed"?"selected":""}>Completed</option>
-          <option ${o.status==="Cancelled"?"selected":""}>Cancelled</option>
-        </select>
-        <label class="muted" style="margin:0">Payment:
-          <select data-id="${esc(o.order_id)}" onchange="setPayment(this.dataset.id,this.value)">
-            <option ${o.payment_status==="Pending"?"selected":""}>Pending</option>
-            <option ${o.payment_status==="Customer Marked Paid"?"selected":""}>Customer Marked Paid</option>
-            <option ${o.payment_status==="Paid"?"selected":""}>Paid</option>
-            <option ${o.payment_status==="Refunded"?"selected":""}>Refunded</option>
-          </select>
-        </label>
-        <button class="btn" data-id="${esc(o.order_id)}" onclick="editOrder(this.dataset.id)">✏️ Edit</button>
-        <button class="btn" style="background:#274a68" data-id="${esc(o.order_id)}" onclick="openStaff(this.dataset.id)">📍 Staff GPS</button>
-        <button class="btn danger" data-id="${esc(o.order_id)}" onclick="deleteOrder(this.dataset.id)">🗑 Delete</button>
-      </div>
-    </div>`).join("")||"<p class='muted'>No orders found.</p>";
+  const groups=[["🆕 New / Received",o=>o.status==="Booking Received"||o.status==="Confirmed"],["🚗 Running / Service In Progress",o=>["On the Way","Arriving Soon","Running"].includes(o.status)],["✅ Completed / Closed",o=>o.status==="Completed"],["❌ Cancelled",o=>o.status==="Cancelled"]];
+  let html="";
+  groups.forEach(([title,test])=>{
+    const g=list.filter(test); if(!g.length)return;
+    html+="<div style=\"margin:18px 0 8px\"><h3 style=\"color:#d4af37;margin:0\">"+title+" <span class=\"muted\">("+g.length+")</span></h3></div>";
+    html+=g.map(o=>"<div class=\"order\"><b>"+esc(o.order_id)+"</b> — "+esc(o.service)+" — ₹"+esc(o.price)+"<br><span class=\"muted\">"+esc(o.customer_name)+" • "+esc(o.customer_mobile)+" • "+esc(o.customer_email)+"<br>"+esc(o.vehicle)+" • "+esc(o.service_date)+" • "+esc(o.preferred_time||"")+"<br>"+esc(o.address)+"</span><div class=\"row\" style=\"margin-top:10px\"><select data-id=\""+esc(o.order_id)+"\" onchange=\"setStatus(this.dataset.id,this.value)\"><option "+(o.status==="Booking Received"?"selected":"")+">Booking Received</option><option "+(o.status==="Confirmed"?"selected":"")+">Confirmed</option><option "+(o.status==="On the Way"?"selected":"")+">On the Way</option><option "+(o.status==="Arriving Soon"?"selected":"")+">Arriving Soon</option><option "+(o.status==="Running"?"selected":"")+">Running</option><option "+(o.status==="Completed"?"selected":"")+">Completed</option><option "+(o.status==="Cancelled"?"selected":"")+">Cancelled</option></select><label class=\"muted\" style=\"margin:0\">Payment: <select data-id=\""+esc(o.order_id)+"\" onchange=\"setPayment(this.dataset.id,this.value)\"><option "+(o.payment_status==="Pending"?"selected":"")+">Pending</option><option "+(o.payment_status==="Customer Marked Paid"?"selected":"")+">Customer Marked Paid</option><option "+(o.payment_status==="Collected"?"selected":"")+">Collected</option><option "+(o.payment_status==="Refunded"?"selected":"")+">Refunded</option></select></label><button class=\"btn\" data-id=\""+esc(o.order_id)+"\" onclick=\"editOrder(this.dataset.id)\">✏️ Edit</button><button class=\"btn\" style=\"background:#274a68\" data-id=\""+esc(o.order_id)+"\" onclick=\"openStaff(this.dataset.id)\">📍 Staff GPS</button><button class=\"btn danger\" data-id=\""+esc(o.order_id)+"\" onclick=\"deleteOrder(this.dataset.id)\">🗑 Delete</button></div></div>").join("");
+  });
+  document.getElementById("orders").innerHTML=html||"<p class=\"muted\">No orders found.</p>";
 }
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 async function setPayment(id,payment_status){
