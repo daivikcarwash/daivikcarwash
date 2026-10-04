@@ -23,65 +23,108 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Daivik Doorstep Car Wash","image":"https://daivikcarwash.github.io/daivikcarwash/images/dlogo.jpeg","@id":"https://daivikcarwash.github.io/daivikcarwash/","url":"https://daivikcarwash.github.io/daivikcarwash/","telephone":"+917906199445","address":{"@type":"PostalAddress","streetAddress":"Haridwar","addressLocality":"Haridwar","addressRegion":"Uttarakhand","postalCode":"249401","addressCountry":"IN"},"geo":{"@type":"GeoCoordinates","latitude":29.9457,"longitude":78.1642},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"08:00","closes":"20:00"},"priceRange":"₹50-₹1100","sameAs":["YOUR_FB_LINK","YOUR_INSTA_LINK"]}</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}:root{--gold:#d4af37;--gold2:#b78e20;--navy:#071a31;--navy2:#12385d;--text:#172235;--muted:#617086;--line:#e5eaf0}
-html{scroll-behavior:smooth}body{font-family:Poppins,sans-serif;color:var(--text);background:#f5f7fa;overflow-x:hidden}
-header{min-height:500px;padding:54px 20px 58px;text-align:center;color:#fff;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(7,26,49,.97),rgba(18,56,93,.94))}
-header:after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-220px;top:-280px;background:rgba(212,175,55,.14)}
-.logo{width:120px;height:120px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 24px;border:3px solid rgba(255,255,255,.75);box-shadow:0 14px 40px rgba(0,0,0,.3);cursor:pointer;position:relative;z-index:2}
-header h1{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,54px);line-height:1.1;margin:0;position:relative;z-index:2;color:#fff}
-header p{font-size:clamp(15px,2vw,20px);margin:13px auto 0;color:#dfe8f3;position:relative;z-index:2;max-width:650px}
-.hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:28px;position:relative;z-index:2}.hero-actions a{padding:13px 23px;border-radius:28px;text-decoration:none;font-weight:700;font-size:14px}
-.hero-book{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;box-shadow:0 8px 25px rgba(212,175,55,.25)}.hero-call{border:1px solid rgba(255,255,255,.5);color:#fff;background:rgba(255,255,255,.08)}
-nav{position:sticky;top:0;z-index:999;background:rgba(7,26,49,.97);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,.12);display:flex;justify-content:center;gap:7px;padding:10px 12px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
-nav a{color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:9px 13px;border-radius:20px;border:1px solid transparent}nav a:hover{background:rgba(212,175,55,.14);border-color:rgba(212,175,55,.45);color:#ffd85a}
-section{width:min(1080px,94%);padding:42px 0;margin:auto}.box{background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:0 10px 35px rgba(15,35,60,.07);margin-bottom:20px;opacity:1;transform:none;position:relative}.box:before{content:"";position:absolute;left:0;top:22px;bottom:22px;width:3px;border-radius:3px;background:var(--gold)}
-h2{text-align:left;font-family:'Playfair Display',serif;font-size:clamp(25px,4vw,34px);color:var(--navy);margin:0 0 18px;padding-left:10px}.box>p{line-height:1.8;color:#536276}
-#services .service-item{display:inline-flex;width:calc(50% - 9px);margin:5px 5px 5px 0;padding:14px 16px;background:#f7f9fb;border:1px solid #e5eaf0;border-left:3px solid var(--gold);border-radius:12px;font-size:14px;color:#29384b}.service-item,.price-item{transition:.2s}.service-item:hover,.price-item:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(10,30,55,.07)}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#d4af37;--gold2:#a98118;--navy:#061426;--navy2:#0c2945;--text:#182436;--muted:#647287;--line:#e5e9ef;--soft:#f7f9fb}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',Arial,sans-serif;color:var(--text);background:#f3f6f9;overflow-x:hidden}
+header{min-height:610px;padding:72px 20px 75px;text-align:center;color:#fff;position:relative;overflow:hidden;background:linear-gradient(135deg,#04111f 0%,#0a2743 55%,#061729 100%)}
+header:before{content:"";position:absolute;width:680px;height:680px;border:1px solid rgba(212,175,55,.16);border-radius:50%;left:50%;top:-410px;transform:translateX(-50%);box-shadow:0 0 0 90px rgba(212,175,55,.025),0 0 0 180px rgba(212,175,55,.018)}
+header:after{content:"";position:absolute;width:380px;height:380px;border-radius:50%;right:-170px;bottom:-250px;background:rgba(212,175,55,.08)}
+.logo{width:126px;height:126px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 28px;border:2px solid rgba(255,255,255,.75);box-shadow:0 18px 55px rgba(0,0,0,.35);cursor:pointer;position:relative;z-index:2}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(38px,6vw,64px);line-height:1.08;margin:0;position:relative;z-index:2;letter-spacing:.2px}
+header p{font-size:clamp(15px,2vw,19px);margin:17px auto 0;color:#cbd7e4;position:relative;z-index:2;max-width:700px;line-height:1.65}
+.hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:32px;position:relative;z-index:2}
+.hero-actions a{padding:14px 26px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.2px}
+.hero-book{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;box-shadow:0 12px 30px rgba(212,175,55,.22)}
+.hero-call{border:1px solid rgba(255,255,255,.30);color:#fff;background:rgba(255,255,255,.055)}
+nav{position:sticky;top:0;z-index:999;background:rgba(4,17,31,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.10);display:flex;justify-content:center;gap:4px;padding:11px 12px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{color:#e9eef4;text-decoration:none;font-size:13px;font-weight:600;padding:10px 15px;border-radius:8px;border:1px solid transparent;transition:.2s}
+nav a:hover{background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.28);color:#e7c85f}
+section{width:min(1080px,94%);padding:44px 0;margin:auto}
+.box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:32px;box-shadow:0 12px 38px rgba(15,35,60,.065);margin-bottom:22px;position:relative}
+.box:before{content:"";position:absolute;left:0;top:25px;bottom:25px;width:3px;border-radius:3px;background:var(--gold)}
+h2{text-align:left;font-family:'Playfair Display',serif;font-size:clamp(27px,4vw,36px);color:var(--navy);margin:0 0 20px;padding-left:12px}
+.box>p{line-height:1.85;color:#536276}
+#services .service-item{display:flex;width:calc(50% - 9px);margin:5px 5px 5px 0;padding:16px 18px;background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;font-size:14px;color:#29384b;align-items:center}
+.service-item,.price-item{transition:.2s}.service-item:hover,.price-item:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(10,30,55,.06)}
 #pricing h3,#monthly h3{font-family:'Playfair Display',serif;color:var(--navy)!important;font-size:20px;margin:22px 0 10px}
-.price-item{display:flex;justify-content:space-between;align-items:center;gap:15px;background:#f8fafc;border:1px solid #e5eaf0;border-left:3px solid var(--gold);padding:12px 14px;margin:7px 0;border-radius:11px;font-size:14px;color:#314157}.price-item span{font-weight:800;font-size:16px;color:var(--navy);background:#fff4c7;padding:4px 10px;border-radius:9px;white-space:nowrap}
-#pricing .btn,#monthly .btn{margin:24px auto 0}.btn{display:block;width:fit-content;padding:13px 25px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;text-decoration:none;border-radius:28px;box-shadow:0 7px 20px rgba(212,175,55,.2)}
-#monthly>p{line-height:1.7;color:var(--muted)}#monthly hr{border:none;height:1px!important;background:#e7ebf0!important;margin:25px 0!important}
-.package-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}.package-card{background:#f8fafc;border:1px solid #e3e9f0;border-radius:18px;padding:16px}.package-head{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--navy);font-weight:800;font-size:16px;margin-bottom:10px}.package-head small{font-size:10px;color:var(--gold2);background:#fff4c7;padding:5px 8px;border-radius:10px;white-space:nowrap}.package{background:#fff;border:1px solid #e5eaf0;border-radius:13px;padding:13px;margin-top:9px}.package>div{display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--navy)}.package span{font-weight:800;color:var(--gold2);white-space:nowrap}.package p{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}.package.popular{border:2px solid var(--gold);box-shadow:0 8px 22px rgba(212,175,55,.13)}.daily-package{margin-top:22px;padding:22px;border:2px solid var(--gold);border-radius:20px;background:linear-gradient(135deg,#fffaf0,#ffffff);text-align:center;box-shadow:0 12px 30px rgba(212,175,55,.12)}.daily-badge{display:inline-block;background:#fff0b8;color:#765d00;font-size:11px;font-weight:900;letter-spacing:.7px;padding:6px 10px;border-radius:999px}.daily-package h3{margin:12px 0 5px;color:var(--navy);font-size:22px}.daily-price{margin:0;color:#5e6672;font-weight:700}.daily-features{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px 0}.daily-features span{background:#fff;border:1px solid #e6e2d3;border-radius:999px;padding:7px 10px;font-size:12px;color:#4b5260}.daily-note{font-size:11px;color:#777;line-height:1.6;max-width:680px;margin:0 auto}.package-note{text-align:center;margin-top:16px;padding:11px;border-radius:12px;background:#fff9df;color:#5d5129;font-size:12px}
-.package-book{display:block;width:100%;margin-top:10px;padding:9px 12px;border:0;border-radius:10px;background:#d4af37;color:#fff;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;font-family:inherit;font-size:14px;transition:.2s}.package-book:hover{background:#b8962e;transform:translateY(-1px)}
-#contact p{margin:8px 0;color:#536276}.review-box{background:#f8fafc;padding:18px;border-radius:12px;border-left:3px solid var(--gold)}
-.whatsapp{position:fixed;right:20px;bottom:20px;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#25d366;color:#fff;text-decoration:none;font-size:25px;box-shadow:0 8px 25px rgba(0,0,0,.2);z-index:1000}
-footer{background:var(--navy);color:#dce5ef;text-align:center;padding:24px 15px;font-size:13px}.logo-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);justify-content:center;align-items:center;z-index:99999}.logo-popup img{width:min(340px,75vw);height:min(340px,75vw);border-radius:50%;object-fit:cover;border:5px solid var(--gold)}.close-btn{position:absolute;top:20px;right:25px;font-size:40px;color:#fff;cursor:pointer}
-@media(max-width:700px){.package-grid{grid-template-columns:1fr}.package-head{font-size:15px}.package>div{flex-wrap:wrap}.package span{font-size:14px}header{min-height:430px;padding:40px 18px 45px}.logo{width:100px;height:100px;margin-bottom:20px}nav{justify-content:flex-start}.box{padding:23px 18px;border-radius:17px}section{width:94%;padding:30px 0}#services .service-item{display:flex;width:100%;margin:5px 0}.price-item{font-size:13px;padding:11px 10px}.price-item span{font-size:15px}.hero-actions a{width:100%;max-width:280px;text-align:center}h2{font-size:27px}.whatsapp{right:16px;bottom:16px}}
+.price-item{display:flex;justify-content:space-between;align-items:center;gap:15px;background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--gold);padding:12px 14px;margin:7px 0;border-radius:10px;font-size:14px;color:#314157}
+.price-item span{font-weight:800;font-size:16px;color:var(--navy);background:#fff4c7;padding:4px 10px;border-radius:8px;white-space:nowrap}
+.btn{display:block;width:fit-content;padding:13px 25px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;text-decoration:none;border-radius:10px;box-shadow:0 8px 22px rgba(212,175,55,.18);transition:.2s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+#pricing .btn,#monthly .btn{margin:24px auto 0}
+#monthly>p{line-height:1.7;color:var(--muted)}
+#monthly hr{border:none;height:1px!important;background:#e7ebf0!important;margin:25px 0!important}
+.package-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+.package-card{background:var(--soft);border:1px solid #e3e8ee;border-radius:15px;padding:16px}
+.package-head{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--navy);font-weight:800;font-size:15px;margin-bottom:10px}
+.package-head small{font-size:10px;color:var(--gold2);background:#fff4c7;padding:5px 8px;border-radius:8px;white-space:nowrap}
+.package{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px;margin-top:9px}
+.package>div{display:flex;justify-content:space-between;gap:8px;align-items:center;color:var(--navy)}
+.package span{font-weight:800;color:var(--gold2);white-space:nowrap}
+.package p{font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px}
+.package.popular{border:2px solid var(--gold);box-shadow:0 8px 22px rgba(212,175,55,.11)}
+.daily-package{margin-top:22px;padding:24px;border:1px solid rgba(212,175,55,.65);border-radius:15px;background:linear-gradient(135deg,#fffaf0,#fff);text-align:center;box-shadow:0 10px 28px rgba(212,175,55,.08)}
+.daily-badge{display:inline-block;background:#fff0b8;color:#765d00;font-size:10px;font-weight:800;letter-spacing:1px;padding:6px 11px;border-radius:6px}
+.daily-package h3{margin:12px 0 5px;color:var(--navy);font-size:22px}
+.daily-price{margin:0;color:#5e6672;font-weight:700}
+.daily-features{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px 0}
+.daily-features span{background:#fff;border:1px solid #e6e2d3;border-radius:7px;padding:7px 10px;font-size:12px;color:#4b5260}
+.daily-note{font-size:11px;color:#777;line-height:1.6;max-width:680px;margin:0 auto}
+.package-note{text-align:center;margin-top:16px;padding:11px;border-radius:9px;background:#fff9df;color:#5d5129;font-size:12px}
+.package-book{display:block;width:100%;margin-top:10px;padding:9px 12px;border:0;border-radius:8px;background:#d4af37;color:#fff;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;font-family:inherit;font-size:13px;transition:.2s}
+.package-book:hover{background:#b8962e;transform:translateY(-1px)}
+#contact p{margin:8px 0;color:#536276}
+.review-box{background:var(--soft);padding:18px;border-radius:10px;border-left:3px solid var(--gold)}
+.whatsapp{position:fixed;right:20px;bottom:20px;width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#168a50;color:#fff;text-decoration:none;font-size:13px;font-weight:800;letter-spacing:.2px;box-shadow:0 8px 25px rgba(0,0,0,.18);z-index:1000}
+footer{background:var(--navy);color:#cbd7e4;text-align:center;padding:28px 15px;font-size:13px}
+.logo-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);justify-content:center;align-items:center;z-index:99999}
+.logo-popup img{width:min(340px,75vw);height:min(340px,75vw);border-radius:50%;object-fit:cover;border:4px solid var(--gold)}
+.close-btn{position:absolute;top:20px;right:25px;font-size:40px;color:#fff;cursor:pointer}
+@media(max-width:700px){
+.package-grid{grid-template-columns:1fr}.package-head{font-size:15px}.package>div{flex-wrap:wrap}.package span{font-size:14px}
+header{min-height:530px;padding:55px 18px 58px}.logo{width:105px;height:105px;margin-bottom:22px}
+nav{justify-content:flex-start}.box{padding:25px 18px;border-radius:15px}section{width:94%;padding:30px 0}
+#services .service-item{display:flex;width:100%;margin:5px 0}.price-item{font-size:13px;padding:11px 10px}.price-item span{font-size:15px}
+.hero-actions a{width:100%;max-width:290px;text-align:center}h2{font-size:28px}.whatsapp{right:16px;bottom:16px}
+}
 </style>
 </head>
 <body>
 <header>
-<img src="images/dlogo.jpeg" class="logo" alt="Logo" onclick="openLogo">
+<img src="images/dlogo.jpeg" class="logo" alt="Logo" onclick="openLogo()">
 <h1>Daivik Doorstep Car Wash</h1>
 <p>Premium car & bike cleaning at your doorstep in Haridwar • Easy booking • Transparent pricing</p>
-<div class="hero-actions"><a class="hero-book" href="customer.html">🧼 Book Your Car Wash</a><a class="hero-call" href="tel:7906199445">📞 Call Now</a></div>
+<div class="hero-actions"><a class="hero-book" href="customer.html">Book Your Car Wash</a><a class="hero-call" href="tel:7906199445">Call Now</a></div>
 </header>
-<nav><a href="owner.html">🔐 Admin</a><a href="monthly.html">📦 Monthly Packages</a><a href="#contact">Contact</a><a href="#reviews">Reviews</a><a href="#about">About</a></nav>
+<nav><a href="owner.html">Admin</a><a href="monthly.html">Monthly Packages</a><a href="#contact">Contact</a><a href="#reviews">Reviews</a><a href="#about">About</a></nav>
 <section id="about" class="box"><h2>About Us</h2><p>Daivik Doorstep Car Wash brings premium car cleaning directly to your home in Haridwar. We offer foam washing, interior vacuuming, dashboard cleaning, tyre shine, polishing and detailing — with fast online booking.<br><br>100% Reliable · Best Price · Professional Team · Home Service</p></section>
 <section id="services" class="box"><h2>Our Services</h2><div class="service-item">🚗 Exterior Foam Wash</div><div class="service-item">🧽 Interior Vacuum Cleaning</div><div class="service-item">✨ Dashboard Polishing</div><div class="service-item">🛞 Alloy Cleaning + Tyre Shine</div><div class="service-item">💧 Deep Interior Cleaning</div><div class="service-item">🔥 Full Body Polishing</div></section>
 <section id="monthly" class="box">
-<h2>📦 Monthly Car Wash Packages</h2><p>Regular doorstep car care with simple monthly plans. Choose by vehicle size and how often you want the service.</p>
+<h2>Monthly Car Wash Packages</h2><p>Regular doorstep car care with simple monthly plans. Choose by vehicle size and how often you want the service.</p>
 <div class="package-grid">
-<div class="package-card"><div class="package-head"><span>🚗 Hatchback / Sedan</span><small>4 Visits / Month</small></div>
+<div class="package-card"><div class="package-head"><span>Hatchback / Sedan</span><small>4 Visits / Month</small></div>
 <div class="package"><div><b>Exterior Care</b><span>₹799 / month</span></div><p>4 × Exterior Ceramic Foam Wash • Glass • Tyre & Rim Cleaning</p><a class="package-book" href="customer.html?monthly=Hatchback%20Sedan%20Exterior%20Care%20%E2%82%B9799">Book Plan</a></div>
 <div class="package popular"><div><b>Complete ⭐</b><span>₹1,499 / month</span></div><p>4 × Complete Car Wash (Exterior + Interior)</p><a class="package-book" href="customer.html?monthly=Hatchback%20Sedan%20Complete%20%E2%82%B91499">Book Plan</a></div>
 <div class="package"><div><b>Premium</b><span>₹1,999 / month</span></div><p>2 × Complete Wash + 2 × Premium Spa & Body Polish</p><a class="package-book" href="customer.html?monthly=Hatchback%20Sedan%20Premium%20%E2%82%B91999">Book Plan</a></div></div>
-<div class="package-card"><div class="package-head"><span>🚙 SUV</span><small>4 Visits / Month</small></div>
+<div class="package-card"><div class="package-head"><span>SUV</span><small>4 Visits / Month</small></div>
 <div class="package"><div><b>Exterior Care</b><span>₹899 / month</span></div><p>4 × Exterior Ceramic Foam Wash • Glass • Tyre & Rim Cleaning</p><a class="package-book" href="customer.html?monthly=SUV%20Exterior%20Care%20%E2%82%B9899">Book Plan</a></div>
 <div class="package popular"><div><b>Complete ⭐</b><span>₹1,599 / month</span></div><p>4 × Complete SUV Wash (Exterior + Interior)</p><a class="package-book" href="customer.html?monthly=SUV%20Complete%20%E2%82%B91599">Book Plan</a></div>
 <div class="package"><div><b>Premium</b><span>₹2,199 / month</span></div><p>2 × Complete Wash + 2 × Premium Spa & Body Polish</p><a class="package-book" href="customer.html?monthly=SUV%20Premium%20%E2%82%B92199">Book Plan</a></div></div>
-<div class="package-card"><div class="package-head"><span>🏍️ Bike</span><small>4 Visits / Month</small></div>
+<div class="package-card"><div class="package-head"><span>Bike</span><small>4 Visits / Month</small></div>
 <div class="package"><div><b>Regular</b><span>₹499 / month</span></div><p>4 × Normal Bike Ceramic Wash</p><a class="package-book" href="customer.html?monthly=Bike%20Regular%20%E2%82%B9499">Book Plan</a></div>
 <div class="package popular"><div><b>Premium ⭐</b><span>₹699 / month</span></div><p>4 × Premium Bike Ceramic Wash</p><a class="package-book" href="customer.html?monthly=Bike%20Premium%20%E2%82%B9699">Book Plan</a></div></div>
 </div>
-<div class="daily-package"><div class="daily-badge">🔥 SPECIAL MORNING PLAN</div><h3>🚗 Daily Morning Exterior Dusting — ₹500 / Month</h3><p class="daily-price">Water + cloth cleaning • Exterior only • Every morning • Up to 26 visits/month</p><div class="daily-features"><span>✓ Water + cloth cleaning</span><span>✓ Outside body dusting</span><span>✓ Every morning</span><span>✓ Doorstep service</span></div><p class="daily-note">Water + cloth cleaning of the exterior body only. No foam wash or interior cleaning. Sunday/weekly off as per service schedule. Subject to service-area and morning-slot availability.</p><a href="customer.html?monthly=Daily%20Morning%20Exterior%20Dusting%20%E2%82%B9500" class="btn" style="margin:18px auto 0;">🌅 Book Morning Plan</a></div>
-<div class="package-note">✓ Doorstep service &nbsp; • &nbsp; ✓ Fixed monthly price &nbsp; • &nbsp; ✓ Easy scheduling</div>
-<a href="customer.html" class="btn" style="margin:22px auto 0;">📅 Choose Service & Book</a>
+<div class="daily-package"><div class="daily-badge">SPECIAL MORNING PLAN</div><h3>Daily Morning Exterior Dusting — ₹500 / Month</h3><p class="daily-price">Water + cloth cleaning • Exterior only • Every morning • Up to 26 visits/month</p><div class="daily-features"><span>Water + cloth cleaning</span><span>Outside body dusting</span><span>Every morning</span><span>Doorstep service</span></div><p class="daily-note">Water + cloth cleaning of the exterior body only. No foam wash or interior cleaning. Sunday/weekly off as per service schedule. Subject to service-area and morning-slot availability.</p><a href="customer.html?monthly=Daily%20Morning%20Exterior%20Dusting%20%E2%82%B9500" class="btn" style="margin:18px auto 0;">Book Morning Plan</a></div>
+<div class="package-note">Doorstep service &nbsp; • &nbsp; ✓ Fixed monthly price &nbsp; • &nbsp; ✓ Easy scheduling</div>
+<a href="customer.html" class="btn" style="margin:22px auto 0;">Choose Service & Book</a>
 </section>
-<section id="contact" class="box"><h2>Contact Us</h2><p><b>Phone:</b> 7906199445</p><p><b>Location:</b> Haridwar, Uttarakhand</p><p><b>Email:</b> daivikcarwash@gmail.com</p><div style="text-align:center;margin-top:25px;"><p style="font-size:18px;font-weight:600;margin-bottom:15px;">For more enquiry call now</p><a href="tel:7906199445" style="display:inline-block;margin-top:10px;padding:18px 40px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-size:20px;font-weight:700;border-radius:50px;text-decoration:none;font-family:'Playfair Display',serif;">📞 Call Now – 7906199445</a></div><h3 style="text-align:center;margin-top:30px;">Follow us</h3><p style="text-align:center;"><a href="https://www.facebook.com/profile.php?id=61584516316968" style="color:var(--gold);font-weight:600;text-decoration:none;">Facebook</a> | <a href="YOUR_INSTA_LINK" style="color:var(--gold);font-weight:600;text-decoration:none;">Instagram</a></p></section>
-<section id="reviews" class="box"><h2>Customer Reviews</h2><div style="text-align:center;margin-bottom:25px;"><a href="https://g.page/r/CYf950D1mxKyEBM/review" target="_blank" style="display:inline-block;padding:16px 35px;background:linear-gradient(135deg,#4285F4,#3367D6);color:#fff;font-size:20px;font-weight:600;border-radius:12px;text-decoration:none;font-family:'Playfair Display',serif;">⭐ Write a Google Review</a></div><p style="text-align:center;margin-top:20px;font-size:18px;">See our reviews directly on Google by clicking the button above.</p></section>
+<section id="contact" class="box"><h2>Contact Us</h2><p><b>Phone:</b> 7906199445</p><p><b>Location:</b> Haridwar, Uttarakhand</p><p><b>Email:</b> daivikcarwash@gmail.com</p><div style="text-align:center;margin-top:25px;"><p style="font-size:18px;font-weight:600;margin-bottom:15px;">For more enquiry call now</p><a href="tel:7906199445" style="display:inline-block;margin-top:10px;padding:18px 40px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-size:20px;font-weight:700;border-radius:50px;text-decoration:none;font-family:'Playfair Display',serif;">Call Now – 7906199445</a></div><h3 style="text-align:center;margin-top:30px;">Follow us</h3><p style="text-align:center;"><a href="https://www.facebook.com/profile.php?id=61584516316968" style="color:var(--gold);font-weight:600;text-decoration:none;">Facebook</a> | <a href="YOUR_INSTA_LINK" style="color:var(--gold);font-weight:600;text-decoration:none;">Instagram</a></p></section>
+<section id="reviews" class="box"><h2>Customer Reviews</h2><div style="text-align:center;margin-bottom:25px;"><a href="https://g.page/r/CYf950D1mxKyEBM/review" target="_blank" style="display:inline-block;padding:16px 35px;background:linear-gradient(135deg,#4285F4,#3367D6);color:#fff;font-size:20px;font-weight:600;border-radius:12px;text-decoration:none;font-family:'Playfair Display',serif;">Write a Google Review</a></div><p style="text-align:center;margin-top:20px;font-size:18px;">See our reviews directly on Google by clicking the button above.</p></section>
 <footer>© 2026 Daivik Doorstep Car Wash • Haridwar • Premium Car Cleaning at Your Doorstep</footer>
-<a class="whatsapp" href="https://wa.me/7906199445">💬</a>
+<a class="whatsapp" href="https://wa.me/7906199445">WA</a>
 <div id="logoPopup" class="logo-popup"><span class="close-btn" onclick="closeLogo()">×</span><img src="images/dlogo.jpeg" alt="Logo"></div>
 <script>
 function openLogo(){document.getElementById("logoPopup").style.display="flex"}function closeLogo(){document.getElementById("logoPopup").style.display="none"}
