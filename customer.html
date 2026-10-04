@@ -65,36 +65,38 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 </main>
 <script>
 const SERVICES=[
-{name:"Complete Car Wash",desc:"Exterior + Interior cleaning",price:399},
-{name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:249},
-{name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:649},
-{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:749},
-{name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149},
-{name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199}
+{name:"Complete Car Wash",desc:"Exterior + Interior cleaning",price:399,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
+{name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:249,includes:"Ceramic foam • Body rinse • Tyre/rim cleaning"},
+{name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:649,includes:"Deep interior cleaning • Foam wash • Glass cleaning"},
+{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:749,includes:"Premium wash • Body polish • Tyre shine • Final detailing"},
+{name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149,includes:"Ceramic foam • Rinse • Tyre cleaning"},
+{name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199,includes:"Premium foam • Deep clean • Tyre shine • Finish"}
 ];
 const SUPABASE_URL="https://holelzxzhaiefaqezmce.supabase.co";
 const SUPABASE_KEY="sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let selected=null;const $=id=>document.getElementById(id);
 $("date").min=new Date().toISOString().split("T")[0];
-function renderServices(){$("services").innerHTML=SERVICES.map((s,i)=>`<div class="service" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><div class="price">₹${s.price}</div></div>`).join("")}
-function selectService(i){selected=SERVICES[i];document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));$("msg").textContent=selected.name+" selected • ₹"+selected.price}
+function renderServices(){$("services").innerHTML=SERVICES.map((s,i)=>`<div class="service" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><p style="color:#dfe8f5">✓ ${s.includes}</p><div class="price">₹${s.price}</div></div>`).join("")}
+function selectService(i){selected=SERVICES[i];document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));$("msg").textContent=selected.name+" selected • ₹"+selected.price+" • "+selected.includes}
 function customers(){return JSON.parse(localStorage.getItem("daivikCustomers")||"[]")}
 function saveCustomers(x){localStorage.setItem("daivikCustomers",JSON.stringify(x))}
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
-function placeOrder(){
+async function placeOrder(){
+ const btn=$("bookBtn");if(btn.disabled)return;
  const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value,address=$("address").value.trim(),pay=document.querySelector('input[name="pay"]:checked').value;
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("msg").textContent="Please complete your name, email, mobile, vehicle, date and address.";return}
+ if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
+ btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile}
- const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$( "time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
- customer.orders.push(order);saveCustomers(list);
- // Show the newly created order and its unique Order ID immediately, using the email just entered.
- renderHistory(customer);
- syncOrderToCloud(order,name,email,mobile);
- if(pay==="UPI"||pay==="ONLINE"){showPayment(order);return}
- confirmBooking(order,name,customer);
+ const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
+ const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
+ if(!cloudSaved){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent="We could not save your booking to the server. Please check your internet connection and try again.";return}
+ customer.orders.push(order);saveCustomers(list);renderHistory(customer);
+ if(pay==="UPI"||pay==="ONLINE"){showPayment(order);btn.disabled=false;btn.textContent="Booking Saved ✓";return}
+ await confirmBooking(order,name,customer);
 }
 function showPayment(order){
  $("payNote").innerHTML='<b>Pay ₹'+order.price+'</b> to <b>7906199445@ybl</b><div style="margin-top:14px;text-align:center"><div id="qr" style="display:inline-block;padding:12px;background:#fff;border-radius:16px"></div><div style="color:#fff;font-size:12px;margin-top:10px">Scan QR with any UPI app</div><button class="btn" style="margin-top:12px" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button></div>';
@@ -104,15 +106,19 @@ function showPayment(order){
 }
 function confirmPaid(){
  const order=window.pendingOrder;if(!order)return;
- const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";confirmBooking(order,customer.name,customer)}
+ const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";await markCloudPayment(order);await confirmBooking(order,customer.name,customer)}
 }
 let trackingMap=null,routeLine=null,carMarker=null,routeCoords=[],carTimer=null,lastCustomerCoords=null,lastOriginCoords=null,liveStaffMarker=null,currentCloudOrder=null;
 async function syncOrderToCloud(order,name,email,mobile){
  try{
-  const payload={order_id:order.id,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle:order.vehicle,service:order.service,price:order.price,service_date:order.date,preferred_time:order.time,address:order.address,payment_method:order.payment,payment_status:order.status==="Payment Marked by Customer"?"Customer Marked Paid":"Pending",status:order.status,wash_team_lat:WASH_TEAM_LOCATION.lat,wash_team_lng:WASH_TEAM_LOCATION.lng};
+  const payload={order_id:order.id,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle:order.vehicle,service:order.service,price:order.price,service_date:order.date,preferred_time:order.time,address:order.address,payment_method:order.payment,payment_status:"Pending",status:"Booking Received",wash_team_lat:WASH_TEAM_LOCATION.lat,wash_team_lng:WASH_TEAM_LOCATION.lng};
   const {error}=await db.from("daivik_car_wash_orders").insert(payload);
-  if(error)console.error("Cloud order save failed",error);
- }catch(e){console.error(e)}
+  if(error){console.error("Cloud order save failed",error);return false}return true;
+ }catch(e){console.error(e);return false}
+}
+async function markCloudPayment(order){
+ try{const {error}=await db.from("daivik_car_wash_orders").update({payment_status:"Customer Marked Paid",updated_at:new Date().toISOString()}).eq("order_id",order.id);if(error)console.error("Payment update failed",error)}
+ catch(e){console.error(e)}
 }
 function startRealtimeTracking(orderId,email){
  try{
@@ -205,6 +211,7 @@ function openGoogleMaps(){
  if(!lastCustomerCoords)return;
  window.open("https://www.google.com/maps/dir/?api=1&origin="+lastOriginCoords.lat+","+lastOriginCoords.lng+"&destination="+lastCustomerCoords.lat+","+lastCustomerCoords.lng+"&travelmode=driving","_blank");
 }
+function openWhatsApp(orderId){const text=encodeURIComponent("Hello Daivik Car Wash, I need help with Order ID "+orderId);window.open("https://wa.me/917906199445?text="+text,"_blank")}
 function renderHistory(c){$("history").classList.remove("hidden");$("orders").innerHTML=(c.orders||[]).slice().reverse().map(o=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${o.id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${o.id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found for this email.</p>"}
 async function loadMyOrders(){const email=$("lookupEmail").value.trim().toLowerCase();if(!validEmail(email)){$("lookupMsg").textContent="Enter your email first.";return}$("lookupMsg").textContent="Searching your orders…";$("history").classList.remove("hidden");$("orders").innerHTML="<p class='muted'>Loading your orders…</p>";try{const {data,error}=await db.from("daivik_car_wash_orders").select("order_id,created_at").eq("customer_email",email).order("created_at",{ascending:false});if(error){$("lookupMsg").textContent="Unable to load orders: "+error.message;$("orders").innerHTML="<p class='muted'>Could not load orders. Please try again.</p>";return}if(!data||!data.length){$("lookupMsg").textContent="No orders found for this email.";renderCloudHistory([]);return}$("lookupMsg").textContent=data.length+" order(s) found ✓";renderCloudHistory(data)}catch(e){console.error(e);$("lookupMsg").textContent="Unable to load orders. Please try again.";$("orders").innerHTML="<p class='muted'>Could not load orders. Please try again.</p>"}}
 function renderCloudHistory(rows){$("history").classList.remove("hidden");$("orders").innerHTML=rows.map(data=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${data.order_id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${data.order_id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found.</p>"}
