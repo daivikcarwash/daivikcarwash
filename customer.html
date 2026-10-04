@@ -304,4 +304,78 @@ document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("ch
 function showPaymentPreview(){$("payNote").innerHTML='<b>UPI / PhonePe / Google Pay</b><br>UPI ID: <b>7906199445@ybl</b><br><span class="muted">QR and Pay button will be shown after booking.</span>'}
 renderServices();
 </script>
-</body></html>
+
+<section id="monthlyBooking" class="card hidden">
+  <h2>📦 Monthly Package Booking</h2>
+  <div id="monthlySelected" class="summary"></div>
+  <p class="muted" style="margin-top:8px">Fill these details once. Your monthly package request will be saved separately and the service dates will be shown immediately after successful booking.</p>
+  <div class="formgrid">
+    <div><label>Full Name</label><input id="mName" placeholder="Your name"></div>
+    <div><label>Email Address</label><input id="mEmail" type="email" placeholder="yourname@email.com"></div>
+    <div><label>Mobile Number</label><input id="mMobile" inputmode="numeric" placeholder="10-digit mobile number"></div>
+    <div><label>Vehicle Number</label><input id="mVehicle" placeholder="e.g. UK08AB1234"></div>
+    <div><label>First Service Date</label><input id="mDate" type="date"></div>
+    <div><label>Preferred Service Time</label><select id="mTime"><option>7:00 AM - 9:00 AM</option><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>4:00 PM - 6:00 PM</option><option>6:00 PM - 8:00 PM</option></select></div>
+  </div>
+  <label>Doorstep Address</label><input id="mAddress" placeholder="Where should we provide the monthly service?">
+  <div style="margin-top:15px">
+    <label class="pay"><input type="radio" name="mpay" value="COD" checked> 💵 Pay at service / cash</label>
+    <label class="pay"><input type="radio" name="mpay" value="UPI"> 📱 UPI / PhonePe / Google Pay</label>
+  </div>
+  <button class="btn" id="monthlyBookBtn" onclick="placeMonthlyOrder()">Confirm Monthly Package</button>
+  <p id="monthlyMsg" class="muted" style="text-align:center;margin-top:10px"></p>
+</section>
+<style>
+.monthly-schedule{margin-top:14px;display:grid;gap:8px}.monthly-day{padding:11px 13px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;justify-content:space-between;gap:10px}.monthly-day b{color:var(--gold)}@media(max-width:700px){.monthly-day{flex-direction:column;gap:3px}}
+</style>
+<script>
+const MONTHLY_PACKAGES={
+"Hatchback Sedan Exterior Care ₹799":{name:"Hatchback / Sedan — Exterior Care",price:799,visits:4,mode:"weekly"},
+"Hatchback Sedan Complete ₹1499":{name:"Hatchback / Sedan — Complete ⭐",price:1499,visits:4,mode:"weekly"},
+"Hatchback Sedan Premium ₹1999":{name:"Hatchback / Sedan — Premium",price:1999,visits:4,mode:"weekly"},
+"SUV Exterior Care ₹899":{name:"SUV — Exterior Care",price:899,visits:4,mode:"weekly"},
+"SUV Complete ₹1599":{name:"SUV — Complete ⭐",price:1599,visits:4,mode:"weekly"},
+"SUV Premium ₹2199":{name:"SUV — Premium",price:2199,visits:4,mode:"weekly"},
+"Bike Regular ₹499":{name:"Bike — Regular",price:499,visits:4,mode:"weekly"},
+"Bike Premium ₹699":{name:"Bike — Premium ⭐",price:699,visits:4,mode:"weekly"},
+"Daily Morning Exterior Dusting ₹500":{name:"Daily Morning Exterior Dusting",price:500,visits:26,mode:"daily"}
+};
+function getMonthlyKey(){return new URLSearchParams(location.search).get("monthly")}
+function formatScheduleDate(v){return new Date(v+"T12:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",weekday:"short"})}
+function buildMonthlySchedule(start,pack,time){
+  const out=[];let d=new Date(start+"T12:00:00");
+  for(let i=0;i<pack.visits;i++){
+    if(pack.mode==="daily"){
+      while(d.getDay()===0)d.setDate(d.getDate()+1);
+      out.push({date:d.toISOString().slice(0,10),time});
+      d.setDate(d.getDate()+1);
+    }else{
+      out.push({date:d.toISOString().slice(0,10),time});
+      d.setDate(d.getDate()+7);
+    }
+  }
+  return out;
+}
+function showMonthlyBooking(){
+ const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key]; if(!pack)return;
+ $("monthlyBooking").classList.remove("hidden");
+ $("monthlySelected").innerHTML="<b>"+pack.name+"</b><strong style='float:right;color:var(--gold);font-size:18px'>₹"+pack.price+" / month</strong><div class='muted' style='margin-top:6px'>"+(pack.mode==="daily"?"Up to 26 morning services":"4 services in the month")+"</div>";
+ $("mDate").min=new Date().toISOString().split("T")[0]; $("mDate").value=$("mDate").min;
+ $("monthlyBooking").scrollIntoView({behavior:"smooth"});
+}
+async function placeMonthlyOrder(){
+ const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key],btn=$("monthlyBookBtn"); if(!pack||btn.disabled)return;
+ const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value,address=$("mAddress").value.trim(),pay=document.querySelector('input[name="mpay"]:checked').value;
+ if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("monthlyMsg").textContent="Please complete all details.";return}
+ if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
+ const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
+ btn.disabled=true;btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
+ const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule});
+ if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
+ localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
+ const html="<div class='success'><h3>✓ Monthly Package Order Successful</h3><p style='margin-top:7px'>Your <b>"+pack.name+"</b> has been booked successfully.</p><p style='margin-top:6px'>Order ID: <b>"+orderId+"</b></p><div class='summary' style='margin-top:12px'><b>📅 Your Service Schedule</b><div class='monthly-schedule'>"+schedule.map((s,i)=>"<div class='monthly-day'><b>Service "+(i+1)+"</b><span>"+formatScheduleDate(s.date)+" • "+s.time+"</span></div>").join("")+"</div></div><p class='muted' style='margin-top:10px'>Please keep this Order ID. Your monthly order is saved separately and will appear in the admin dashboard.</p></div>";
+ $("monthlyBooking").innerHTML=html;
+ window.scrollTo({top:$("monthlyBooking").offsetTop-20,behavior:"smooth"});
+}
+window.addEventListener("DOMContentLoaded",showMonthlyBooking);
+</script></body></html>
