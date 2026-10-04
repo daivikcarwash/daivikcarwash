@@ -33,7 +33,14 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 
 <section class="card">
 <h2>1. Choose Your Service</h2>
-<div id="services" class="services"></div>
+<div id="services" class="services">
+<div class="service" data-service-index="0" onclick="selectService(0)"><h3>Complete Car Wash</h3><p>Exterior + Interior cleaning</p><p style="color:#dfe8f5">✓ Exterior foam • Interior vacuum • Dashboard cleaning</p><div class="price">₹399</div></div>
+<div class="service" data-service-index="1" onclick="selectService(1)"><h3>Exterior Ceramic Foam Wash</h3><p>Paint-safe exterior foam wash</p><p style="color:#dfe8f5">✓ Ceramic foam • Body rinse • Tyre/rim cleaning</p><div class="price">₹249</div></div>
+<div class="service" data-service-index="2" onclick="selectService(2)"><h3>Deep Cleaning + Foam Wash</h3><p>Deep interior + foam wash</p><p style="color:#dfe8f5">✓ Deep interior cleaning • Foam wash • Glass cleaning</p><div class="price">₹649</div></div>
+<div class="service" data-service-index="3" onclick="selectService(3)"><h3>Premium Spa + Body Polish</h3><p>Premium spa and body polish</p><p style="color:#dfe8f5">✓ Premium wash • Body polish • Tyre shine • Final detailing</p><div class="price">₹749</div></div>
+<div class="service" data-service-index="4" onclick="selectService(4)"><h3>Normal Bike Ceramic Wash</h3><p>Standard bike ceramic wash</p><p style="color:#dfe8f5">✓ Ceramic foam • Rinse • Tyre cleaning</p><div class="price">₹149</div></div>
+<div class="service" data-service-index="5" onclick="selectService(5)"><h3>Premium Bike Ceramic Wash</h3><p>Premium bike ceramic wash</p><p style="color:#dfe8f5">✓ Premium foam • Deep clean • Tyre shine • Finish</p><div class="price">₹199</div></div>
+</div>
 </section>
 
 <section class="card">
@@ -77,7 +84,7 @@ const SUPABASE_KEY="sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let selected=null;const $=id=>document.getElementById(id);
 $("date").min=new Date().toISOString().split("T")[0];
-function renderServices(){$("services").innerHTML=SERVICES.map((s,i)=>`<div class="service" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><p style="color:#dfe8f5">✓ ${s.includes}</p><div class="price">₹${s.price}</div></div>`).join("")}
+function renderServices(){const el=$("services");if(!el)return;if(!el.querySelector(".service"))el.innerHTML=SERVICES.map((s,i)=>`<div class="service" data-service-index="${i}" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><p style="color:#dfe8f5">✓ ${s.includes}</p><div class="price">₹${s.price}</div></div>`).join("")}
 function selectService(i){selected=SERVICES[i];document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));$("msg").textContent=selected.name+" selected • ₹"+selected.price+" • "+selected.includes}
 function customers(){return JSON.parse(localStorage.getItem("daivikCustomers")||"[]")}
 function saveCustomers(x){localStorage.setItem("daivikCustomers",JSON.stringify(x))}
