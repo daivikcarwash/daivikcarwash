@@ -160,7 +160,8 @@ async function setMonthlyPayment(id,payment_status){const {error}=await db.from(
 async function deleteMonthlyOrder(id){if(!confirm("Delete monthly order "+id+" permanently?"))return;const {error}=await db.from("daivik_monthly_orders").delete().eq("order_id",id);if(error){alert("Delete failed: "+error.message);return}monthlyOrders=monthlyOrders.filter(o=>o.order_id!==id);renderMonthlyOrders()}
 function render(){
   const f=document.getElementById("filter").value;
-  const list=f==="ALL"?orders:orders.filter(o=>o.status===f);\n  const oneCount=document.getElementById("oneTimeCount"); if(oneCount) oneCount.textContent=orders.length;
+  const list=f==="ALL"?orders:orders.filter(o=>o.status===f);
+  const oneCount=document.getElementById("oneTimeCount"); if(oneCount) oneCount.textContent=orders.length;
   document.getElementById("total").textContent=orders.length;
   document.getElementById("received").textContent=orders.filter(o=>o.status==="Booking Received").length;
   document.getElementById("onway").textContent=orders.filter(o=>o.status==="On the Way"||o.status==="Arriving Soon"||o.status==="Running").length;
