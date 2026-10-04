@@ -5,6 +5,8 @@
 <title>Book a Car Wash | Daivik Doorstep Car Wash</title>
 <meta name="description" content="Book Daivik Doorstep Car Wash at your doorstep.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{--gold:#D4AF37;--gold2:#B8962E;--bg:#061326;--bg2:#102f50;--muted:#aebbd0;--glass:rgba(255,255,255,.08);--border:rgba(255,255,255,.15)}
 *{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}body{min-height:100vh;color:#fff;background:linear-gradient(135deg,var(--bg),var(--bg2));overflow-x:hidden}
@@ -18,6 +20,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 .btn{width:100%;border:0;border-radius:13px;padding:14px;margin-top:17px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-weight:700;font-size:15px;cursor:pointer}.btn:disabled{opacity:.5;cursor:not-allowed}
 .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 15px}.payment{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pay{border:1px solid var(--border);border-radius:15px;padding:14px;cursor:pointer;background:rgba(255,255,255,.04);color:#fff}.pay input{width:auto;margin-right:6px}
 .note{padding:11px 13px;border-radius:12px;background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.2);color:#ffe9a3;font-size:12px;margin-top:13px}.success{padding:18px;border:1px solid rgba(83,214,143,.35);background:rgba(83,214,143,.08);border-radius:16px}.success h3{color:#8ff0b8}.order{padding:14px 0;border-bottom:1px solid var(--border)}.order:last-child{border:0}.badge{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:var(--gold);font-size:11px}.muted{color:var(--muted);font-size:12px}.hidden{display:none!important}
+#map{height:390px;border-radius:18px;overflow:hidden;border:1px solid var(--border);margin-top:14px}.tracking-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.track-stat{padding:13px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border)}.track-stat b{display:block;color:var(--gold);font-size:17px;margin-top:3px}.track-actions{display:flex;gap:10px;margin-top:14px}.track-actions .btn{margin-top:0}.map-note{margin-top:10px;color:var(--muted);font-size:11px}@media(max-width:700px){#map{height:330px}.tracking-grid{grid-template-columns:1fr}.track-actions{flex-direction:column}}
 @media(max-width:700px){.services,.payment,.formgrid{grid-template-columns:1fr}.hero h1{font-size:30px}.card{padding:20px}}
 </style>
 </head>
@@ -55,6 +58,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 
 <section id="success" class="card hidden"><div class="success"><h3>✓ Booking Confirmed</h3><p id="successText" style="margin-top:7px"></p><p class="muted" style="margin-top:8px">Your booking details have been saved. We can use your email to recognize your future bookings.</p></div></section>
 
+<section id="tracking" class="card hidden"><h2>📍 Track Your Car Wash</h2><p class="muted">See the customer location, wash team location, route and estimated arrival time.</p><div class="tracking-grid"><div class="track-stat"><span class="muted">Distance</span><b id="trackDistance">—</b></div><div class="track-stat"><span class="muted">Estimated Arrival</span><b id="trackEta">—</b></div><div class="track-stat"><span class="muted">Status</span><b id="trackStatus">On the Way</b></div><div class="track-stat"><span class="muted">Vehicle</span><b id="trackVehicle">—</b></div></div><div id="map"></div><div class="map-note">The moving car icon is a visual route simulation. Exact live staff tracking can be connected later to the staff phone's GPS.</div><div class="track-actions"><button class="btn" onclick="openGoogleMaps()">Open Route in Google Maps</button></div></section>
 <section id="history" class="card hidden"><h2>Your Recent Bookings</h2><div id="orders"></div></section>
 </main>
 <script>
@@ -94,10 +98,61 @@ function confirmPaid(){
  const order=window.pendingOrder;if(!order)return;
  const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";confirmBooking(order,customer.name,customer)}
 }
-function confirmBooking(order,name,customer){
+let trackingMap=null,routeLine=null,carMarker=null,routeCoords=[],carTimer=null,lastCustomerCoords=null,lastOriginCoords=null;
+const WASH_TEAM_LOCATION={lat:30.3165,lng:78.0322,name:"Daivik Wash Team"}; // Change these coordinates to your actual starting location.
+async function confirmBooking(order,name,customer){
  $("success").classList.remove("hidden");$("successText").textContent="Thank you "+name+"! Your "+order.service+" booking is confirmed. Order ID: "+order.id+".";
  $("history").classList.remove("hidden");renderHistory(customer);window.scrollTo({top:$("success").offsetTop-20,behavior:"smooth"});
  $("bookBtn").textContent="Booking Placed ✓";$("bookBtn").disabled=true;
+ await startTracking(order);
+}
+async function geocodeAddress(address){
+ const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=in&q="+encodeURIComponent(address);
+ const res=await fetch(url,{headers:{"Accept":"application/json"}});
+ const data=await res.json();
+ if(!data.length) throw new Error("Customer address could not be found on the map.");
+ return {lat:Number(data[0].lat),lng:Number(data[0].lon),label:data[0].display_name};
+}
+async function startTracking(order){
+ $("tracking").classList.remove("hidden");
+ $("trackVehicle").textContent=order.vehicle;
+ $("trackStatus").textContent="Finding route…";
+ try{
+  const dest=await geocodeAddress(order.address);lastCustomerCoords=dest;lastOriginCoords=WASH_TEAM_LOCATION;
+  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+WASH_TEAM_LOCATION.lng+","+WASH_TEAM_LOCATION.lat+";"+dest.lng+","+dest.lat+"?overview=full&geometries=geojson");
+  const routeData=await routeRes.json();
+  if(!routeData.routes||!routeData.routes[0]) throw new Error("Route not found.");
+  const route=routeData.routes[0];routeCoords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
+  const km=route.distance/1000,minutes=Math.max(1,Math.round(route.duration/60));
+  $("trackDistance").textContent=km.toFixed(1)+" KM";
+  $("trackEta").textContent=minutes+" min";
+  $("trackStatus").textContent="On the Way";
+  renderMap(routeCoords,minutes);
+ }catch(e){
+  $("trackStatus").textContent="Route unavailable";
+  $("trackDistance").textContent="—";$("trackEta").textContent="—";
+  $("msg").textContent=e.message+" Please check the customer address.";
+ }
+}
+function renderMap(coords,minutes){
+ if(trackingMap)trackingMap.remove();
+ trackingMap=L.map("map").setView(coords[Math.floor(coords.length/2)],13);
+ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(trackingMap);
+ routeLine=L.polyline(coords,{weight:6}).addTo(trackingMap);
+ L.marker(coords[coords.length-1]).addTo(trackingMap).bindPopup("📍 Customer location").openPopup();
+ const washIcon=L.divIcon({className:"",html:"<div style='font-size:30px'>🧼</div>",iconSize:[34,34],iconAnchor:[17,17]});
+ carMarker=L.marker(coords[0],{icon:washIcon}).addTo(trackingMap).bindPopup("🚗 Daivik Car Wash • On the way");
+ trackingMap.fitBounds(routeLine.getBounds(),{padding:[25,25]});
+ animateCar(coords,minutes);
+}
+function animateCar(coords,minutes){
+ if(carTimer)clearInterval(carTimer);
+ let i=0;const step=Math.max(500,Math.round((minutes*60*1000)/Math.max(coords.length-1,1)));
+ carTimer=setInterval(()=>{if(i>=coords.length-1){clearInterval(carTimer);$("trackStatus").textContent="Arriving Soon";return}i++;carMarker.setLatLng(coords[i]);},step);
+}
+function openGoogleMaps(){
+ if(!lastCustomerCoords)return;
+ window.open("https://www.google.com/maps/dir/?api=1&origin="+WASH_TEAM_LOCATION.lat+","+WASH_TEAM_LOCATION.lng+"&destination="+lastCustomerCoords.lat+","+lastCustomerCoords.lng+"&travelmode=driving","_blank");
 }
 function renderHistory(c){$("orders").innerHTML=c.orders.slice().reverse().map(o=>`<div class="order"><b>${o.service}</b> — ₹${o.price}<br><span class="badge">${o.status}</span> <span class="muted">${o.payment}</span><div class="muted" style="margin-top:5px">${o.date} • ${o.time} • ${o.vehicle}<br>${o.address}</div></div>`).join("")}
 document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{$("payNote").textContent=r.value==="COD"?"You can pay in cash after the service is completed.":r.value==="UPI"?"UPI payment will be available after the payment gateway is connected.":"Secure online payment will be available after the payment gateway is connected."}));
