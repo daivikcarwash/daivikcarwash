@@ -190,7 +190,14 @@ function openSpecificUPI(app){
 async function copyUPI(){try{await navigator.clipboard.writeText("7906199445@ybl");$("payNote").insertAdjacentHTML("beforeend","<div style='margin-top:8px;color:#8ff0b8'>UPI ID copied ✓</div>")}catch(e){alert("UPI ID: 7906199445@ybl")}}
 async function confirmPaid(){
  const order=window.pendingOrder;if(!order)return;
- const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";await markCloudPayment(order);await confirmBooking(order,customer.name,customer)}
+ const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());
+ if(customer){
+  customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Completed",paymentStatus:"Collected"}:o);
+  saveCustomers(list);
+  order.status="Completed";order.paymentStatus="Collected";
+  await markCloudPayment(order);
+  await confirmBooking(order,customer.name,customer);
+ }
 }
 let trackingMap=null,routeLine=null,carMarker=null,routeCoords=[],carTimer=null,lastCustomerCoords=null,lastOriginCoords=null,liveStaffMarker=null,currentCloudOrder=null;
 async function syncOrderToCloud(order,name,email,mobile){
@@ -201,8 +208,10 @@ async function syncOrderToCloud(order,name,email,mobile){
  }catch(e){console.error(e);return false}
 }
 async function markCloudPayment(order){
- try{const {error}=await db.from("daivik_car_wash_orders").update({payment_status:"Customer Marked Paid",updated_at:new Date().toISOString()}).eq("order_id",order.id);if(error)console.error("Payment update failed",error)}
- catch(e){console.error(e)}
+ try{
+  const {error}=await db.from("daivik_car_wash_orders").update({payment_status:"Collected",status:"Completed",updated_at:new Date().toISOString()}).eq("order_id",order.id);
+  if(error)console.error("Payment update failed",error)
+ }catch(e){console.error(e)}
 }
 function startRealtimeTracking(orderId,email){
  try{
