@@ -24,7 +24,7 @@ label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}input{wi
 <body>
 <header class="top"><div class="brand">Daivik Doorstep Car Wash</div><a class="back" href="monthly.html">← Monthly Plans</a></header>
 <main class="wrap">
-<section class="hero"><h1>📦 My Monthly Booking</h1><p>Check your monthly package and complete service schedule anytime.</p></section>
+<section class="hero"><h1>📦 My Monthly Booking</h1><p>Check your recent monthly packages and service schedules anytime.</p></section>
 <section class="card">
 <label>Order ID <span class="muted">(optional)</span></label>
 <input id="orderId" autocomplete="off" placeholder="Enter Order ID">
@@ -66,7 +66,7 @@ async function findMonthly(){
 
     // If Order ID is supplied, use it first. If it does not match, fall back to email.
     if(id){
-      const r=await db.from("daivik_monthly_orders").select("*").eq("order_id",id).order("created_at",{ascending:false});
+      const r=await db.from("daivik_monthly_orders").select("*").eq("order_id",id).order("created_at",{ascending:false}).limit(5);
       data=r.data||[]; error=r.error;
       if(!error && !data.length && emailOk){
         const r2=await db.from("daivik_monthly_orders").select("*").eq("customer_email",email).order("created_at",{ascending:false});
@@ -95,7 +95,7 @@ async function findMonthly(){
         schedule.map((s,i)=>"<div class='day'><b>Service "+(i+1)+"</b><br>"+dateText(s.date)+" • "+esc(s.time||row.service_time||"")+"</div>").join("")+
         "</div></div></div>";
     });
-    html+="<p class='muted' style='margin-top:12px'>Your monthly booking is saved in our system. Keep your Order ID for future reference.</p></div>";
+    html+="<p class='muted' style='margin-top:12px'>Your recent monthly bookings are shown for this email. Keep your Order IDs for future reference.</p></div>";
     $("result").innerHTML=html;
     setMessage(data.length+" monthly booking"+(data.length>1?"s":"")+" found ✓");
     localStorage.setItem("daivikMonthlyLookup",JSON.stringify({orderId:id,email}));
