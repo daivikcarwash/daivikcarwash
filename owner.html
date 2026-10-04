@@ -40,7 +40,7 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 .section-count{float:right;background:rgba(212,175,55,.13);border:1px solid rgba(212,175,55,.35);color:#e7c85f;border-radius:20px;padding:3px 10px;font-size:12px;margin-right:14px}
 .order{background:linear-gradient(145deg,#0b233c,#091d31);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:17px;margin:11px 0;box-shadow:0 7px 20px rgba(0,0,0,.12)}
 .order b{color:#fff}
-.order select{font-size:13px}
+.order select{font-size:13px}.gallery-admin-item{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);margin:8px 0}.gallery-admin-item img,.gallery-admin-item video{width:72px;height:54px;object-fit:cover;border-radius:7px;background:#071b2e}.gallery-admin-item b{font-size:13px}.gallery-admin-item span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
 @media(max-width:850px){.grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.wrap{padding:16px 12px 40px}.card{padding:18px;border-radius:16px}.grid{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat b{font-size:23px}input{min-width:0;flex:1}.btn{width:auto}.admin-section summary{padding:16px}}
 </style>
@@ -101,6 +101,20 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 <summary>Morning Plan <span class="section-count" id="morningCount">0</span></summary>
 <div class="section-body">
 <div id="morningOrders"><p class="muted">Loading Morning Plan orders...</p></div>
+</div>
+</details>
+
+<details class="admin-section">
+<summary>Service Gallery <span class="section-count" id="galleryCount">0</span></summary>
+<div class="section-body">
+<p class="muted">Yahan se aap real Daivik service ki photos aur videos upload kar sakte ho. Ye files customer website ke Service Gallery me automatically dikhengi.</p>
+<div class="row">
+<button class="btn" onclick="document.getElementById('adminGalleryFiles').click()">+ Upload Photo / Video</button>
+<input id="adminGalleryFiles" type="file" accept="image/*,video/*" multiple hidden onchange="uploadAdminGallery(this.files)">
+<button class="btn homebtn" onclick="loadAdminGallery()">Refresh Gallery</button>
+</div>
+<p id="galleryAdminMsg" class="muted" style="margin-top:10px"></p>
+<div id="adminGalleryList" style="margin-top:12px"><p class="muted">Open this section to load gallery items.</p></div>
 </div>
 </details>
 
@@ -243,6 +257,41 @@ async function deleteOrder(id){
   if(error){alert("Delete failed: "+error.message+"\\n\\nIf this is a database policy error, the Supabase DELETE policy needs to be enabled.");return}
   orders=orders.filter(o=>o.order_id!==id);render();setMsg("Order "+id+" deleted ✓");
 }
+async function loadAdminGallery(){
+  if(!(await initDB()))return;
+  const box=document.getElementById("adminGalleryList"),msg=document.getElementById("galleryAdminMsg");
+  if(box)box.innerHTML='<p class="muted">Loading gallery...</p>';
+  const {data,error}=await db.from("daivik_service_gallery").select("*").order("created_at",{ascending:false});
+  if(error){if(msg)msg.textContent="Gallery load failed: "+error.message;return}
+  if(document.getElementById("galleryCount"))document.getElementById("galleryCount").textContent=(data||[]).length;
+  if(!(data||[]).length){if(box)box.innerHTML='<p class="muted">No gallery items yet.</p>';return}
+  if(box)box.innerHTML=data.map(x=>'<div class="gallery-admin-item">'+(x.media_type==="video"?'<video controls preload="metadata" src="'+esc(x.file_url)+'"></video>':'<img loading="lazy" src="'+esc(x.file_url)+'" alt="Gallery">')+'<div><b>'+esc(x.title||"Service media")+'</b><span>'+esc(x.media_type||"image")+'</span></div></div>').join("");
+}
+async function uploadAdminGallery(files){
+  if(!files||!files.length)return;
+  if(!(await initDB()))return;
+  const msg=document.getElementById("galleryAdminMsg"); if(msg)msg.textContent="Uploading...";
+  let ok=0;
+  for(const file of Array.from(files)){
+    if(file.size>25*1024*1024){alert(file.name+" is larger than 25 MB and was skipped.");continue}
+    if(!file.type.startsWith("image/")&&!file.type.startsWith("video/"))continue;
+    const mediaType=file.type.startsWith("video/")?"video":"image";
+    const ext=(file.name.split(".").pop()||"bin").toLowerCase();
+    const path=new Date().toISOString().slice(0,10)+"/"+crypto.randomUUID()+"."+ext;
+    try{
+      const up=await db.storage.from("daivik-service-gallery").upload(path,file,{contentType:file.type,upsert:false});
+      if(up.error)throw up.error;
+      const pub=db.storage.from("daivik-service-gallery").getPublicUrl(path);
+      const ins=await db.from("daivik_service_gallery").insert({title:file.name.replace(/\.[^.]+$/,""),media_type:mediaType,file_url:pub.data.publicUrl,storage_path:path});
+      if(ins.error)throw ins.error;
+      ok++;
+    }catch(e){console.error(e);alert("Upload failed: "+file.name+"\n"+(e?.message||e))}
+  }
+  document.getElementById("adminGalleryFiles").value="";
+  if(msg)msg.textContent=ok+" file(s) uploaded ✓";
+  loadAdminGallery();
+}
+
 function openStaff(id){window.open("staff.html?order="+encodeURIComponent(id),"_blank")}
 function exportCSV(){
   const rows=[["Order ID","Name","Email","Mobile","Vehicle","Service","Price","Date","Time","Status","Payment","Address"]].concat(orders.map(o=>[o.order_id,o.customer_name,o.customer_email,o.customer_mobile,o.vehicle,o.service,o.price,o.service_date,o.preferred_time,o.status,o.payment_status,o.address]));
