@@ -6,7 +6,7 @@
 <title>Daivik Owner Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{max-width:1200px;margin:auto;padding:20px}.card{background:#102b49;border:1px solid #31516f;border-radius:18px;padding:20px;margin-bottom:18px}h1{color:#d4af37;margin-top:0}input,select{padding:11px;border-radius:9px;border:1px solid #49657e;background:#081b30;color:#fff}.btn{padding:11px 16px;border:0;border-radius:9px;background:#d4af37;color:#fff;font-weight:bold;cursor:pointer}.danger{background:#a83232}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#0b2037;padding:16px;border-radius:12px}.stat b{display:block;font-size:24px;color:#d4af37;margin-top:5px}.order{background:#0b2037;border:1px solid #294863;border-radius:14px;padding:15px;margin:10px 0}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.muted{color:#aebbd0;font-size:13px}.error{color:#ff8585}.ok{color:#8ff0a4}@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}.wrap{padding:12px}}
+body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{max-width:1200px;margin:auto;padding:20px}.card{background:#102b49;border:1px solid #31516f;border-radius:18px;padding:20px;margin-bottom:18px}h1{color:#d4af37;margin-top:0}input,select{padding:11px;border-radius:9px;border:1px solid #49657e;background:#081b30;color:#fff}.btn{padding:11px 16px;border:0;border-radius:9px;background:#d4af37;color:#fff;font-weight:bold;cursor:pointer}.homebtn{background:#274a68;text-decoration:none;display:inline-block}.danger{background:#a83232}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#0b2037;padding:16px;border-radius:12px}.stat b{display:block;font-size:24px;color:#d4af37;margin-top:5px}.order{background:#0b2037;border:1px solid #294863;border-radius:14px;padding:15px;margin:10px 0}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.muted{color:#aebbd0;font-size:13px}.error{color:#ff8585}.ok{color:#8ff0a4}@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}.wrap{padding:12px}}
 </style>
 </head>
 <body>
@@ -15,6 +15,7 @@ body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{m
 <h1>🚗 Daivik Owner Dashboard</h1>
 <p class="muted">All booking orders • Edit • Delete • Status • Export</p>
 <div class="row">
+<a class="btn homebtn" href="index.html">🏠 Main Website</a>
 <input id="pin" type="password" inputmode="numeric" placeholder="Owner PIN" onkeydown="if(event.key==='Enter')login()">
 <button class="btn" onclick="login()">Open Dashboard</button>
 </div>
@@ -144,9 +145,10 @@ async function editOrder(id){
 }
 async function deleteOrder(id){
   if(!confirm("Delete order "+id+" permanently?"))return;
+  if(!db && !(await initDB()))return;
   const {error}=await db.from("daivik_car_wash_orders").delete().eq("order_id",id);
-  if(error){alert("Delete failed: "+error.message);return}
-  orders=orders.filter(o=>o.order_id!==id);render();
+  if(error){alert("Delete failed: "+error.message+"\\n\\nIf this is a database policy error, the Supabase DELETE policy needs to be enabled.");return}
+  orders=orders.filter(o=>o.order_id!==id);render();setMsg("Order "+id+" deleted ✓");
 }
 function openStaff(id){window.open("staff.html?order="+encodeURIComponent(id),"_blank")}
 function exportCSV(){
