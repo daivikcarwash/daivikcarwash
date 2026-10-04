@@ -95,11 +95,24 @@ async function initDB(){
 }
 function setMsg(t,error=false){const el=document.getElementById("msg");el.textContent=t;el.className="muted "+(error?"error":"ok")}
 async function login(){
-  if(document.getElementById("pin").value!==OWNER_PIN){setMsg("Invalid owner PIN.",true);return}
-  document.getElementById("app").style.display="block";
-  setMsg("Dashboard connected ✓ Loading orders...");
-  await loadOrders();
-  await loadMonthlyOrders();
+  const pinEl=document.getElementById("pin");
+  const appEl=document.getElementById("app");
+  if(!pinEl||!appEl){return}
+  if(pinEl.value!==OWNER_PIN){setMsg("Invalid owner PIN.",true);return}
+  appEl.style.display="block";
+  setMsg("Connecting to Daivik Admin...");
+  try{
+    if(!initDB()){
+      setMsg("Admin opened, but database connection failed. Please refresh and try again.",true);
+      return;
+    }
+    setMsg("Admin connected ✓ Loading orders...");
+    await Promise.all([loadOrders(),loadMonthlyOrders()]);
+    setMsg("Admin ready ✓");
+  }catch(e){
+    console.error(e);
+    setMsg("Admin opened, but data loading failed: "+(e?.message||e),true);
+  }
 }
 async function loadOrders(){
   if(!(await initDB()))return;
