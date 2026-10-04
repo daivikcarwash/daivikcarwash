@@ -16,13 +16,13 @@ body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle 
 .brand{font:700 24px "Playfair Display";color:var(--gold)}.back{color:#fff;text-decoration:none;border:1px solid var(--gold);padding:8px 15px;border-radius:22px;font-size:13px}
 .wrap{width:min(1050px,94%);margin:32px auto 60px}.hero{text-align:center;margin-bottom:24px}.hero h1{font:700 38px "Playfair Display"}.hero p{color:var(--muted);margin-top:6px}
 .card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:26px;box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px);margin-bottom:20px}
-h2{font:700 25px "Playfair Display";margin-bottom:17px}.services{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.service{padding:18px;border:1px solid var(--border);border-radius:17px;background:rgba(255,255,255,.045);cursor:pointer;transition:.2s}.service:hover,.service.selected{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 8px 25px rgba(212,175,55,.12)}.service h3{font-size:16px}.service p{font-size:12px;color:var(--muted);margin:4px 0 8px}.price{color:var(--gold);font-weight:700;font-size:18px}
+h2{font:700 25px "Playfair Display";margin-bottom:17px}.services{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.service{padding:18px;border:1px solid var(--border);border-radius:17px;background:rgba(255,255,255,.045);cursor:pointer;transition:.2s}.service:hover,.service.selected{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 8px 25px rgba(212,175,55,.12)}.vehicle-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.vehicle-type{padding:16px;border:1px solid var(--border);border-radius:17px;background:rgba(255,255,255,.045);cursor:pointer;text-align:center;transition:.2s}.vehicle-type:hover,.vehicle-type.selected{border-color:var(--gold);background:rgba(212,175,55,.08);box-shadow:0 8px 25px rgba(212,175,55,.12)}.vehicle-type .icon{font-size:30px;display:block;margin-bottom:5px}.service-group{margin-top:14px}.service-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;color:#fff;font-size:15px}.service-title span{color:var(--gold);font-size:12px}.saved-address{display:none;margin-top:8px;padding:9px 12px;border-radius:10px;background:rgba(83,214,143,.08);border:1px solid rgba(83,214,143,.25);color:#9cf2bd;font-size:12px}.summary{margin-top:15px;padding:14px;border-radius:14px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25)}.service h3{font-size:16px}.service p{font-size:12px;color:var(--muted);margin:4px 0 8px}.price{color:var(--gold);font-weight:700;font-size:18px}
 label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.25);color:#fff;outline:none}select option{color:#111}input:focus,select:focus{border-color:var(--gold)}
 .btn{width:100%;border:0;border-radius:13px;padding:14px;margin-top:17px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-weight:700;font-size:15px;cursor:pointer}.btn:disabled{opacity:.5;cursor:not-allowed}
 .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 15px}.payment{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pay{border:1px solid var(--border);border-radius:15px;padding:14px;cursor:pointer;background:rgba(255,255,255,.04);color:#fff}.pay input{width:auto;margin-right:6px}
 .note{padding:11px 13px;border-radius:12px;background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.2);color:#ffe9a3;font-size:12px;margin-top:13px}.success{padding:18px;border:1px solid rgba(83,214,143,.35);background:rgba(83,214,143,.08);border-radius:16px}.success h3{color:#8ff0b8}.order{padding:14px 0;border-bottom:1px solid var(--border)}.order:last-child{border:0}.badge{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:var(--gold);font-size:11px}.muted{color:var(--muted);font-size:12px}.hidden{display:none!important}
 #map{height:390px;border-radius:18px;overflow:hidden;border:1px solid var(--border);margin-top:14px}.tracking-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.track-stat{padding:13px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border)}.track-stat b{display:block;color:var(--gold);font-size:17px;margin-top:3px}.track-actions{display:flex;gap:10px;margin-top:14px}.track-actions .btn{margin-top:0}.map-note{margin-top:10px;color:var(--muted);font-size:11px}@media(max-width:700px){#map{height:330px}.tracking-grid{grid-template-columns:1fr}.track-actions{flex-direction:column}}
-@media(max-width:700px){.services,.payment,.formgrid{grid-template-columns:1fr}.hero h1{font-size:30px}.card{padding:20px}}
+@media(max-width:700px){.services,.payment,.formgrid,.vehicle-types{grid-template-columns:1fr}.hero h1{font-size:30px}.card{padding:20px}}
 </style>
 </head>
 <body>
@@ -32,15 +32,15 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <section class="hero"><h1>Book Your Car Wash</h1><p>Choose your service, enter your details and place your booking.</p></section>
 
 <section class="card">
-<h2>1. Choose Your Service</h2>
-<div id="services" class="services">
-<div class="service" data-service-index="0" onclick="selectService(0)"><h3>Complete Car Wash</h3><p>Exterior + Interior cleaning</p><p style="color:#dfe8f5">✓ Exterior foam • Interior vacuum • Dashboard cleaning</p><div class="price">₹399</div></div>
-<div class="service" data-service-index="1" onclick="selectService(1)"><h3>Exterior Ceramic Foam Wash</h3><p>Paint-safe exterior foam wash</p><p style="color:#dfe8f5">✓ Ceramic foam • Body rinse • Tyre/rim cleaning</p><div class="price">₹249</div></div>
-<div class="service" data-service-index="2" onclick="selectService(2)"><h3>Deep Cleaning + Foam Wash</h3><p>Deep interior + foam wash</p><p style="color:#dfe8f5">✓ Deep interior cleaning • Foam wash • Glass cleaning</p><div class="price">₹649</div></div>
-<div class="service" data-service-index="3" onclick="selectService(3)"><h3>Premium Spa + Body Polish</h3><p>Premium spa and body polish</p><p style="color:#dfe8f5">✓ Premium wash • Body polish • Tyre shine • Final detailing</p><div class="price">₹749</div></div>
-<div class="service" data-service-index="4" onclick="selectService(4)"><h3>Normal Bike Ceramic Wash</h3><p>Standard bike ceramic wash</p><p style="color:#dfe8f5">✓ Ceramic foam • Rinse • Tyre cleaning</p><div class="price">₹149</div></div>
-<div class="service" data-service-index="5" onclick="selectService(5)"><h3>Premium Bike Ceramic Wash</h3><p>Premium bike ceramic wash</p><p style="color:#dfe8f5">✓ Premium foam • Deep clean • Tyre shine • Finish</p><div class="price">₹199</div></div>
+<h2>1. Choose Vehicle Type</h2>
+<p class="muted">Pricing is shown according to your vehicle. First choose your vehicle type, then select the service.</p>
+<div id="vehicleTypes" class="vehicle-types" style="margin-top:14px">
+  <div class="vehicle-type" data-type="car" onclick="selectVehicleType('car')"><span class="icon">🚗</span><b>Hatchback / Sedan</b><small class="muted" style="display:block;margin-top:4px">Starting ₹149</small></div>
+  <div class="vehicle-type" data-type="suv" onclick="selectVehicleType('suv')"><span class="icon">🚙</span><b>SUV</b><small class="muted" style="display:block;margin-top:4px">Starting ₹199</small></div>
+  <div class="vehicle-type" data-type="bike" onclick="selectVehicleType('bike')"><span class="icon">🏍️</span><b>Bike</b><small class="muted" style="display:block;margin-top:4px">Starting ₹149</small></div>
 </div>
+<div id="services" class="services" style="margin-top:18px"></div>
+<div id="serviceHint" class="note">Select a vehicle type to see its services and exact prices.</div>
 </section>
 
 <section class="card">
@@ -53,14 +53,14 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <div><label>Service Date</label><input id="date" type="date"></div>
 <div><label>Preferred Time</label><select id="time"><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>12:00 PM - 2:00 PM</option><option>2:00 PM - 4:00 PM</option><option>4:00 PM - 6:00 PM</option><option>6:00 PM - 8:00 PM</option></select></div>
 </div>
-<label>Doorstep Address</label><input id="address" placeholder="Where should we come for the service?">
+<label>Doorstep Address</label><input id="address" placeholder="Where should we come for the service?" onblur="loadSavedCustomer()"><div id="savedAddressNote" class="saved-address"></div>
 <h2 style="margin-top:25px">3. Payment</h2>
 <div class="payment">
 <label class="pay"><input type="radio" name="pay" value="COD" checked> 💵 Cash on Delivery</label>
 <label class="pay"><input type="radio" name="pay" value="UPI"> 📱 UPI / PhonePe / Google Pay</label>
 
 </div>
-<div id="payNote" class="note">You can pay in cash after the service is completed.</div>
+<div id="bookingSummary" class="summary">Choose your vehicle type and service to see the final booking amount.</div><div id="payNote" class="note">You can pay in cash after the service is completed.</div>
 <button id="bookBtn" class="btn" onclick="placeOrder()">Place My Booking</button>
 <p id="msg" class="muted" style="text-align:center;margin-top:10px"></p>
 </section>
@@ -71,34 +71,94 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <section id="history" class="card hidden"><h2>Your Orders & Order IDs</h2><p class="muted">Your email is used to show your Order IDs. Select an Order ID to track that booking.</p><div id="orders"></div></section>
 </main>
 <script>
-const SERVICES=[
-{name:"Complete Car Wash",desc:"Exterior + Interior cleaning",price:399,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
+const SERVICE_CATALOG={
+car:{label:"Hatchback / Sedan",icon:"🚗",services:[
+{name:"Interior Vacuum & Dashboard Cleaning",desc:"Interior vacuum + dashboard cleaning",price:149,includes:"Interior vacuum • Dashboard cleaning"},
 {name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:249,includes:"Ceramic foam • Body rinse • Tyre/rim cleaning"},
+{name:"Complete Car Wash (Exterior + Interior)",desc:"Complete exterior + interior cleaning",price:399,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
 {name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:649,includes:"Deep interior cleaning • Foam wash • Glass cleaning"},
-{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:749,includes:"Premium wash • Body polish • Tyre shine • Final detailing"},
+{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:749,includes:"Premium wash • Body polish • Tyre shine • Final detailing"}
+]},
+suv:{label:"SUV",icon:"🚙",services:[
+{name:"Interior Vacuum & Dashboard Cleaning",desc:"Interior vacuum + dashboard cleaning",price:199,includes:"Interior vacuum • Dashboard cleaning"},
+{name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:299,includes:"Ceramic foam • Body rinse • Tyre/rim cleaning"},
+{name:"Complete Car Wash (Exterior + Interior)",desc:"Complete exterior + interior cleaning",price:449,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
+{name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:699,includes:"Deep interior cleaning • Foam wash • Glass cleaning"},
+{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:799,includes:"Premium wash • Body polish • Tyre shine • Final detailing"}
+]},
+bike:{label:"Bike",icon:"🏍️",services:[
 {name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149,includes:"Ceramic foam • Rinse • Tyre cleaning"},
 {name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199,includes:"Premium foam • Deep clean • Tyre shine • Finish"}
-];
+]}};
 const SUPABASE_URL="https://holelzxzhaiefaqezmce.supabase.co";
 const SUPABASE_KEY="sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let selected=null;const $=id=>document.getElementById(id);
+let selected=null,selectedVehicleType=null;const $=id=>document.getElementById(id);
 $("date").min=new Date().toISOString().split("T")[0];
-function renderServices(){const el=$("services");if(!el)return;if(!el.querySelector(".service"))el.innerHTML=SERVICES.map((s,i)=>`<div class="service" data-service-index="${i}" onclick="selectService(${i})"><h3>${s.name}</h3><p>${s.desc}</p><p style="color:#dfe8f5">✓ ${s.includes}</p><div class="price">₹${s.price}</div></div>`).join("")}
-function selectService(i){selected=SERVICES[i];document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));$("msg").textContent=selected.name+" selected • ₹"+selected.price+" • "+selected.includes}
+function renderServices(){
+ const el=$("services"); if(!el)return;
+ if(!selectedVehicleType){el.innerHTML="";return}
+ const group=SERVICE_CATALOG[selectedVehicleType];
+ el.innerHTML='<div class="service-group" style="grid-column:1/-1"><div class="service-title"><b>'+group.icon+" "+group.label+'</b><span>Choose one service</span></div></div>'+
+ group.services.map((s,i)=>'<div class="service" data-service-index="'+i+'" onclick="selectService('+i+')"><h3>'+s.name+'</h3><p>'+s.desc+'</p><p style="color:#dfe8f5">✓ '+s.includes+'</p><div class="price">₹'+s.price+'</div></div>').join("");
+}
+function selectVehicleType(type){
+ selectedVehicleType=type;selected=null;
+ document.querySelectorAll(".vehicle-type").forEach(x=>x.classList.toggle("selected",x.dataset.type===type));
+ renderServices();
+ const g=SERVICE_CATALOG[type];
+ $("serviceHint").textContent=g.label+" selected • Choose the service below.";
+ $("bookingSummary").innerHTML="Choose a service to see the final amount.";
+}
+function selectService(i){
+ if(!selectedVehicleType)return;
+ const s=SERVICE_CATALOG[selectedVehicleType].services[i];
+ selected={...s,vehicleType:selectedVehicleType,vehicleTypeLabel:SERVICE_CATALOG[selectedVehicleType].label};
+ document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));
+ $("msg").textContent=selected.name+" selected • ₹"+selected.price;
+ $("bookingSummary").innerHTML="<b>Selected:</b> "+selected.vehicleTypeLabel+" — "+selected.name+" <strong style='float:right;color:var(--gold);font-size:18px'>₹"+selected.price+"</strong>";
+}
+async function loadSavedCustomer(){
+ const email=$("email").value.trim().toLowerCase();
+ if(!validEmail(email))return;
+ const local=customers().find(c=>c.email===email);
+ if(local){
+   if(local.name&&!$("name").value.trim())$("name").value=local.name;
+   if(local.mobile&&!$("mobile").value.trim())$("mobile").value=local.mobile;
+   if(local.address){
+     $("address").value=local.address;
+     $("savedAddressNote").style.display="block";
+     $("savedAddressNote").textContent="✓ Saved address found — we filled it for you.";
+     return;
+   }
+ }
+ try{
+   const {data}=await db.from("daivik_car_wash_orders").select("customer_name,customer_mobile,address").eq("customer_email",email).order("created_at",{ascending:false}).limit(1).maybeSingle();
+   if(data){
+     if(data.customer_name&&!$("name").value.trim())$("name").value=data.customer_name;
+     if(data.customer_mobile&&!$("mobile").value.trim())$("mobile").value=data.customer_mobile;
+     if(data.address){
+       $("address").value=data.address;
+       $("savedAddressNote").style.display="block";
+       $("savedAddressNote").textContent="✓ Saved address found — we filled it for you.";
+     }
+   }
+ }catch(e){console.warn("Saved customer lookup failed",e)}
+}
 function customers(){return JSON.parse(localStorage.getItem("daivikCustomers")||"[]")}
 function saveCustomers(x){localStorage.setItem("daivikCustomers",JSON.stringify(x))}
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 async function placeOrder(){
  const btn=$("bookBtn");if(btn.disabled)return;
  const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value,address=$("address").value.trim(),pay=document.querySelector('input[name="pay"]:checked').value;
+ if(!selectedVehicleType){$("msg").textContent="Please choose your vehicle type first.";return}
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("msg").textContent="Please complete your name, email, mobile, vehicle, date and address.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
- if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile}
- const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
+ if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
+ const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
  const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
  if(!cloudSaved){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent="We could not save your booking to the server. Please check your internet connection and try again.";return}
  customer.orders.push(order);saveCustomers(list);renderHistory(customer);
