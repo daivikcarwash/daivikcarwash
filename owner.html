@@ -37,6 +37,11 @@ body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{m
 </div>
 
 <div class="card">
+<h2 style="color:#d4af37;margin-top:0">📦 Monthly Package Orders</h2>
+<p class="muted">Monthly subscriptions are stored separately from one-time bookings.</p>
+<div id="monthlyOrders"><p class="muted">Loading monthly orders...</p></div>
+</div>
+<div class="card">
 <div class="row">
 <a class="btn" href="staff.html" target="_blank" style="text-decoration:none;text-align:center">📍 Open Staff GPS</a>
 <select id="filter" onchange="render()">
@@ -52,7 +57,7 @@ body{font-family:Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{m
 
 <script>
 const OWNER_PIN="7906199445";
-let db=null,orders=[],channelStarted=false;
+let db=null,orders=[],monthlyOrders=[],channelStarted=false,monthlyChannelStarted=false;
 
 async function initDB(){
   if(db)return true;
@@ -74,6 +79,7 @@ async function login(){
   document.getElementById("app").style.display="block";
   setMsg("Dashboard connected ✓ Loading orders...");
   await loadOrders();
+  await loadMonthlyOrders();
 }
 async function loadOrders(){
   if(!(await initDB()))return;
@@ -82,6 +88,35 @@ async function loadOrders(){
   orders=data||[];render();setMsg("Dashboard connected ✓ "+orders.length+" order(s) loaded");
   if(!channelStarted)subscribe();
 }
+async function loadMonthlyOrders(){
+  if(!(await initDB()))return;
+  const {data,error}=await db.from("daivik_monthly_orders").select("*").order("created_at",{ascending:false});
+  if(error){setMsg("Monthly orders error: "+error.message,true);return}
+  monthlyOrders=data||[];renderMonthlyOrders();
+  if(!monthlyChannelStarted){
+    monthlyChannelStarted=true;
+    db.channel("owner-monthly-orders").on("postgres_changes",{event:"*",schema:"public",table:"daivik_monthly_orders"},()=>loadMonthlyOrders()).subscribe();
+  }
+}
+function renderMonthlyOrders(){
+ const el=document.getElementById("monthlyOrders"); if(!el)return;
+ el.innerHTML=monthlyOrders.map(o=>{
+   const schedule=Array.isArray(o.schedule)?o.schedule:[];
+   return '<div class="order"><b>'+esc(o.order_id)+'</b> — '+esc(o.package_name)+' — ₹'+esc(o.price) +
+   '<br><span class="muted">'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+' • '+esc(o.customer_email)+
+   '<br>'+esc(o.vehicle)+' • Start: '+esc(o.service_date)+' • '+esc(o.service_time||'')+'<br>'+esc(o.address)+'</span>'+
+   '<div style="margin-top:10px"><span class="muted">Status:</span> <select data-id="'+esc(o.order_id)+'" onchange="setMonthlyStatus(this.dataset.id,this.value)">'+
+   ['Monthly Order Received','Confirmed','Active','Completed','Cancelled'].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join('')+
+   '</select> <span class="muted" style="margin-left:10px">Payment:</span> <select data-id="'+esc(o.order_id)+'" onchange="setMonthlyPayment(this.dataset.id,this.value)">'+
+   ['Pending','Paid','Customer Marked Paid','Refunded'].map(s=>'<option '+(o.payment_status===s?'selected':'')+'>'+s+'</option>').join('')+
+   '</select></div>'+
+   '<div style="margin-top:9px"><b>Schedule:</b> '+(schedule.length?schedule.map((s,i)=>'Service '+(i+1)+': '+esc(s.date)+' • '+esc(s.time)).join(' &nbsp; | &nbsp; '):'Not scheduled')+'</div>'+
+   '<div class="row" style="margin-top:10px"><button class="btn danger" data-id="'+esc(o.order_id)+'" onclick="deleteMonthlyOrder(this.dataset.id)">🗑 Delete</button></div></div>';
+ }).join('')||"<p class='muted'>No monthly package orders yet.</p>";
+}
+async function setMonthlyStatus(id,status){const {error}=await db.from("daivik_monthly_orders").update({status,updated_at:new Date().toISOString()}).eq("order_id",id);if(error){alert("Status update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.status=status;renderMonthlyOrders()}
+async function setMonthlyPayment(id,payment_status){const {error}=await db.from("daivik_monthly_orders").update({payment_status,updated_at:new Date().toISOString()}).eq("order_id",id);if(error){alert("Payment update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.payment_status=payment_status;renderMonthlyOrders()}
+async function deleteMonthlyOrder(id){if(!confirm("Delete monthly order "+id+" permanently?"))return;const {error}=await db.from("daivik_monthly_orders").delete().eq("order_id",id);if(error){alert("Delete failed: "+error.message);return}monthlyOrders=monthlyOrders.filter(o=>o.order_id!==id);renderMonthlyOrders()}
 function render(){
   const f=document.getElementById("filter").value;
   const list=f==="ALL"?orders:orders.filter(o=>o.status===f);
