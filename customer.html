@@ -79,9 +79,23 @@ function placeOrder(){
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("msg").textContent="Please complete your name, email, mobile, vehicle, date and address.";return}
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile}
- const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
+ const order={id:"ORD"+Date.now(),service:selected.name,price:selected.price,date,time:$( "time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
  customer.orders.push(order);saveCustomers(list);
- $("success").classList.remove("hidden");$("successText").textContent="Thank you "+name+"! Your "+selected.name+" booking is confirmed. Order ID: "+order.id+".";
+ if(pay==="UPI"||pay==="ONLINE"){showPayment(order);return}
+ confirmBooking(order,name,customer);
+}
+function showPayment(order){
+ $("payNote").innerHTML='<b>Pay ₹'+order.price+'</b> to <b>7906199445@ybl</b><div style="margin-top:14px;text-align:center"><div id="qr" style="display:inline-block;padding:12px;background:#fff;border-radius:16px"></div><div style="color:#fff;font-size:12px;margin-top:10px">Scan QR with any UPI app</div><button class="btn" style="margin-top:12px" onclick="confirmPaid()">I Have Paid ₹'+order.price+'</button></div>';
+ const upi="upi://pay?pa=7906199445@ybl&pn=Daivik%20Doorstep%20Car%20Wash&am="+encodeURIComponent(order.price.toFixed(2))+"&cu=INR&tn="+encodeURIComponent(order.id);
+ const img=document.createElement("img");img.alt="UPI QR";img.width=220;img.height=220;img.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);$("qr").appendChild(img);
+ window.pendingOrder=order;
+}
+function confirmPaid(){
+ const order=window.pendingOrder;if(!order)return;
+ const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";confirmBooking(order,customer.name,customer)}
+}
+function confirmBooking(order,name,customer){
+ $("success").classList.remove("hidden");$("successText").textContent="Thank you "+name+"! Your "+order.service+" booking is confirmed. Order ID: "+order.id+".";
  $("history").classList.remove("hidden");renderHistory(customer);window.scrollTo({top:$("success").offsetTop-20,behavior:"smooth"});
  $("bookBtn").textContent="Booking Placed ✓";$("bookBtn").disabled=true;
 }
