@@ -18,9 +18,10 @@
 <main class="wrap">
 <section class="hero"><h1>📦 My Monthly Booking</h1><p>Check your monthly package and complete service schedule anytime.</p></section>
 <section class="card">
-<label>Order ID</label><input id="orderId" placeholder="e.g. MON1791135774763">
-<label>Email Address</label><input id="email" type="email" placeholder="The email used while booking">
-<button class="btn" onclick="findMonthly()">View My Booking</button>
+<label>Order ID <span class="muted">(optional)</span></label><input id="orderId" placeholder="Enter Order ID — or leave blank">
+<label>Email Address <span class="muted">(optional)</span></label><input id="email" type="email" placeholder="Enter booking email — or leave blank">
+<button class="btn" onclick="findMonthly()">🔎 Find My Booking</button>
+<p class="muted" style="text-align:center;margin-top:8px">Order ID <b>या</b> Email — दोनों में से कोई एक सही हो तो booking मिल जाएगी.</p>
 <p id="msg" class="msg"></p>
 <div id="result"></div>
 </section>
@@ -34,15 +35,22 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function dateText(v){return new Date(v+"T12:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short",year:"numeric"})}
 async function findMonthly(){
  const id=$("orderId").value.trim(),email=$("email").value.trim().toLowerCase();
- if(!id||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$("msg").textContent="Please enter your Order ID and booking email.";return}
- $("msg").textContent="Finding your monthly booking…";$("result").innerHTML="";
- const {data,error}=await db.from("daivik_monthly_orders").select("*").eq("order_id",id).eq("customer_email",email).maybeSingle();
- if(error||!data){$("msg").textContent="Booking not found. Please check Order ID and email.";return}
- let schedule=Array.isArray(data.schedule)?data.schedule:[]; 
- let html="<div class='success'><h2>✓ Monthly Booking Found</h2><p style='margin-top:8px'>"+esc(data.package_name)+"</p><p style='margin-top:5px'><b>Order ID:</b> "+esc(data.order_id)+"</p><p style='margin-top:5px'><b>Status:</b> "+esc(data.status)+"</p><p style='margin-top:5px'><b>Payment:</b> "+esc(data.payment_status)+"</p><div class='summary'><b>📅 Your Service Schedule</b><div class='schedule'>"+schedule.map((s,i)=>"<div class='day'><b>Service "+(i+1)+"</b><br>"+dateText(s.date)+" • "+esc(s.time||data.service_time||"")+"</div>").join("")+"</div></div><p class='muted' style='margin-top:12px'>Your monthly booking is saved in our system. Keep your Order ID for future reference.</p></div>";
- $("result").innerHTML=html;$("msg").textContent="Booking found ✓";localStorage.setItem("daivikMonthlyLookup",JSON.stringify({orderId:id,email}));
+ const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+ if(!id&&!emailOk){$("msg").textContent="Order ID या valid email डालें.";return}
+ $("msg").textContent="Booking खोज रहे हैं…";$("result").innerHTML="";
+ let query=db.from("daivik_monthly_orders").select("*").order("created_at",{ascending:false});
+ if(id&&emailOk) query=query.or("order_id.eq."+id+",customer_email.eq."+email);
+ else if(id) query=query.eq("order_id",id);
+ else query=query.eq("customer_email",email);
+ const {data,error}=await query;
+ if(error||!data||!data.length){$("msg").textContent="Monthly booking नहीं मिली. Order ID या email check करें.";return}
+ let html="<div class='success'><h2>✓ Monthly Booking Found</h2>";
+ data.forEach((row,ri)=>{
+   const schedule=Array.isArray(row.schedule)?row.schedule:[];
+   html+="<div class='summary' style='margin-top:"+(ri? "14px":"10px")+"'><p><b>"+esc(row.package_name)+"</b></p><p style='margin-top:5px'><b>Order ID:</b> "+esc(row.order_id)+"</p><p style='margin-top:5px'><b>Status:</b> "+esc(row.status)+"</p><p style='margin-top:5px'><b>Payment:</b> "+esc(row.payment_status)+"</p><div style='margin-top:12px'><b>📅 Service Schedule</b><div class='schedule'>"+schedule.map((s,i)=>"<div class='day'><b>Service "+(i+1)+"</b><br>"+dateText(s.date)+" • "+esc(s.time||row.service_time||"")+"</div>").join("")+"</div></div></div>";
+ });
+ html+="<p class='muted' style='margin-top:12px'>Your monthly booking is saved in our system. Keep your Order ID for future reference.</p></div>";
+ $("result").innerHTML=html;$("msg").textContent=data.length+" monthly booking"+(data.length>1?"s":"")+" found ✓";
+ localStorage.setItem("daivikMonthlyLookup",JSON.stringify({orderId:id,email}));
 }
-window.addEventListener("DOMContentLoaded",()=>{try{const x=JSON.parse(localStorage.getItem("daivikMonthlyLookup")||"null");if(x){$("orderId").value=x.orderId||"";$("email").value=x.email||""}}catch(e){}});
-</script>
-</body>
-</html>
+>
