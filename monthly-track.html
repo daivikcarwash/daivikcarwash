@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Monthly Booking | Daivik Doorstep Car Wash</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--gold:#D4AF37;--bg:#061326;--bg2:#102f50;--muted:#aebbd0;--glass:rgba(255,255,255,.08);--border:rgba(255,255,255,.15)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,sans-serif}body{min-height:100vh;color:#fff;background:linear-gradient(135deg,var(--bg),var(--bg2));padding-bottom:50px}
+.top{padding:15px 20px;display:flex;justify-content:space-between;align-items:center;background:rgba(5,18,37,.92);border-bottom:1px solid var(--border)}.brand{font:700 23px "Playfair Display";color:var(--gold)}.back{color:#fff;text-decoration:none;border:1px solid var(--gold);padding:8px 15px;border-radius:22px;font-size:13px}
+.wrap{width:min(850px,94%);margin:35px auto}.hero{text-align:center;margin-bottom:22px}.hero h1{font:700 38px "Playfair Display";color:var(--gold)}.hero p{color:var(--muted);margin-top:7px}.card{background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:25px;box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px)}label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.25);color:#fff;outline:none}input:focus{border-color:var(--gold)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 15px}.btn{width:100%;border:0;border-radius:13px;padding:14px;margin-top:17px;background:linear-gradient(135deg,var(--gold),#B8962E);color:#fff;font-weight:700;font-size:15px}.msg{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}.success{margin-top:20px;padding:20px;border:1px solid rgba(83,214,143,.35);background:rgba(83,214,143,.08);border-radius:18px}.success h2{color:#8ff0b8;font-size:21px}.summary{margin-top:14px;padding:15px;border-radius:15px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25)}.schedule{display:grid;gap:9px;margin-top:10px}.day{padding:13px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid var(--border)}.day b{color:var(--gold)}.muted{color:var(--muted);font-size:12px}@media(max-width:650px){.grid{grid-template-columns:1fr}.hero h1{font-size:30px}.card{padding:20px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">Daivik Doorstep Car Wash</div><a class="back" href="monthly.html">← Monthly Plans</a></header>
+<main class="wrap">
+<section class="hero"><h1>📦 My Monthly Booking</h1><p>Check your monthly package and complete service schedule anytime.</p></section>
+<section class="card">
+<label>Order ID</label><input id="orderId" placeholder="e.g. MON1791135774763">
+<label>Email Address</label><input id="email" type="email" placeholder="The email used while booking">
+<button class="btn" onclick="findMonthly()">View My Booking</button>
+<p id="msg" class="msg"></p>
+<div id="result"></div>
+</section>
+</main>
+<script>
+const SUPABASE_URL="https://holelzxzhaiefaqezmce.supabase.co";
+const SUPABASE_KEY="sb_publishable_KoCQClKL582rggMuDJhYQ_UhHOB4xZ";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function dateText(v){return new Date(v+"T12:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short",year:"numeric"})}
+async function findMonthly(){
+ const id=$("orderId").value.trim(),email=$("email").value.trim().toLowerCase();
+ if(!id||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$("msg").textContent="Please enter your Order ID and booking email.";return}
+ $("msg").textContent="Finding your monthly booking…";$("result").innerHTML="";
+ const {data,error}=await db.from("daivik_monthly_orders").select("*").eq("order_id",id).eq("customer_email",email).maybeSingle();
+ if(error||!data){$("msg").textContent="Booking not found. Please check Order ID and email.";return}
+ let schedule=Array.isArray(data.schedule)?data.schedule:[]; 
+ let html="<div class='success'><h2>✓ Monthly Booking Found</h2><p style='margin-top:8px'>"+esc(data.package_name)+"</p><p style='margin-top:5px'><b>Order ID:</b> "+esc(data.order_id)+"</p><p style='margin-top:5px'><b>Status:</b> "+esc(data.status)+"</p><p style='margin-top:5px'><b>Payment:</b> "+esc(data.payment_status)+"</p><div class='summary'><b>📅 Your Service Schedule</b><div class='schedule'>"+schedule.map((s,i)=>"<div class='day'><b>Service "+(i+1)+"</b><br>"+dateText(s.date)+" • "+esc(s.time||data.service_time||"")+"</div>").join("")+"</div></div><p class='muted' style='margin-top:12px'>Your monthly booking is saved in our system. Keep your Order ID for future reference.</p></div>";
+ $("result").innerHTML=html;$("msg").textContent="Booking found ✓";localStorage.setItem("daivikMonthlyLookup",JSON.stringify({orderId:id,email}));
+}
+window.addEventListener("DOMContentLoaded",()=>{try{const x=JSON.parse(localStorage.getItem("daivikMonthlyLookup")||"null");if(x){$("orderId").value=x.orderId||"";$("email").value=x.email||""}}catch(e){}});
+</script>
+</body>
+</html>
