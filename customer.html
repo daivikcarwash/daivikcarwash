@@ -104,7 +104,7 @@ function showPayment(order){
  const img=document.createElement("img");img.alt="UPI QR";img.width=220;img.height=220;img.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);$("qr").appendChild(img);
  window.pendingOrder=order;
 }
-function confirmPaid(){
+async function confirmPaid(){
  const order=window.pendingOrder;if(!order)return;
  const list=customers(),customer=list.find(c=>c.email===$("email").value.trim().toLowerCase());if(customer){customer.orders=customer.orders.map(o=>o.id===order.id?{...o,status:"Payment Marked by Customer"}:o);saveCustomers(list);order.status="Payment Marked by Customer";await markCloudPayment(order);await confirmBooking(order,customer.name,customer)}
 }
