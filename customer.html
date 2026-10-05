@@ -160,7 +160,6 @@ async function placeOrder(){
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
- try{await validateServiceArea(streetAddress,city,pincode)}catch(e){$("msg").textContent=e.message;return}
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
@@ -505,7 +504,6 @@ async function placeMonthlyOrder(){
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
- try{await validateServiceArea(streetAddress,city,pincode)}catch(e){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent=e.message;return}
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
