@@ -259,11 +259,30 @@ async function confirmBooking(order,name,customer){
  await startTracking(order);
 }
 async function geocodeAddress(address){
- const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=in&q="+encodeURIComponent(address);
- const res=await fetch(url,{headers:{"Accept":"application/json"}});
- const data=await res.json();
- if(!data.length) throw new Error("Customer address could not be found on the map.");
- return {lat:Number(data[0].lat),lng:Number(data[0].lon),label:data[0].display_name};
+ const raw=address.trim();
+ const queries=[raw+", India",raw+", Dehradun, Uttarakhand, India"];
+ let candidates=[];
+ for(const q of queries){
+  try{
+   const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&addressdetails=1&countrycodes=in&q="+encodeURIComponent(q);
+   const res=await fetch(url,{headers:{"Accept":"application/json"}});
+   const data=await res.json();
+   if(Array.isArray(data)) candidates.push(...data);
+   if(candidates.length>=8) break;
+  }catch(e){}
+ }
+ if(!candidates.length) throw new Error("Customer address could not be found. Please enter full address with city or PIN code.");
+ const origin=WASH_TEAM_LOCATION;
+ const distKm=(lat,lng)=>{
+   const R=6371, a=Math.PI/180;
+   const dLat=(lat-origin.lat)*a,dLng=(lng-origin.lng)*a;
+   const x=Math.sin(dLat/2)**2+Math.cos(origin.lat*a)*Math.cos(lat*a)*Math.sin(dLng/2)**2;
+   return 2*R*Math.asin(Math.sqrt(x));
+ };
+ candidates.sort((a,b)=>distKm(Number(a.lat),Number(a.lon))-distKm(Number(b.lat),Number(b.lon)));
+ const best=candidates[0], straightKm=distKm(Number(best.lat),Number(best.lon));
+ if(straightKm>120) throw new Error("Address is too far or ambiguous. Please enter full address with city or PIN code.");
+ return {lat:Number(best.lat),lng:Number(best.lon),label:best.display_name};
 }
 async function startTracking(order,cloudOrder=null){
  $("tracking").classList.remove("hidden");
@@ -276,6 +295,7 @@ async function startTracking(order,cloudOrder=null){
   if(!routeData.routes||!routeData.routes[0]) throw new Error("Route not found.");
   const route=routeData.routes[0];routeCoords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
   const km=route.distance/1000,minutes=Math.max(1,Math.round(route.duration/60));
+  if(km>200) throw new Error("The customer address could not be matched reliably. Please enter the full address with city or PIN code.");
   $("trackDistance").textContent=km.toFixed(1)+" KM";
   $("trackEta").textContent=minutes+" min";
   $("trackStatus").textContent="On the Way";
