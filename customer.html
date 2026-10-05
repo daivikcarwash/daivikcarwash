@@ -396,7 +396,7 @@ async function copyMonthlyUPI(){try{await navigator.clipboard.writeText("7906199
 async function confirmMonthlyPaid(){
  const p=window.pendingMonthly;if(!p)return;
  const {error}=await db.from("daivik_monthly_orders").update({payment_status:"Customer Marked Paid",updated_at:new Date().toISOString()}).eq("order_id",p.orderId);
- if(error){$("monthlyMsg")?.textContent="Payment status could not be updated. Please try again.";return}
+ if(error){const mm=$("monthlyMsg");if(mm)mm.textContent="Payment status could not be updated. Please try again.";return}
  monthlySuccess(p.orderId,p.pack,p.schedule);
 }
 async function placeMonthlyOrder(){
