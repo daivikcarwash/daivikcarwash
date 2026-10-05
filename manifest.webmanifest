@@ -1,0 +1,15 @@
+{
+  "name":"Daivik Doorstep Car Wash",
+  "short_name":"Daivik Wash",
+  "description":"Doorstep car wash booking, tracking and monthly care.",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#061426",
+  "theme_color":"#061426",
+  "orientation":"portrait-primary",
+  "icons":[
+    {"src":"./images/dlogo.jpeg","sizes":"192x192","type":"image/jpeg","purpose":"any maskable"},
+    {"src":"./images/dlogo.jpeg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"}
+  ]
+}
