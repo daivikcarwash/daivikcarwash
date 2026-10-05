@@ -9,7 +9,7 @@
 <div class="staffbox"><div><label class="muted">Staff</label><select id="staffSelect"></select></div><button class="btn" onclick="saveStaff()">Save Staff</button></div>
 <p id="msg" class="muted" style="margin-top:10px"></p></div>
 <div class="grid"><div class="stat">My Jobs<b id="activeCount">0</b></div><div class="stat">Payment Pending<b id="pendingCount">0</b></div><div class="stat">Completed<b id="collectedCount">0</b></div></div>
-<div class="card"><h2>🚗 My Assigned Jobs</h2><p class="muted">Accept → Start Service → Complete. GPS becomes live after you start/choose a job.</p><div id="jobs"><p class="muted">Loading...</p></div></div>
+<div class="card"><h2>📦 My Monthly Visits</h2><p class="muted">Recurring monthly customers assigned by Admin appear here. Accept → Start GPS → Complete Visit.</p><div id="monthlyJobs"><p class="muted">Loading...</p></div></div><div class="card"><h2>🚗 My Assigned Jobs</h2><p class="muted">Accept → Start Service → Complete. GPS becomes live after you start/choose a job.</p><div id="jobs"><p class="muted">Loading...</p></div></div>
 <div class="card"><h2>📡 Live GPS</h2><p id="jobInfo" class="muted">Select a job to start location sharing.</p><p id="gpsStatus" class="muted">GPS not started.</p><p id="coords" class="muted"></p><div class="row"><button class="btn blue" onclick="startGPS()">📍 Start / Resume GPS</button><button class="btn red" onclick="stopGPS()">Stop GPS</button></div></div>
 </div>
 <script>
@@ -29,8 +29,32 @@ async function loadStaff(){
  if(!staff.length){el.innerHTML='<option value="">No active staff found</option>';return}
  await loadJobs();
 }
-function saveStaff(){const id=document.getElementById("staffSelect").value;if(!id){setMsg("Select a staff member.",true);return}localStorage.setItem(staffKey,id);setMsg("Staff saved ✓");loadJobs()}
+function saveStaff(){const id=document.getElementById("staffSelect").value;if(!id){setMsg("Select a staff member.",true);return}localStorage.setItem(staffKey,id);setMsg("Staff saved ✓");loadJobs();loadMonthlyJobs()}
 function currentStaff(){return staff.find(s=>s.id===staffId())||null}
+async function loadMonthlyJobs(){
+ const id=staffId(); if(!id){document.getElementById("monthlyJobs").innerHTML='<p class="muted">Select and save staff first.</p>';return}
+ const {data,error}=await db.from("daivik_monthly_orders").select("*").eq("assigned_staff_id",id).not("status","in","(Closed,Cancelled,Completed)").order("service_date");
+ if(error){document.getElementById("monthlyJobs").innerHTML='<p class="error">Could not load monthly visits: '+esc(error.message)+'</p>';return}
+ const rows=data||[];
+ document.getElementById("monthlyJobs").innerHTML=rows.length?rows.map(o=>{
+   const running=["Confirmed","On the Way","Running","Monthly Order Received"].includes(o.status);
+   return '<div class="job"><h3 style="margin:0 0 7px">'+esc(o.order_id)+' <span class="tag">MONTHLY</span></h3><div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">'+esc(o.package_name)+' • ₹'+esc(o.price)+'</div><div class="muted" style="margin-top:5px">📅 '+esc(o.service_date)+' • '+esc(o.service_time||'')+'</div><div class="muted" style="margin-top:5px">📍 '+esc(o.address)+'</div><div class="row" style="margin-top:12px"><button class="btn" data-id="'+esc(o.order_id)+'" onclick="startMonthlyVisit(this.dataset.id)">▶ Start Visit / GPS</button><button class="btn green" data-id="'+esc(o.order_id)+'" onclick="completeMonthlyVisit(this.dataset.id)">✓ Visit Completed</button><button class="btn blue" data-id="'+esc(o.order_id)+'" onclick="openMonthlyMaps(this.dataset.id)">🗺️ Route</button></div></div>';
+ }).join(""):'<p class="muted">No active monthly visits assigned.</p>';
+}
+async function startMonthlyVisit(id){currentJobId=id;document.getElementById("jobInfo").textContent=id+" • Monthly visit GPS active";document.getElementById("gpsStatus").textContent="Starting GPS for monthly visit…";startGPS();}
+async function completeMonthlyVisit(id){
+ if(!confirm("Complete this monthly visit for "+id+"?"))return;
+ stopGPS();
+ const {data,error}=await db.rpc("daivik_complete_monthly_visit",{p_order_id:id});
+ if(error){alert("Could not complete visit: "+error.message);return}
+ if(currentJobId===id)currentJobId="";
+ await loadMonthlyJobs();setMsg(data?.closed?"Monthly package completed ✓":"Visit completed. Next visit: "+(data?.next_visit_date||"scheduled")+" ✓");
+}
+function openMonthlyMaps(id){
+ const el=document.querySelector('[data-id="'+CSS.escape(id)+'"]'); 
+ const row=el?.closest(".job"); const addr=row?.querySelector(".muted:nth-of-type(3)")?.textContent?.replace(/^📍\s*/,"");
+ if(addr)window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(addr),"_blank");
+}
 async function loadJobs(){
  const id=staffId();if(!id){document.getElementById("jobs").innerHTML='<p class="muted">Select and save staff first.</p>';return}
  let q=db.from("daivik_car_wash_orders").select("*").eq("assigned_staff_id",id).order("service_date").order("created_at",{ascending:false});
@@ -80,5 +104,5 @@ function startGPS(){if(!currentJobId){alert("Pehle job select/accept karo.");ret
 function stopGPS(){if(watch)navigator.geolocation.clearWatch(watch);watch=null;document.getElementById("gpsStatus").textContent="GPS stopped."}
 async function sendPosition(pos){if(!currentJobId)return;const lat=pos.coords.latitude,lng=pos.coords.longitude;document.getElementById("gpsStatus").textContent="LIVE • GPS sharing";document.getElementById("coords").textContent="Lat: "+lat.toFixed(6)+" • Lng: "+lng.toFixed(6);const now=Date.now();if(now-lastGpsSend<4000)return;lastGpsSend=now;const d=await updateOrder(currentJobId,{staff_lat:lat,staff_lng:lng,wash_team_lat:lat,wash_team_lng:lng});if(!d)document.getElementById("gpsStatus").textContent="GPS update failed."}
 function openMaps(id){const o=jobs.find(x=>x.order_id===id);if(o)window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.address),"_blank")}
-loadStaff();
+loadStaff();setInterval(()=>{loadJobs();loadMonthlyJobs()},15000);
 </script></body></html>
