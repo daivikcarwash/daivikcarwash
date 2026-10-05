@@ -261,28 +261,58 @@ async function confirmBooking(order,name,customer){
 }
 async function geocodeAddress(address){
  const raw=address.trim();
- const queries=[raw+", India",raw+", Dehradun, Uttarakhand, India"];
+ const pinMatch=raw.match(/\\b\\d{6}\\b/);
+ const pin=pinMatch?pinMatch[0]:"";
+ const withoutPin=raw.replace(/,?\\s*\\b\\d{6}\\b/,"").trim();
+ const queries=[raw,raw+", India"];
+ if(pin){
+   queries.push(pin+", India");
+   queries.push("PIN "+pin+", India");
+ }
  let candidates=[];
+ // Try Nominatim with the complete address first.
  for(const q of queries){
   try{
-   const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&addressdetails=1&countrycodes=in&q="+encodeURIComponent(q);
+   const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=10&addressdetails=1&countrycodes=in&q="+encodeURIComponent(q);
    const res=await fetch(url,{headers:{"Accept":"application/json"}});
-   const data=await res.json();
-   if(Array.isArray(data)) candidates.push(...data);
-   if(candidates.length>=8) break;
+   if(res.ok){
+    const data=await res.json();
+    if(Array.isArray(data))candidates.push(...data);
+   }
+   if(candidates.length>=10)break;
   }catch(e){}
  }
- if(!candidates.length) throw new Error("Customer address could not be found. Please enter full address with city or PIN code.");
+ // Fallback to Photon if Nominatim does not find the address.
+ if(!candidates.length){
+  for(const q of [raw,withoutPin]){
+   try{
+    const res=await fetch("https://photon.komoot.io/api/?limit=10&q="+encodeURIComponent(q));
+    if(res.ok){
+     const data=await res.json();
+     if(Array.isArray(data.features)){
+      candidates.push(...data.features.map(f=>({
+       lat:f.geometry&&f.geometry.coordinates?f.geometry.coordinates[1]:null,
+       lon:f.geometry&&f.geometry.coordinates?f.geometry.coordinates[0]:null,
+       display_name:[f.properties&&f.properties.name,f.properties&&f.properties.city,f.properties&&f.properties.state,f.properties&&f.properties.country].filter(Boolean).join(", ")
+      })));
+     }
+    }
+   }catch(e){}
+   if(candidates.length)break;
+  }
+ }
+ candidates=candidates.filter(x=>Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon)));
+ if(!candidates.length)throw new Error("Customer address could not be found. Please check the address, city and 6-digit PIN code.");
  const origin=WASH_TEAM_LOCATION;
  const distKm=(lat,lng)=>{
-   const R=6371, a=Math.PI/180;
+   const R=6371,a=Math.PI/180;
    const dLat=(lat-origin.lat)*a,dLng=(lng-origin.lng)*a;
    const x=Math.sin(dLat/2)**2+Math.cos(origin.lat*a)*Math.cos(lat*a)*Math.sin(dLng/2)**2;
    return 2*R*Math.asin(Math.sqrt(x));
  };
  candidates.sort((a,b)=>distKm(Number(a.lat),Number(a.lon))-distKm(Number(b.lat),Number(b.lon)));
- const best=candidates[0], straightKm=distKm(Number(best.lat),Number(best.lon));
- if(straightKm>120) throw new Error("Address is too far or ambiguous. Please enter the complete address, city and PIN code.");
+ const best=candidates[0],straightKm=distKm(Number(best.lat),Number(best.lon));
+ if(straightKm>120)throw new Error("Customer address could not be matched near the service area. Please check the city and PIN code.");
  return {lat:Number(best.lat),lng:Number(best.lon),label:best.display_name};
 }
 async function validateServiceArea(address){
