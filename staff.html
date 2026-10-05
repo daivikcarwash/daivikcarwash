@@ -14,7 +14,7 @@
 </div>
 <script>
 const db=supabase.createClient("https://holelzxzhaiefaqezmce.supabase.co","sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ");
-let staff=[],jobs=[],watch=null,currentJobId="",lastGpsSend=0,channel=null;
+let staff=[],jobs=[],watch=null,currentJobId="",currentJobType="one-time",lastGpsSend=0,channel=null;
 const params=new URLSearchParams(location.search);if(params.get("order"))currentJobId=params.get("order");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const staffKey="daivikStaffId";
@@ -41,7 +41,7 @@ async function loadMonthlyJobs(){
    return '<div class="job"><h3 style="margin:0 0 7px">'+esc(o.order_id)+' <span class="tag">MONTHLY</span></h3><div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">'+esc(o.package_name)+' • ₹'+esc(o.price)+'</div><div class="muted" style="margin-top:5px">📅 '+esc(o.service_date)+' • '+esc(o.service_time||'')+'</div><div class="muted" style="margin-top:5px">📍 '+esc(o.address)+'</div><div class="row" style="margin-top:12px"><button class="btn" data-id="'+esc(o.order_id)+'" onclick="startMonthlyVisit(this.dataset.id)">▶ Start Visit / GPS</button><button class="btn green" data-id="'+esc(o.order_id)+'" onclick="completeMonthlyVisit(this.dataset.id)">✓ Visit Completed</button><button class="btn blue" data-id="'+esc(o.order_id)+'" onclick="openMonthlyMaps(this.dataset.id)">🗺️ Route</button></div></div>';
  }).join(""):'<p class="muted">No active monthly visits assigned.</p>';
 }
-async function startMonthlyVisit(id){currentJobId=id;document.getElementById("jobInfo").textContent=id+" • Monthly visit GPS active";document.getElementById("gpsStatus").textContent="Starting GPS for monthly visit…";startGPS();}
+async function startMonthlyVisit(id){currentJobId=id;currentJobType="monthly";document.getElementById("jobInfo").textContent=id+" • Monthly visit GPS active";document.getElementById("gpsStatus").textContent="Starting GPS for monthly visit…";startGPS();}
 async function completeMonthlyVisit(id){
  if(!confirm("Complete this monthly visit for "+id+"?"))return;
  stopGPS();
@@ -95,14 +95,14 @@ async function updateOrder(id,patch){
  const {data,error}=await db.from("daivik_car_wash_orders").update({...patch,updated_at:new Date().toISOString()}).eq("order_id",id).select().maybeSingle();
  if(error){alert("Update failed: "+error.message);return null}return data;
 }
-async function acceptJob(id){const d=await updateOrder(id,{accepted_at:new Date().toISOString(),status:"Confirmed"});if(d){currentJobId=id;renderJobs();setMsg("Job accepted ✓");startGPS()}}
-async function startService(id){const d=await updateOrder(id,{status:"On the Way",started_at:new Date().toISOString()});if(d){currentJobId=id;document.getElementById("jobInfo").textContent=id+" • GPS active for this job";renderJobs();startGPS();setMsg("Service started. Customer can now see live movement ✓")}}
-async function completeJob(id){if(!confirm("Service completed for "+id+"?"))return;const d=await updateOrder(id,{status:"Completed",completed_at:new Date().toISOString()});if(d){if(currentJobId===id){stopGPS();currentJobId=""}await loadJobs();setMsg("Job completed ✓")}}
+async function acceptJob(id){currentJobType="one-time";const d=await updateOrder(id,{accepted_at:new Date().toISOString(),status:"Confirmed"});if(d){currentJobId=id;renderJobs();setMsg("Job accepted ✓");startGPS()}}
+async function startService(id){currentJobType="one-time";const d=await updateOrder(id,{status:"On the Way",started_at:new Date().toISOString()});if(d){currentJobId=id;document.getElementById("jobInfo").textContent=id+" • GPS active for this job";renderJobs();startGPS();setMsg("Service started. Customer can now see live movement ✓")}}
+async function completeJob(id){if(!confirm("Service completed for "+id+"?"))return;const d=await updateOrder(id,{status:"Completed",completed_at:new Date().toISOString()});if(d){if(currentJobId===id){stopGPS();currentJobId="";currentJobType="one-time"}await loadJobs();setMsg("Job completed ✓")}}
 async function collectPayment(id){const o=jobs.find(x=>x.order_id===id);if(!o||o.payment_status==="Collected")return;if(!confirm("Confirm you actually received ₹"+o.price+" for "+id+"?"))return;const d=await updateOrder(id,{payment_status:"Collected"});if(d){await loadJobs();setMsg("Payment marked collected ✓")}}
-function selectJob(id){currentJobId=id;const o=jobs.find(x=>x.order_id===id);if(o)document.getElementById("jobInfo").textContent=o.order_id+" • "+o.customer_name+" • "+o.address;startGPS()}
+function selectJob(id){currentJobType="one-time";currentJobId=id;const o=jobs.find(x=>x.order_id===id);if(o)document.getElementById("jobInfo").textContent=o.order_id+" • "+o.customer_name+" • "+o.address;startGPS()}
 function startGPS(){if(!currentJobId){alert("Pehle job select/accept karo.");return}if(!navigator.geolocation){document.getElementById("gpsStatus").textContent="GPS is not supported.";return}document.getElementById("gpsStatus").textContent="Requesting GPS…";if(watch)navigator.geolocation.clearWatch(watch);watch=navigator.geolocation.watchPosition(sendPosition,e=>{document.getElementById("gpsStatus").textContent="GPS error: "+e.message},{enableHighAccuracy:true,maximumAge:5000,timeout:15000})}
 function stopGPS(){if(watch)navigator.geolocation.clearWatch(watch);watch=null;document.getElementById("gpsStatus").textContent="GPS stopped."}
-async function sendPosition(pos){if(!currentJobId)return;const lat=pos.coords.latitude,lng=pos.coords.longitude;document.getElementById("gpsStatus").textContent="LIVE • GPS sharing";document.getElementById("coords").textContent="Lat: "+lat.toFixed(6)+" • Lng: "+lng.toFixed(6);const now=Date.now();if(now-lastGpsSend<4000)return;lastGpsSend=now;const d=await updateOrder(currentJobId,{staff_lat:lat,staff_lng:lng,wash_team_lat:lat,wash_team_lng:lng});if(!d)document.getElementById("gpsStatus").textContent="GPS update failed."}
+async function sendPosition(pos){if(!currentJobId)return;const lat=pos.coords.latitude,lng=pos.coords.longitude;document.getElementById("gpsStatus").textContent="LIVE • GPS sharing";document.getElementById("coords").textContent="Lat: "+lat.toFixed(6)+" • Lng: "+lng.toFixed(6);const now=Date.now();if(now-lastGpsSend<4000)return;lastGpsSend=now;const d=currentJobType==="monthly" ? await db.from("daivik_monthly_orders").update({staff_lat:lat,staff_lng:lng,updated_at:new Date().toISOString()}).eq("order_id",currentJobId).select().maybeSingle() : await updateOrder(currentJobId,{staff_lat:lat,staff_lng:lng,wash_team_lat:lat,wash_team_lng:lng});if(d?.error||!d?.data)document.getElementById("gpsStatus").textContent="GPS update failed."}
 function openMaps(id){const o=jobs.find(x=>x.order_id===id);if(o)window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.address),"_blank")}
 loadStaff();setInterval(()=>{loadJobs();loadMonthlyJobs()},15000);
 </script></body></html>
