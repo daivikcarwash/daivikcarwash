@@ -72,13 +72,6 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 <div class="stat">Live GPS<b id="liveGps">0</b></div>
 </div>
 
-<div class="card" style="margin-bottom:14px">
-<h2 style="color:#d4af37;margin-top:0">Daivik Base Location</h2>
-<p class="muted">Wash team base will be taken from this phone's current GPS location. This base is used for the 25 KM service-area check and customer tracking.</p>
-<button class="btn" onclick="setCurrentWashLocation()">📍 Use My Current Location as Daivik Base</button>
-<p id="baseLocationMsg" class="muted" style="margin-top:10px"></p>
-</div>
-
 <div class="card">
 <h2 style="color:#d4af37;margin-top:0">Order Management</h2>
 <p class="muted">Manage customer bookings, monthly plans, payments, service status and staff operations from one professional workspace.</p>
@@ -171,24 +164,7 @@ async function login(){
     setMsg("Admin opened, but data loading failed: "+(e?.message||e),true);
   }
 }
-async function setCurrentWashLocation(){
- const msg=document.getElementById("baseLocationMsg");
- if(msg)msg.textContent="Requesting current GPS location…";
- if(!(await initDB())){if(msg)msg.textContent="Database connection failed.";return}
- if(!navigator.geolocation){if(msg)msg.textContent="Location is not supported on this device.";return}
- navigator.geolocation.getCurrentPosition(async pos=>{
-  try{
-   const {data,error}=await db.rpc("set_daivik_wash_team_location",{p_lat:pos.coords.latitude,p_lng:pos.coords.longitude,p_accuracy:pos.coords.accuracy});
-   if(error)throw error;
-   if(msg)msg.textContent="Daivik base location updated ✓ Accuracy: "+Math.round(pos.coords.accuracy||0)+" m";
-   setMsg("Daivik base location updated ✓");
-  }catch(e){
-   if(msg)msg.textContent="Could not save location: "+(e?.message||e);
-  }
- },err=>{
-  if(msg)msg.textContent=err.code===1?"Please allow location access for this site.":err.code===2?"Location unavailable.":"Location request timed out.";
- },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
-}
+
 
 async function loadOrders(){
   if(!(await initDB()))return;
