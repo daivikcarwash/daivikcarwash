@@ -323,7 +323,8 @@ async function geocodeAddress(streetAddress,city,pincode){
     const hay=[o.office_name,o.district,o.state,o.taluk].filter(Boolean).join(" ").toLowerCase();
     return !cityNeedle||hay.includes(cityNeedle)||cityNeedle.includes(String(o.district||"").toLowerCase());
    });
-   const pool=compatible.length?compatible:offices;
+   if(offices.length&&compatible.length===0)throw new Error("City and PIN code do not match. Please check both fields.");
+   const pool=compatible;
    for(const o of pool){
     const lat=Number(o.latitude??o.lat),lng=Number(o.longitude??o.lon??o.longitude);
     if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
@@ -331,7 +332,6 @@ async function geocodeAddress(streetAddress,city,pincode){
     if(d>120)continue;
     return {lat,lng,label:[o.office_name,o.district,o.state,pin].filter(Boolean).join(", ")};
    }
-   if(offices.length&&compatible.length===0)throw new Error("City and PIN code do not match. Please check both fields.");
   }
  }catch(e){
   if(e.message&&e.message.includes("City and PIN"))throw e;
