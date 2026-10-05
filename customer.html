@@ -155,6 +155,7 @@ async function placeOrder(){
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("msg").textContent="Please complete your name, email, mobile, vehicle, date and address.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
+ try{await validateServiceArea(address)}catch(e){$("msg").textContent=e.message;return}
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
@@ -284,6 +285,15 @@ async function geocodeAddress(address){
  if(straightKm>120) throw new Error("Address is too far or ambiguous. Please enter full address with city or PIN code.");
  return {lat:Number(best.lat),lng:Number(best.lon),label:best.display_name};
 }
+async function validateServiceArea(address){
+ const dest=await geocodeAddress(address);
+ const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+WASH_TEAM_LOCATION.lng+","+WASH_TEAM_LOCATION.lat+";"+dest.lng+","+dest.lat+"?overview=false&alternatives=false&steps=false");
+ const routeData=await routeRes.json();
+ if(!routeData.routes||!routeData.routes[0])throw new Error("Route could not be found for this address.");
+ const km=routeData.routes[0].distance/1000;
+ if(km>25)throw new Error("Sorry, we currently provide doorstep service only within 25 KM. This address is approximately "+km.toFixed(1)+" KM away.");
+ return {dest,km};
+}
 async function startTracking(order,cloudOrder=null){
  $("tracking").classList.remove("hidden");
  $("trackVehicle").textContent=order.vehicle;
@@ -295,7 +305,7 @@ async function startTracking(order,cloudOrder=null){
   if(!routeData.routes||!routeData.routes[0]) throw new Error("Route not found.");
   const route=routeData.routes[0];routeCoords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
   const km=route.distance/1000,minutes=Math.max(1,Math.round(route.duration/60));
-  if(km>200) throw new Error("The customer address could not be matched reliably. Please enter the full address with city or PIN code.");
+  if(km>25) throw new Error("This address is outside the 25 KM doorstep service area.");
   $("trackDistance").textContent=km.toFixed(1)+" KM";
   $("trackEta").textContent=minutes+" min";
   $("trackStatus").textContent="On the Way";
@@ -425,7 +435,9 @@ async function placeMonthlyOrder(){
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("monthlyMsg").textContent="Please complete all details.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
- btn.disabled=true;btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
+ btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
+ try{await validateServiceArea(address)}catch(e){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent=e.message;return}
+ btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
  localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
