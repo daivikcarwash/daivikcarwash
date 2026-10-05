@@ -209,6 +209,7 @@ async function confirmPaid(){
 }
 let trackingMap=null,routeLine=null,carMarker=null,routeCoords=[],carTimer=null,lastCustomerCoords=null,lastOriginCoords=null,liveStaffMarker=null,currentCloudOrder=null;
 async function syncOrderToCloud(order,name,email,mobile){
+ await loadWashTeamLocation();
  try{
   const payload={order_id:order.id,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle:order.vehicle,service:order.service,price:order.price,service_date:order.date,preferred_time:order.time,address:order.address,payment_method:order.payment,payment_status:"Pending",status:"Booking Received",wash_team_lat:WASH_TEAM_LOCATION.lat,wash_team_lng:WASH_TEAM_LOCATION.lng};
   const {error}=await db.from("daivik_car_wash_orders").insert(payload);
@@ -257,7 +258,19 @@ async function lookupOrder(){
  $("tracking").scrollIntoView({behavior:"smooth"});
 }
 
-const WASH_TEAM_LOCATION={lat:30.3165,lng:78.0322,name:"Daivik Wash Team"}; // Change these coordinates to your actual starting location.
+let WASH_TEAM_LOCATION={lat:30.3165,lng:78.0322,name:"Daivik Wash Team"};
+let washTeamLocationLoaded=false;
+async function loadWashTeamLocation(){
+ if(washTeamLocationLoaded)return WASH_TEAM_LOCATION;
+ try{
+  const {data,error}=await db.from("daivik_wash_team_location").select("lat,lng,accuracy_meters,updated_at").eq("id",1).maybeSingle();
+  if(!error&&data&&Number.isFinite(Number(data.lat))&&Number.isFinite(Number(data.lng))){
+   WASH_TEAM_LOCATION={lat:Number(data.lat),lng:Number(data.lng),name:"Daivik Wash Team",accuracy:Number(data.accuracy_meters)||null,updatedAt:data.updated_at||null};
+  }
+ }catch(e){console.warn("Wash team base lookup failed",e)}
+ washTeamLocationLoaded=true;
+ return WASH_TEAM_LOCATION;
+} // Change these coordinates to your actual starting location.
 async function confirmBooking(order,name,customer){
  $("success").classList.remove("hidden");$("successText").textContent="Thank you "+name+"! Your "+order.service+" booking is confirmed. Order ID: "+order.id+".";
  $("history").classList.remove("hidden");renderHistory(customer);window.scrollTo({top:$("success").offsetTop-20,behavior:"smooth"});
@@ -340,6 +353,7 @@ async function geocodeAddress(streetAddress,city,pincode){
  throw new Error("Customer address could not be located. Please check the street/area, city and 6-digit PIN code.");
 }
 async function validateServiceArea(streetAddress,city,pincode){
+ await loadWashTeamLocation();
  const dest=await geocodeAddress(streetAddress,city,pincode);
  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+WASH_TEAM_LOCATION.lng+","+WASH_TEAM_LOCATION.lat+";"+dest.lng+","+dest.lat+"?overview=false&alternatives=false&steps=false");
  const routeData=await routeRes.json();
@@ -349,6 +363,7 @@ async function validateServiceArea(streetAddress,city,pincode){
  return {dest,km};
 }
 async function startTracking(order,cloudOrder=null){
+ await loadWashTeamLocation();
  $("tracking").classList.remove("hidden");
  $("trackVehicle").textContent=order.vehicle;
  $("trackStatus").textContent="Finding route…";
