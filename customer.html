@@ -53,7 +53,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <div><label>Service Date</label><input id="date" type="date"></div>
 <div><label>Preferred Time</label><select id="time"><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>12:00 PM - 2:00 PM</option><option>2:00 PM - 4:00 PM</option><option>4:00 PM - 6:00 PM</option><option>6:00 PM - 8:00 PM</option></select></div>
 </div>
-<label>Doorstep Address</label><input id="address" placeholder="Where should we come for the service?" onblur="loadSavedCustomer()"><div id="savedAddressNote" class="saved-address"></div>
+<label>Doorstep Address</label><input id="address" placeholder="House / Street / Area" onblur="loadSavedCustomer()"><div class="formgrid"><div><label>City</label><input id="city" placeholder="e.g. Dehradun"></div><div><label>PIN Code</label><input id="pincode" inputmode="numeric" maxlength="6" placeholder="6-digit PIN code"></div></div><div id="savedAddressNote" class="saved-address"></div>
 <h2 style="margin-top:25px">3. Payment</h2>
 <div class="payment">
 <label class="pay"><input type="radio" name="pay" value="COD" checked> 💵 Cash on Delivery</label>
@@ -150,10 +150,10 @@ function saveCustomers(x){localStorage.setItem("daivikCustomers",JSON.stringify(
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 async function placeOrder(){
  const btn=$("bookBtn");if(btn.disabled)return;
- const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value,address=$("address").value.trim(),pay=document.querySelector('input[name="pay"]:checked').value;
+ const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value,streetAddress=$("address").value.trim(),city=$("city").value.trim(),pincode=$("pincode").value.trim(),address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="pay"]:checked').value;
  if(!selectedVehicleType){$("msg").textContent="Please choose your vehicle type first.";return}
  if(!selected){$("msg").textContent="Please choose a service first.";return}
- if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("msg").textContent="Please complete your name, email, mobile, vehicle, date and address.";return}
+ if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
  try{await validateServiceArea(address)}catch(e){$("msg").textContent=e.message;return}
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
@@ -282,7 +282,7 @@ async function geocodeAddress(address){
  };
  candidates.sort((a,b)=>distKm(Number(a.lat),Number(a.lon))-distKm(Number(b.lat),Number(b.lon)));
  const best=candidates[0], straightKm=distKm(Number(best.lat),Number(best.lon));
- if(straightKm>120) throw new Error("Address is too far or ambiguous. Please enter full address with city or PIN code.");
+ if(straightKm>120) throw new Error("Address is too far or ambiguous. Please enter the complete address, city and PIN code.");
  return {lat:Number(best.lat),lng:Number(best.lon),label:best.display_name};
 }
 async function validateServiceArea(address){
@@ -358,7 +358,7 @@ renderServices();
     <div><label>First Service Date</label><input id="mDate" type="date"></div>
     <div><label>Preferred Service Time</label><select id="mTime"><option>7:00 AM - 9:00 AM</option><option>8:00 AM - 10:00 AM</option><option>10:00 AM - 12:00 PM</option><option>4:00 PM - 6:00 PM</option><option>6:00 PM - 8:00 PM</option></select></div>
   </div>
-  <label>Doorstep Address</label><input id="mAddress" placeholder="Where should we provide the monthly service?">
+  <label>Doorstep Address</label><input id="mAddress" placeholder="House / Street / Area"><div class="formgrid"><div><label>City</label><input id="mCity" placeholder="e.g. Dehradun"></div><div><label>PIN Code</label><input id="mPincode" inputmode="numeric" maxlength="6" placeholder="6-digit PIN code"></div></div>
   <div style="margin-top:15px">
     <label class="pay"><input type="radio" name="mpay" value="COD" checked> 💵 Pay at service / cash</label>
     <label class="pay"><input type="radio" name="mpay" value="UPI"> 📱 UPI / PhonePe / Google Pay</label>
@@ -431,8 +431,8 @@ async function confirmMonthlyPaid(){
 }
 async function placeMonthlyOrder(){
  const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key],btn=$("monthlyBookBtn");if(!pack||btn.disabled)return;
- const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value,address=$("mAddress").value.trim(),pay=document.querySelector('input[name="mpay"]:checked').value;
- if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!address){$("monthlyMsg").textContent="Please complete all details.";return}
+ const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value,streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim(),address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
+ if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
