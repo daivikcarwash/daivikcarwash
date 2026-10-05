@@ -121,28 +121,33 @@ function selectService(i){
 async function loadSavedCustomer(){
  const email=$("email").value.trim().toLowerCase();
  if(!validEmail(email))return;
+ const applySaved=(saved,name,mobile)=>{
+  if(name&&!$("name").value.trim())$("name").value=name;
+  if(mobile&&!$("mobile").value.trim())$("mobile").value=mobile;
+  const raw=String(saved||"").trim();
+  if(!raw)return;
+  const pinMatch=raw.match(/\b\d{6}\b/);
+  const pin=pinMatch?pinMatch[0]:"";
+  const parts=raw.split(",").map(x=>x.trim()).filter(Boolean);
+  const onlyPin=/^\d{6}$/.test(raw);
+  if(onlyPin){
+   if(!$("pincode").value.trim())$("pincode").value=pin;
+  }else{
+   if(!$("address").value.trim())$("address").value=raw.replace(/,?\s*\b\d{6}\b\s*$/,"").replace(/,\s*$/,"").trim();
+   if(pin&&!$("pincode").value.trim())$("pincode").value=pin;
+   if(parts.length>=2&&!$("city").value.trim()){
+    const possibleCity=parts[parts.length-2];
+    if(possibleCity&&!/^\d{6}$/.test(possibleCity))$("city").value=possibleCity;
+   }
+  }
+  $("savedAddressNote").style.display="block";
+  $("savedAddressNote").textContent=onlyPin?"✓ Saved PIN found — please confirm your street/area and city.":"✓ Saved address found — we filled it for you.";
+ };
  const local=customers().find(c=>c.email===email);
- if(local){
-   if(local.name&&!$("name").value.trim())$("name").value=local.name;
-   if(local.mobile&&!$("mobile").value.trim())$("mobile").value=local.mobile;
-   if(local.address){
-     $("address").value=local.address;
-     $("savedAddressNote").style.display="block";
-     $("savedAddressNote").textContent="✓ Saved address found — we filled it for you.";
-     return;
-   }
- }
+ if(local){applySaved(local.address,local.name,local.mobile);if(local.address)return;}
  try{
-   const {data}=await db.from("daivik_car_wash_orders").select("customer_name,customer_mobile,address").eq("customer_email",email).order("created_at",{ascending:false}).limit(1).maybeSingle();
-   if(data){
-     if(data.customer_name&&!$("name").value.trim())$("name").value=data.customer_name;
-     if(data.customer_mobile&&!$("mobile").value.trim())$("mobile").value=data.customer_mobile;
-     if(data.address){
-       $("address").value=data.address;
-       $("savedAddressNote").style.display="block";
-       $("savedAddressNote").textContent="✓ Saved address found — we filled it for you.";
-     }
-   }
+  const {data}=await db.from("daivik_car_wash_orders").select("customer_name,customer_mobile,address").eq("customer_email",email).order("created_at",{ascending:false}).limit(1).maybeSingle();
+  if(data)applySaved(data.address,data.customer_name,data.customer_mobile);
  }catch(e){console.warn("Saved customer lookup failed",e)}
 }
 function customers(){return JSON.parse(localStorage.getItem("daivikCustomers")||"[]")}
@@ -150,12 +155,12 @@ function saveCustomers(x){localStorage.setItem("daivikCustomers",JSON.stringify(
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 async function placeOrder(){
  const btn=$("bookBtn");if(btn.disabled)return;
- const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value,streetAddress=$("address").value.trim(),city=$("city").value.trim(),pincode=$("pincode").value.trim(),address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="pay"]:checked').value;
+ const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value;let streetAddress=$("address").value.trim(),city=$("city").value.trim(),pincode=$("pincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("pincode").value=pincode;$("address").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="pay"]:checked').value;
  if(!selectedVehicleType){$("msg").textContent="Please choose your vehicle type first.";return}
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
- try{await validateServiceArea(address)}catch(e){$("msg").textContent=e.message;return}
+ try{await validateServiceArea(streetAddress,city,pincode)}catch(e){$("msg").textContent=e.message;return}
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
@@ -259,64 +264,83 @@ async function confirmBooking(order,name,customer){
  $("bookBtn").textContent="Booking Placed ✓";$("bookBtn").disabled=true;
  await startTracking(order);
 }
-async function geocodeAddress(address){
- const raw=address.trim();
- const pinMatch=raw.match(/\\b\\d{6}\\b/);
- const pin=pinMatch?pinMatch[0]:"";
- const withoutPin=raw.replace(/,?\\s*\\b\\d{6}\\b/,"").trim();
- const queries=[raw,raw+", India"];
- if(pin){
-   queries.push(pin+", India");
-   queries.push("PIN "+pin+", India");
- }
- let candidates=[];
- // Try Nominatim with the complete address first.
- for(const q of queries){
-  try{
-   const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=10&addressdetails=1&countrycodes=in&q="+encodeURIComponent(q);
-   const res=await fetch(url,{headers:{"Accept":"application/json"}});
-   if(res.ok){
-    const data=await res.json();
-    if(Array.isArray(data))candidates.push(...data);
-   }
-   if(candidates.length>=10)break;
-  }catch(e){}
- }
- // Fallback to Photon if Nominatim does not find the address.
- if(!candidates.length){
-  for(const q of [raw,withoutPin]){
-   try{
-    const res=await fetch("https://photon.komoot.io/api/?limit=10&q="+encodeURIComponent(q));
-    if(res.ok){
-     const data=await res.json();
-     if(Array.isArray(data.features)){
-      candidates.push(...data.features.map(f=>({
-       lat:f.geometry&&f.geometry.coordinates?f.geometry.coordinates[1]:null,
-       lon:f.geometry&&f.geometry.coordinates?f.geometry.coordinates[0]:null,
-       display_name:[f.properties&&f.properties.name,f.properties&&f.properties.city,f.properties&&f.properties.state,f.properties&&f.properties.country].filter(Boolean).join(", ")
-      })));
-     }
-    }
-   }catch(e){}
-   if(candidates.length)break;
-  }
- }
- candidates=candidates.filter(x=>Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon)));
- if(!candidates.length)throw new Error("Customer address could not be found. Please check the address, city and 6-digit PIN code.");
+async function geocodeAddress(streetAddress,city,pincode){
+ const street=String(streetAddress||"").trim();
+ const cityName=String(city||"").trim();
+ const pin=String(pincode||"").trim();
  const origin=WASH_TEAM_LOCATION;
  const distKm=(lat,lng)=>{
-   const R=6371,a=Math.PI/180;
-   const dLat=(lat-origin.lat)*a,dLng=(lng-origin.lng)*a;
-   const x=Math.sin(dLat/2)**2+Math.cos(origin.lat*a)*Math.cos(lat*a)*Math.sin(dLng/2)**2;
-   return 2*R*Math.asin(Math.sqrt(x));
+  const R=6371,a=Math.PI/180;
+  const dLat=(lat-origin.lat)*a,dLng=(lng-origin.lng)*a;
+  const x=Math.sin(dLat/2)**2+Math.cos(origin.lat*a)*Math.cos(lat*a)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
  };
- candidates.sort((a,b)=>distKm(Number(a.lat),Number(a.lon))-distKm(Number(b.lat),Number(b.lon)));
- const best=candidates[0],straightKm=distKm(Number(best.lat),Number(best.lon));
- if(straightKm>120)throw new Error("Customer address could not be matched near the service area. Please check the city and PIN code.");
- return {lat:Number(best.lat),lng:Number(best.lon),label:best.display_name};
+ if(!street||!cityName||!/^[0-9]{6}$/.test(pin))throw new Error("Please enter a complete street/area, city and 6-digit PIN code.");
+
+ // First try Photon for the exact address. It accepts free-form addresses and is used only
+ // after the customer submits the form, not as an autocomplete service.
+ const exactQuery=[street,cityName,pin,"India"].filter(Boolean).join(", ");
+ try{
+  const res=await fetch("https://photon.komoot.io/api/?limit=10&q="+encodeURIComponent(exactQuery));
+  if(res.ok){
+   const data=await res.json();
+   const features=Array.isArray(data.features)?data.features:[];
+   const wantedCity=cityName.toLowerCase();
+   const scored=features.map(f=>{
+    const p=f.properties||{},hay=JSON.stringify(p).toLowerCase();
+    const postcode=String(p.postcode||p.postalcode||"");
+    let score=0;
+    if(postcode===pin)score+=100;
+    if(hay.includes(wantedCity))score+=60;
+    const streetTokens=street.toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>2);
+    for(const t of streetTokens)if(hay.includes(t))score+=8;
+    return {f,score};
+   }).sort((a,b)=>b.score-a.score);
+   for(const item of scored){
+    const f=item.f,p=f.properties||{},coords=f.geometry&&f.geometry.coordinates;
+    if(!coords||coords.length<2)continue;
+    const lat=Number(coords[1]),lng=Number(coords[0]);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
+    const postcode=String(p.postcode||p.postalcode||"");
+    if(postcode&&postcode!==pin)continue;
+    if(item.score<100)continue;
+    const d=distKm(lat,lng);
+    if(d>120)continue;
+    return {lat,lng,label:[p.name,p.street,p.city||p.district,p.state,p.country,p.postcode].filter(Boolean).join(", ")};
+   }
+  }
+ }catch(e){console.warn("Exact address lookup failed",e)}
+
+ // Reliable Indian PIN fallback. This also fixes old saved addresses such as "249403"
+ // that were previously placed into the street field.
+ try{
+  const res=await fetch("https://api.pincodeapi.in/api/v1/pincode/"+encodeURIComponent(pin));
+  if(res.ok){
+   const data=await res.json();
+   const offices=data&&data.data&&Array.isArray(data.data.post_offices)?data.data.post_offices:[];
+   const cityNeedle=cityName.toLowerCase();
+   const compatible=offices.filter(o=>{
+    const hay=[o.office_name,o.district,o.state,o.taluk].filter(Boolean).join(" ").toLowerCase();
+    return !cityNeedle||hay.includes(cityNeedle)||cityNeedle.includes(String(o.district||"").toLowerCase());
+   });
+   const pool=compatible.length?compatible:offices;
+   for(const o of pool){
+    const lat=Number(o.latitude??o.lat),lng=Number(o.longitude??o.lon??o.longitude);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
+    const d=distKm(lat,lng);
+    if(d>120)continue;
+    return {lat,lng,label:[o.office_name,o.district,o.state,pin].filter(Boolean).join(", ")};
+   }
+   if(offices.length&&compatible.length===0)throw new Error("City and PIN code do not match. Please check both fields.");
+  }
+ }catch(e){
+  if(e.message&&e.message.includes("City and PIN"))throw e;
+  console.warn("PIN lookup failed",e);
+ }
+ throw new Error("Customer address could not be located. Please check the street/area, city and 6-digit PIN code.");
 }
-async function validateServiceArea(address){
- const dest=await geocodeAddress(address);
+async function validateServiceArea(streetAddress,city,pincode){
+ const dest=await geocodeAddress(streetAddress,city,pincode);
  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+WASH_TEAM_LOCATION.lng+","+WASH_TEAM_LOCATION.lat+";"+dest.lng+","+dest.lat+"?overview=false&alternatives=false&steps=false");
  const routeData=await routeRes.json();
  if(!routeData.routes||!routeData.routes[0])throw new Error("Route could not be found for this address.");
@@ -329,7 +353,7 @@ async function startTracking(order,cloudOrder=null){
  $("trackVehicle").textContent=order.vehicle;
  $("trackStatus").textContent="Finding route…";
  try{
-  const dest=await geocodeAddress(order.address);lastCustomerCoords=dest;lastOriginCoords=cloudOrder&&cloudOrder.wash_team_lat?{lat:Number(cloudOrder.wash_team_lat),lng:Number(cloudOrder.wash_team_lng),name:"Daivik Wash Team"}:WASH_TEAM_LOCATION;
+  const stored=String(order.address||"");const pinMatch=stored.match(/\b\d{6}\b/);const pin=pinMatch?pinMatch[0]:"";const parts=stored.split(",").map(x=>x.trim()).filter(Boolean);const street=parts.length>1?parts.slice(0,-2).join(", "):parts[0]||"";const city=parts.length>1?parts[parts.length-2]:"";const dest=await geocodeAddress(street,city,pin);lastCustomerCoords=dest;lastOriginCoords=cloudOrder&&cloudOrder.wash_team_lat?{lat:Number(cloudOrder.wash_team_lat),lng:Number(cloudOrder.wash_team_lng),name:"Daivik Wash Team"}:WASH_TEAM_LOCATION;
   const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+lastOriginCoords.lng+","+lastOriginCoords.lat+";"+dest.lng+","+dest.lat+"?overview=full&geometries=geojson");
   const routeData=await routeRes.json();
   if(!routeData.routes||!routeData.routes[0]) throw new Error("Route not found.");
@@ -461,12 +485,12 @@ async function confirmMonthlyPaid(){
 }
 async function placeMonthlyOrder(){
  const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key],btn=$("monthlyBookBtn");if(!pack||btn.disabled)return;
- const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value,streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim(),address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
+ const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value;let streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("mPincode").value=pincode;$("mAddress").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
- try{await validateServiceArea(address)}catch(e){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent=e.message;return}
+ try{await validateServiceArea(streetAddress,city,pincode)}catch(e){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent=e.message;return}
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
