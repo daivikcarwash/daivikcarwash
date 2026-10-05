@@ -232,14 +232,32 @@ function startRealtimeTracking(orderId,email){
   }).subscribe();
  }catch(e){console.error("Realtime tracking failed",e)}
 }
-function updateLiveStaff(lat,lng){
- if(!trackingMap)return;
+let liveRouteBusy=false,lastLiveRouteAt=0;
+async function updateLiveStaff(lat,lng){
+ if(!trackingMap||!lastCustomerCoords)return;
+ lastOriginCoords={lat,lng,name:"Live Daivik Wash Team"};
  if(!liveStaffMarker){
   const icon=L.divIcon({className:"",html:"<div style='font-size:30px'>🚗</div>",iconSize:[34,34],iconAnchor:[17,17]});
   liveStaffMarker=L.marker([lat,lng],{icon}).addTo(trackingMap).bindPopup("🚗 Daivik Wash Team • Live GPS");
  }else liveStaffMarker.setLatLng([lat,lng]);
- lastOriginCoords={lat,lng,name:"Live Daivik Wash Team"};
  $("trackStatus").textContent="Wash Team Live Location";
+ const now=Date.now();
+ if(liveRouteBusy||now-lastLiveRouteAt<8000)return;
+ liveRouteBusy=true;lastLiveRouteAt=now;
+ try{
+  const res=await fetch("https://router.project-osrm.org/route/v1/driving/"+lng+","+lat+";"+lastCustomerCoords.lng+","+lastCustomerCoords.lat+"?overview=full&geometries=geojson");
+  const data=await res.json();
+  if(!data.routes||!data.routes[0])throw new Error("Live route unavailable");
+  const route=data.routes[0],km=route.distance/1000,minutes=Math.max(1,Math.round(route.duration/60));
+  $("trackDistance").textContent=km.toFixed(1)+" KM";
+  $("trackEta").textContent=minutes+" min";
+  $("trackStatus").textContent=km<=25?"Wash Team Live":"Outside 25 KM Service Area";
+  const coords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
+  if(routeLine)routeLine.setLatLngs(coords);
+  if(carMarker)carMarker.setLatLng([lat,lng]);
+  trackingMap.fitBounds([[lat,lng],[lastCustomerCoords.lat,lastCustomerCoords.lng]],{padding:[25,25]});
+ }catch(e){console.warn("Live route update failed",e)}
+ finally{liveRouteBusy=false}
 }
 
 async function lookupOrder(){
@@ -367,8 +385,11 @@ async function startTracking(order,cloudOrder=null){
  $("trackVehicle").textContent=order.vehicle;
  $("trackStatus").textContent="Finding route…";
  try{
-  const stored=String(order.address||"");const pinMatch=stored.match(/\b\d{6}\b/);const pin=pinMatch?pinMatch[0]:"";const parts=stored.split(",").map(x=>x.trim()).filter(Boolean);const street=parts.length>1?parts.slice(0,-2).join(", "):parts[0]||"";const city=parts.length>1?parts[parts.length-2]:"";const dest=await geocodeAddress(street,city,pin);lastCustomerCoords=dest;lastOriginCoords=cloudOrder&&cloudOrder.wash_team_lat?{lat:Number(cloudOrder.wash_team_lat),lng:Number(cloudOrder.wash_team_lng),name:"Daivik Wash Team"}:WASH_TEAM_LOCATION;
-  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+lastOriginCoords.lng+","+lastOriginCoords.lat+";"+dest.lng+","+dest.lat+"?overview=full&geometries=geojson");
+  const stored=String(order.address||"");const pinMatch=stored.match(/\b\d{6}\b/);const pin=pinMatch?pinMatch[0]:"";const parts=stored.split(",").map(x=>x.trim()).filter(Boolean);const street=parts.length>1?parts.slice(0,-2).join(", "):parts[0]||"";const city=parts.length>1?parts[parts.length-2]:"";const dest=await geocodeAddress(street,city,pin);lastCustomerCoords=dest;
+  const liveLat=cloudOrder&&cloudOrder.staff_lat!=null?Number(cloudOrder.staff_lat):null,liveLng=cloudOrder&&cloudOrder.staff_lng!=null?Number(cloudOrder.staff_lng):null;
+  if(!Number.isFinite(liveLat)||!Number.isFinite(liveLng)){ $("trackStatus").textContent="Waiting for wash team GPS…"; $("trackDistance").textContent="—"; $("trackEta").textContent="—"; return; }
+  lastOriginCoords={lat:liveLat,lng:liveLng,name:"Live Daivik Wash Team"};
+  const routeRes=await fetch("https://router.project-osrm.org/route/v1/driving/"+liveLng+","+liveLat+";"+dest.lng+","+dest.lat+"?overview=full&geometries=geojson");
   const routeData=await routeRes.json();
   if(!routeData.routes||!routeData.routes[0]) throw new Error("Route not found.");
   const route=routeData.routes[0];routeCoords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
