@@ -158,8 +158,10 @@ async function placeOrder(){
  const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value;let streetAddress=$("address").value.trim(),city=$("city").value.trim(),pincode=$("pincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("pincode").value=pincode;$("address").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="pay"]:checked').value;
  if(!selectedVehicleType){$("msg").textContent="Please choose your vehicle type first.";return}
  if(!selected){$("msg").textContent="Please choose a service first.";return}
+ if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("monthlyMsg").textContent="Please verify your email before placing the monthly booking.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
+ if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("msg").textContent="Please verify your email before placing the booking.";return}
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
@@ -210,7 +212,7 @@ let trackingMap=null,routeLine=null,carMarker=null,routeCoords=[],carTimer=null,
 async function syncOrderToCloud(order,name,email,mobile){
  await loadWashTeamLocation();
  try{
-  const payload={order_id:order.id,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle:order.vehicle,service:order.service,price:order.price,service_date:order.date,preferred_time:order.time,address:order.address,payment_method:order.payment,payment_status:"Pending",status:"Booking Received",wash_team_lat:WASH_TEAM_LOCATION.lat,wash_team_lng:WASH_TEAM_LOCATION.lng,customer_user_id:window.daivikAuthUser?.id||null};
+  const payload={order_id:order.id,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle:order.vehicle,service:order.service,price:order.price,service_date:order.date,preferred_time:order.time,address:order.address,payment_method:order.payment,payment_status:"Pending",status:"Booking Received",wash_team_lat:WASH_TEAM_LOCATION.lat,wash_team_lng:WASH_TEAM_LOCATION.lng,customer_user_id:window.daivikAuthUser?.id};
   const {error}=await db.from("daivik_car_wash_orders").insert(payload);
   if(error){console.error("Cloud order save failed",error);return false}return true;
  }catch(e){console.error(e);return false}
@@ -511,7 +513,7 @@ async function placeMonthlyOrder(){
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
- const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule,customer_user_id:window.daivikAuthUser?.id||null});
+ const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule,customer_user_id:window.daivikAuthUser?.id});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
  localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
  if(pay==="UPI"){showMonthlyPayment(orderId,pack.price,pack,schedule);return}
@@ -654,7 +656,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    btn.disabled=true;msg.textContent="Verifying email…";
    const r=await db.auth.verifyOtp({email,token,type:"email"});btn.disabled=false;
    if(r.error){msg.textContent="Email verification failed: "+r.error.message;return}
-   window.daivikAuthUser=r.data.user;await db.from("daivik_customer_profiles").upsert({id:r.data.user.id,full_name:name,email:email,updated_at:new Date().toISOString()});
+   window.daivikAuthUser=r.data.user;await db.from("daivik_customer_profiles").upsert({id:r.data.user.id,full_name:name,email:email,mobile:document.getElementById("mobile")?.value?.trim()||null,updated_at:new Date().toISOString()});
    setAuthUI(true);msg.textContent="Email verified ✓";
  };
  async function loadAuthProfile(){
@@ -662,6 +664,21 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    const n=document.getElementById("name"),e=document.getElementById("email"),m=document.getElementById("mobile");
    if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=data.email||u.email||"";if(m&&!m.value)m.value=data.mobile||""}
    else{if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(e&&!e.value)e.value=u.email||""}
+   const mn=document.getElementById("mName"),me=document.getElementById("mEmail"),mm=document.getElementById("mMobile");
+   if(mn&&!mn.value)mn.value=data?.full_name||u.user_metadata?.full_name||"";
+   if(me&&!me.value)me.value=data?.email||u.email||"";
+   if(mm&&!mm.value)mm.value=data?.mobile||"";
+   const vr=await db.from("daivik_customer_vehicles").select("vehicle_number,vehicle_type").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
+   if(vr.data){
+     const v=document.getElementById("vehicle"),mv=document.getElementById("mVehicle");
+     if(v&&!v.value)v.value=vr.data.vehicle_number||"";
+     if(mv&&!mv.value)mv.value=vr.data.vehicle_number||"";
+   }
+   const ar=await db.from("daivik_customer_addresses").select("address,city,pincode").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
+   if(ar.data){
+     const vals={address:ar.data.address,city:ar.data.city,pincode:ar.data.pincode,mAddress:ar.data.address,mCity:ar.data.city,mPincode:ar.data.pincode};
+     Object.entries(vals).forEach(([id,val])=>{const el=document.getElementById(id);if(el&&!el.value)el.value=val||""});
+   }
    }catch(e){console.warn("Profile load failed",e)}
  }
  async function loadAllCustomerOrders(){
