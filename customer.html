@@ -536,7 +536,7 @@ async function confirmMonthlyPaid(){
 async function placeMonthlyOrder(){
  const key=getMonthlyKey(),pack=MONTHLY_PACKAGES[key],btn=$("monthlyBookBtn");if(!pack||btn.disabled)return;
  const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value;let streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("mPincode").value=pincode;$("mAddress").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
- if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
+ if(!name||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
  if(!window.daivikAuthUser||String(window.daivikAuthUser.phone||"")!==window.daivikNormalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
