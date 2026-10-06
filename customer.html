@@ -160,7 +160,7 @@ async function placeOrder(){
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
- if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("msg").textContent="Please verify your email before placing the booking.";return}
+ const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.email||"").toLowerCase()!==email){window.daivikAuthUser=null;$("msg").textContent="Please verify your email before placing the booking.";return}window.daivikAuthUser=sessionUser;
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
