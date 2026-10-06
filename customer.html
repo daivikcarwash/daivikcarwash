@@ -179,9 +179,9 @@ async function placeOrder(){
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
- const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.phone||"")!==normalizePhone(mobile)){window.daivikAuthUser=null;$("msg").textContent="Please login with your mobile number and password before placing the booking.";return}window.daivikAuthUser=sessionUser;
+ const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.phone||"")!==window.daivikNormalizePhone(mobile)){window.daivikAuthUser=null;$("msg").textContent="Please login with your mobile number and password before placing the booking.";return}window.daivikAuthUser=sessionUser;
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
- let list=customers(),customer=list.find(c=>c.email===email);
+ let list=customers(),customer=list.find(c=>c.mobile===mobile);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
  const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
  const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
@@ -538,7 +538,7 @@ async function placeMonthlyOrder(){
  const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value;let streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("mPincode").value=pincode;$("mAddress").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
- if(!window.daivikAuthUser||String(window.daivikAuthUser.phone||"")!==normalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
+ if(!window.daivikAuthUser||String(window.daivikAuthUser.phone||"")!==window.daivikNormalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
@@ -665,6 +665,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  const AUTH_SUPABASE_KEY="sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY";
  window.daivikAuthUser=null;
  const normalizePhone=v=>{const d=String(v||"").replace(/\D/g,"");return d.length===10?"+91"+d:(d.startsWith("91")&&d.length===12?"+"+d:d.startsWith("+")?d:"+"+d)};
+ window.daivikNormalizePhone=normalizePhone;
  const authName=()=>String(document.getElementById("authName")?.value||"").trim();
  const authMobile=()=>normalizePhone(document.getElementById("authMobile")?.value||"");
  const authPassword=()=>String(document.getElementById("authPassword")?.value||"");
