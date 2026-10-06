@@ -64,14 +64,14 @@ async function boot(u){user=u;$("login").classList.add("hidden");$("app").classL
 function startRealtimeUpdates(){if(realtimeStarted)return;realtimeStarted=true;db.channel("customer-orders-live").on("postgres_changes",{event:"*",schema:"public",table:"daivik_car_wash_orders"},()=>loadOrders()).on("postgres_changes",{event:"*",schema:"public",table:"daivik_monthly_orders"},()=>loadMonthly()).subscribe()}
 async function loadProfile(){
  const r=await db.from("daivik_customer_profiles").select("*").eq("id",user.id).maybeSingle();
- const phone=(user.phone||"").replace(/^\+91/,"");
+ const phone=String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"");
  if(r.data){
   $("fullName").value=r.data.full_name||user.user_metadata?.full_name||"";
   $("profileEmail").value=r.data.email||"";
   $("mobile").value=(r.data.mobile||phone).replace(/^\+91/,"");
   $("hello").textContent=r.data.full_name||phone||"Customer";
  }else{
-  await db.from("daivik_customer_profiles").upsert({id:user.id,email:user.email||null,full_name:user.user_metadata?.full_name||"Customer",mobile:user.phone||null,updated_at:new Date().toISOString()});
+  await db.from("daivik_customer_profiles").upsert({id:user.id,email:user.email||null,full_name:user.user_metadata?.full_name||"Customer",mobile:user.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
   $("profileEmail").value=user.email||"";
   $("mobile").value=phone;
   $("hello").textContent=user.user_metadata?.full_name||phone||"Customer";
@@ -80,8 +80,8 @@ async function loadProfile(){
 async function saveProfile(){
  const n=$("fullName").value.trim(),m=$("mobile").value.trim();
  if(!n||!/^[0-9]{10}$/.test(m)){ $("loginMsg").textContent="Enter your full name and valid 10-digit mobile number."; return; }
- const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email:user.email||null,mobile:user.phone||m,updated_at:new Date().toISOString()});
- $("hello").textContent=n||user.email.split("@")[0];
+ const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email:user.email||null,mobile:m,updated_at:new Date().toISOString()});
+ $("hello").textContent=n||String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"")||"Customer";
  $("loginMsg").textContent=r.error?r.error.message:"Profile saved ✓";
 }
 async function claimLegacyOrders(){
