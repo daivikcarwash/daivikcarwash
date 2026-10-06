@@ -412,6 +412,7 @@ function openGoogleMaps(){
 }
 function openWhatsApp(orderId){const text=encodeURIComponent("Hello Daivik Car Wash, I need help with Order ID "+orderId);window.open("https://wa.me/917906199445?text="+text,"_blank")}
 function renderHistory(c){$("history").classList.remove("hidden");$("orders").innerHTML=(c.orders||[]).slice().reverse().map(o=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${o.id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${o.id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found for this email.</p>"}
+async function quickTrack(id){return openOwnedOrder(id)}
 function renderCloudHistory(rows){$("history").classList.remove("hidden");$("orders").innerHTML=rows.map(data=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${data.order_id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${data.order_id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found.</p>"}
 async function quickTrack(id){return openOwnedOrder(id)}
 document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{const v=r.value;if(v==="COD")$("payNote").textContent="You can pay in cash after the service is completed.";else if(v==="UPI")showPaymentPreview();}));
