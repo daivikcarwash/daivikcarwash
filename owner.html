@@ -273,11 +273,15 @@ async function deleteAdminGallery(id,path){
   if(!confirm("Delete this photo/video from Service Gallery?"))return;
   const pin=prompt("Enter Admin PIN to delete:");
   if(pin===null)return;
+  if(pin!==OWNER_PIN){alert("Invalid Admin PIN.");return}
   const msg=document.getElementById("galleryAdminMsg"); if(msg)msg.textContent="Deleting...";
   try{
-    const res=await fetch("https://holelzxzhaiefaqezmce.supabase.co/functions/v1/delete-daivik-gallery-item",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin,id,storage_path:path})});
-    const out=await res.json();
-    if(!res.ok)throw new Error(out.error||"Delete failed");
+    if(path){
+      const rem=await db.storage.from("daivik-service-gallery").remove([path]);
+      if(rem.error)throw rem.error;
+    }
+    const del=await db.from("daivik_service_gallery").delete().eq("id",id);
+    if(del.error)throw del.error;
     if(msg)msg.textContent="Deleted ✓";
     await loadAdminGallery();
   }catch(e){console.error(e);if(msg)msg.textContent="Delete failed: "+(e?.message||e);alert("Delete failed. Please try again.");}
