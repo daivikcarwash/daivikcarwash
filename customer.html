@@ -652,22 +652,52 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    const gate=document.getElementById("customerLoginGate");if(gate)gate.classList.toggle("hidden",loggedIn);lock(!loggedIn);
    if(loggedIn){loadAuthProfile();loadAllCustomerOrders();const key=new URLSearchParams(location.search).get("order");if(key)setTimeout(()=>openOwnedOrder(key),250);}
  }
+ let otpCooldownUntil=0,otpTimer=null;
  window.sendBookingOtp=async function(){
    const email=authEmail(),name=authName(),msg=document.getElementById("authMsg"),btn=document.getElementById("authSendOtp");
-   if(!name){msg.textContent="Enter your full name.";return} if(!validEmail(email)){msg.textContent="Enter a valid email address.";return}
+   if(!name){msg.textContent="Enter your full name.";return}
+   if(!validEmail(email)){msg.textContent="Enter a valid email address.";return}
+   if(Date.now()<otpCooldownUntil){msg.textContent="Please wait before requesting another code.";return}
    btn.disabled=true;msg.textContent="Sending verification code…";
-   const r=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,data:{full_name:name}}});btn.disabled=false;
-   if(r.error){msg.textContent="Verification email could not be sent: "+r.error.message;return}
-   document.getElementById("authOtpBox").classList.remove("hidden");document.getElementById("authVerifyOtp").classList.remove("hidden");msg.textContent="Verification code sent to "+email+" ✓";
+   try{
+     const r=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,data:{full_name:name}}});
+     if(r.error){msg.textContent="Verification code could not be sent: "+(r.error.message||"Unknown error");btn.disabled=false;return}
+     document.getElementById("authOtpBox").classList.remove("hidden");
+     document.getElementById("authVerifyOtp").classList.remove("hidden");
+     otpCooldownUntil=Date.now()+60000;
+     clearInterval(otpTimer);
+     otpTimer=setInterval(()=>{
+       const left=Math.max(0,Math.ceil((otpCooldownUntil-Date.now())/1000));
+       if(left>0){btn.disabled=true;btn.textContent="Resend in "+left+"s";}
+       else{clearInterval(otpTimer);btn.disabled=false;btn.textContent="Resend Verification Code";}
+     },1000);
+     btn.textContent="Resend in 60s";
+     msg.textContent="Verification code sent to "+email+" ✓ Check Inbox/Spam.";
+   }catch(e){
+     btn.disabled=false;
+     msg.textContent="Verification code could not be sent: "+(e?.message||String(e));
+   }
  };
  window.verifyBookingOtp=async function(){
    const email=authEmail(),name=authName(),token=(document.getElementById("authOtp")?.value||"").trim(),msg=document.getElementById("authMsg"),btn=document.getElementById("authVerifyOtp");
-   if(!name||!validEmail(email)||token.length<4){msg.textContent="Enter your name, email and verification code.";return}
+   if(!name||!validEmail(email)||!/^[0-9]{6}$/.test(token)){msg.textContent="Enter the 6-digit verification code.";return}
    btn.disabled=true;msg.textContent="Verifying email…";
-   const r=await db.auth.verifyOtp({email,token,type:"email"});btn.disabled=false;
-   if(r.error){msg.textContent="Email verification failed: "+r.error.message;return}
-   window.daivikAuthUser=r.data.user;await db.from("daivik_customer_profiles").upsert({id:r.data.user.id,full_name:name,email:email,mobile:document.getElementById("mobile")?.value?.trim()||null,updated_at:new Date().toISOString()});
-   setAuthUI(true);msg.textContent="Email verified ✓";
+   try{
+     const r=await db.auth.verifyOtp({email,token,type:"email"});
+     if(r.error){btn.disabled=false;msg.textContent="Email verification failed: "+(r.error.message||"Invalid or expired code.");return}
+     const sessionResult=await db.auth.getSession();
+     const session=sessionResult?.data?.session;
+     const user=session?.user||r.data?.user;
+     if(!user){btn.disabled=false;msg.textContent="Verification succeeded but login session was not created. Please try again.";return}
+     window.daivikAuthUser=user;
+     const p=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:name,email:email,mobile:document.getElementById("mobile")?.value?.trim()||null,updated_at:new Date().toISOString()});
+     if(p.error){console.warn("Profile save:",p.error.message)}
+     setAuthUI(true);
+     msg.textContent="Email verified ✓ You are logged in.";
+   }catch(e){
+     btn.disabled=false;
+     msg.textContent="Email verification failed: "+(e?.message||String(e));
+   }
  };
  async function loadAuthProfile(){
    try{const u=window.daivikAuthUser;if(!u)return;const {data}=await db.from("daivik_customer_profiles").select("full_name,mobile,email").eq("id",u.id).maybeSingle();
