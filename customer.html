@@ -414,7 +414,17 @@ function openGoogleMaps(){
 function openWhatsApp(orderId){const text=encodeURIComponent("Hello Daivik Car Wash, I need help with Order ID "+orderId);window.open("https://wa.me/917906199445?text="+text,"_blank")}
 function renderHistory(c){$("history").classList.remove("hidden");$("orders").innerHTML=(c.orders||[]).slice().reverse().map(o=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${o.id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${o.id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found for this email.</p>"}
 async function quickTrack(id){return openOwnedOrder(id)}
-function renderCloudHistory(rows){$("history").classList.remove("hidden");$("orders").innerHTML=rows.map(data=>`<div class="order"><div style="font-weight:700;color:var(--gold)">Order ID: ${data.order_id}</div><button class="btn" style="margin-top:10px" onclick="quickTrack('${data.order_id}')">Track This Order</button></div>`).join("")||"<p class='muted'>No orders found.</p>"}
+function renderCloudHistory(rows){
+ $("history").classList.remove("hidden");
+ $("orders").innerHTML=rows.map(data=>{
+   const monthly=data._type==="Monthly";
+   const cancel=monthly
+     ?(["Monthly Order Received","Confirmed","Active"].includes(String(data.status||"").trim())?'<button class="btn" style="margin-top:8px;background:#b63b3b" onclick="cancelOwnedMonthly(\\''+esc(data.order_id)+'\\')">Cancel Package</button>':"")
+     :(customerCanCancel(data)?'<button class="btn" style="margin-top:8px;background:#b63b3b" onclick="cancelOwnedOrder(\\''+esc(data.order_id)+'\\')">Cancel Order</button>':"");
+   const track=!monthly&&!["Cancelled","Completed"].includes(String(data.status||""))?'<button class="btn blue" style="margin-top:8px" onclick="quickTrack(\\''+esc(data.order_id)+'\\')">Track This Order</button>':"";
+   return '<div class="order"><div style="font-weight:700;color:var(--gold)">'+esc(data.order_id)+' • '+esc(data.status||"")+'</div><div class="muted" style="margin-top:5px">'+esc(data.service||"Monthly Care")+' • ₹'+esc(data.price||"—")+' • '+esc(data.vehicle||"")+'</div><div class="muted" style="margin-top:4px">📅 '+esc(data.service_date||"—")+' • '+esc(data.preferred_time||data.service_time||"")+'</div><div class="muted" style="margin-top:4px">📍 '+esc(data.address||"")+'</div>'+track+cancel+'</div>';
+ }).join("")||"<p class='muted'>No active or recent orders.</p>";
+}
 async function quickTrack(id){return openOwnedOrder(id)}
 document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener("change",()=>{const v=r.value;if(v==="COD")$("payNote").textContent="You can pay in cash after the service is completed.";else if(v==="UPI")showPaymentPreview();}));
 function showPaymentPreview(){$("payNote").innerHTML='<b>UPI / PhonePe / Google Pay</b><br>UPI ID: <b>7906199445@ybl</b><br><span class="muted">QR and Pay button will be shown after booking.</span>'}
@@ -681,17 +691,50 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    }
    }catch(e){console.warn("Profile load failed",e)}
  }
+ function customerRecent(o){
+   const st=String(o.status||"").trim().toLowerCase();
+   if(!["completed","cancelled","closed"].includes(st))return true;
+   const at=o.completed_at||o.cancelled_at||o.updated_at||o.created_at;
+   return Date.now()-new Date(at).getTime()<24*60*60*1000;
+ }
+ function customerCanCancel(o){return ["Booking Received","Confirmed"].includes(String(o.status||"").trim())}
+ window.cancelOwnedOrder=async function(orderId){
+   const u=window.daivikAuthUser;if(!u)return;
+   if(!confirm("Cancel order "+orderId+"?"))return;
+   const {error}=await db.from("daivik_car_wash_orders").update({status:"Cancelled",cancelled_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("order_id",orderId).eq("customer_user_id",u.id).in("status",["Booking Received","Confirmed"]);
+   if(error){alert("Cancellation failed: "+error.message);return}
+   await loadAllCustomerOrders();
+   if(currentCloudOrder?.order_id===orderId){document.getElementById("trackStatus").textContent="Cancelled";}
+ };
+ window.cancelOwnedMonthly=async function(orderId){
+   const u=window.daivikAuthUser;if(!u)return;
+   if(!confirm("Cancel monthly package "+orderId+"?"))return;
+   const {error}=await db.from("daivik_monthly_orders").update({status:"Cancelled",cancelled_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("order_id",orderId).eq("customer_user_id",u.id).in("status",["Monthly Order Received","Confirmed","Active"]);
+   if(error){alert("Cancellation failed: "+error.message);return}
+   await loadAllCustomerOrders();
+ };
  async function loadAllCustomerOrders(){
    const u=window.daivikAuthUser;if(!u)return;
-   try{const [one,monthly]=await Promise.all([db.from("daivik_car_wash_orders").select("*").eq("customer_user_id",u.id).order("created_at",{ascending:false}).limit(50),db.from("daivik_monthly_orders").select("*").eq("customer_user_id",u.id).order("created_at",{ascending:false}).limit(50)]);
-   const rows=[...(one.data||[]).map(o=>({...o,_type:"One-Time"})),...(monthly.data||[]).map(o=>({order_id:o.order_id,status:o.status,service:o.package_name||"Monthly Care",price:o.price,service_date:o.service_date,vehicle:o.vehicle,_type:"Monthly"}))].sort((x,y)=>new Date(y.created_at||y.service_date)-new Date(x.created_at||x.service_date));
-   renderCloudHistory(rows);
+   try{
+     const [one,monthly]=await Promise.all([
+       db.from("daivik_car_wash_orders").select("*").eq("customer_user_id",u.id).order("created_at",{ascending:false}).limit(50),
+       db.from("daivik_monthly_orders").select("*").eq("customer_user_id",u.id).order("created_at",{ascending:false}).limit(50)
+     ]);
+     const rows=[
+       ...(one.data||[]).filter(customerRecent).map(o=>({...o,_type:"One-Time"})),
+       ...(monthly.data||[]).filter(customerRecent).map(o=>({...o,service:o.package_name||"Monthly Care",_type:"Monthly"}))
+     ].sort((x,y)=>new Date(y.created_at||y.service_date)-new Date(x.created_at||x.service_date)).slice(0,50);
+     renderCloudHistory(rows);
    }catch(e){console.warn("Customer order history load failed",e)}
  }
  window.openOwnedOrder=async function(orderId){
    const u=window.daivikAuthUser;if(!u||!orderId)return;
    const q=await db.from("daivik_car_wash_orders").select("*").eq("order_id",orderId).eq("customer_user_id",u.id).maybeSingle(),data=q.data;
-   if(!data){const m=document.getElementById("msg");if(m)m.textContent="Order not found in your account.";return}
+   if(!data){
+     document.getElementById("tracking").classList.add("hidden");
+     const m=document.getElementById("msg");if(m)m.textContent="Order no longer exists in your account.";
+     await loadAllCustomerOrders();return;
+   }
    document.getElementById("tracking").classList.remove("hidden");document.getElementById("trackVehicle").textContent=data.vehicle||"—";document.getElementById("trackStatus").textContent=data.status||"—";
    const found={id:data.order_id,service:data.service,price:Number(data.price),date:data.service_date,time:data.preferred_time,vehicle:data.vehicle,address:data.address,payment:data.payment_method,status:data.status};
    currentCloudOrder=data;await startTracking(found,data);startRealtimeTracking(data.order_id,data.customer_email||"");document.getElementById("tracking").scrollIntoView({behavior:"smooth"});
@@ -700,5 +743,6 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  const originalBoot=async()=>{const s=await db.auth.getSession();if(s.data.session){window.daivikAuthUser=s.data.session.user;setAuthUI(true)}else setAuthUI(false)};
  db.auth.onAuthStateChange((event,session)=>{if(session){window.daivikAuthUser=session.user;setAuthUI(true)}else if(event==="SIGNED_OUT"){window.daivikAuthUser=null;setAuthUI(false)}});
  originalBoot();
+setInterval(()=>{if(window.daivikAuthUser)loadAllCustomerOrders()},10000);
 })();
 </script></body></html>
