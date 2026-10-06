@@ -105,6 +105,21 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 </details>
 
 <details class="admin-section">
+<summary>Staff Management <span class="section-count" id="staffCount">0</span></summary>
+<div class="section-body">
+<p class="muted">Yahin se wash staff add aur Active/Inactive manage kar sakte ho.</p>
+<div class="row">
+<input id="ownerStaffName" placeholder="Staff Name">
+<input id="ownerStaffMobile" inputmode="numeric" placeholder="10-digit Mobile">
+<button class="btn" onclick="ownerAddStaff()">+ Add Staff</button>
+<button class="btn homebtn" onclick="loadOwnerStaff()">Refresh</button>
+</div>
+<p id="ownerStaffMsg" class="muted" style="margin-top:10px"></p>
+<div id="ownerStaffList" style="margin-top:12px"><p class="muted">Loading staff...</p></div>
+</div>
+</details>
+
+<details class="admin-section">
 <summary>Service Gallery <span class="section-count" id="galleryCount">0</span></summary>
 <div class="section-body">
 <p class="muted">Yahan se aap real Daivik service ki photos aur videos upload kar sakte ho. Ye files customer website ke Service Gallery me automatically dikhengi.</p>
@@ -157,7 +172,7 @@ async function login(){
       return;
     }
     setMsg("Admin connected ✓ Loading orders...");
-    await Promise.all([loadOrders(),loadMonthlyOrders()]);
+    await Promise.all([loadOrders(),loadMonthlyOrders(),loadOwnerStaff()]);
     setMsg("Admin ready ✓");
   }catch(e){
     console.error(e);
@@ -264,6 +279,29 @@ async function deleteOrder(id){
   const check=await db.from("daivik_car_wash_orders").select("order_id").eq("order_id",id).maybeSingle();
   if(check.data){alert("Delete was blocked by database policy. Please enable the one-time DELETE policy.");await loadOrders();return}
   orders=orders.filter(o=>o.order_id!==id);render();setMsg("Order "+id+" deleted ✓");
+}
+async function loadOwnerStaff(){
+  if(!(await initDB()))return;
+  const box=document.getElementById("ownerStaffList"),count=document.getElementById("staffCount");
+  const {data,error}=await db.from("daivik_staff").select("*").order("name");
+  if(error){if(box)box.innerHTML='<p class="error">Staff load failed: '+esc(error.message)+'</p>';return}
+  const rows=data||[];
+  if(count)count.textContent=rows.filter(s=>s.status==="Active").length;
+  if(!rows.length){if(box)box.innerHTML='<p class="muted">No staff yet.</p>';return}
+  if(box)box.innerHTML=rows.map(s=>'<div class="order"><b>'+esc(s.name)+'</b><br><span class="muted">'+esc(s.mobile||"No mobile")+' • '+esc(s.role||"wash_boy")+' • '+esc(s.status||"")+'</span><div class="row" style="margin-top:9px"><button class="btn" data-id="'+esc(s.id)+'" data-status="'+esc(s.status||"")+'" onclick="toggleOwnerStaff(this.dataset.id,this.dataset.status)">'+(s.status==="Active"?"Set Inactive":"Set Active")+'</button></div></div>').join("");
+}
+async function ownerAddStaff(){
+  const nameEl=document.getElementById("ownerStaffName"),mobileEl=document.getElementById("ownerStaffMobile"),msg=document.getElementById("ownerStaffMsg");
+  const name=nameEl.value.trim(),mobile=mobileEl.value.trim();
+  if(!name){msg.textContent="Enter staff name.";return}
+  const {error}=await db.from("daivik_staff").insert({name,mobile:mobile||null,role:"wash_boy",status:"Active"});
+  if(error){msg.textContent="Add failed: "+error.message;return}
+  nameEl.value="";mobileEl.value="";msg.textContent="Staff added ✓";await loadOwnerStaff();
+}
+async function toggleOwnerStaff(id,status){
+  const {error}=await db.from("daivik_staff").update({status:status==="Active"?"Inactive":"Active",updated_at:new Date().toISOString()}).eq("id",id);
+  if(error){const msg=document.getElementById("ownerStaffMsg");if(msg)msg.textContent="Update failed: "+error.message;return}
+  await loadOwnerStaff();
 }
 async function loadAdminGallery(){
   if(!(await initDB()))return;
