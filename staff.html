@@ -23,6 +23,11 @@ async function loadStaff(){
  if(error){setMsg("Staff list failed: "+error.message,true);return}
  staff=data||[];
  const requested=new URLSearchParams(location.search).get("staff")||"";
+ const orderParam=new URLSearchParams(location.search).get("order")||"";
+ if(orderParam){
+   const ord=await db.from("daivik_car_wash_orders").select("assigned_staff_id").eq("order_id",orderParam).maybeSingle();
+   if(!ord.error && ord.data?.assigned_staff_id) localStorage.setItem(staffKey,ord.data.assigned_staff_id);
+ }
  if(requested&&staff.some(s=>s.id===requested))localStorage.setItem(staffKey,requested);
  const saved=staffId();
  if(!saved||!staff.some(s=>s.id===saved)){setMsg("Open the assigned job from Owner Dashboard to load the assigned staff.",true);document.getElementById("jobs").innerHTML='<p class="muted">No staff selected. Owner/Admin assigns staff from the Owner Dashboard.</p>';return}
