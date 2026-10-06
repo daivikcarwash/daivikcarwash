@@ -207,9 +207,9 @@ function renderMonthlyOrders(){
  if(mc)mc.textContent=regular.length;
  if(mor)mor.textContent=morning.length;
 }
-async function setMonthlyStatus(id,status){const {error}=await db.from("daivik_monthly_orders").update({status,updated_at:new Date().toISOString()}).eq("order_id",id);if(error){alert("Status update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.status=status;renderMonthlyOrders()}
+async function setMonthlyStatus(id,status){const now=new Date().toISOString();const patch={status,updated_at:now};if(status==="Completed")patch.completed_at=now;if(status==="Cancelled")patch.cancelled_at=now;const {error}=await db.from("daivik_monthly_orders").update(patch).eq("order_id",id);if(error){alert("Status update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.status=status;renderMonthlyOrders()}
 async function setMonthlyPayment(id,payment_status){const {error}=await db.from("daivik_monthly_orders").update({payment_status,updated_at:new Date().toISOString()}).eq("order_id",id);if(error){alert("Payment update failed: "+error.message);return}const o=monthlyOrders.find(x=>x.order_id===id);if(o)o.payment_status=payment_status;renderMonthlyOrders()}
-async function deleteMonthlyOrder(id){if(!confirm("Delete monthly order "+id+" permanently?"))return;if(!db&&!(await initDB()))return;const {error}=await db.from("daivik_monthly_orders").delete().eq("order_id",id);if(error){alert("Delete failed: "+error.message);return}monthlyOrders=monthlyOrders.filter(o=>o.order_id!==id);renderMonthlyOrders();setMsg("Monthly order "+id+" deleted ✓")}
+async function deleteMonthlyOrder(id){if(!confirm("Delete monthly order "+id+" permanently?"))return;if(!db&&!(await initDB()))return;const {error}=await db.from("daivik_monthly_orders").delete().eq("order_id",id);if(error){alert("Delete failed: "+error.message);return}const check=await db.from("daivik_monthly_orders").select("order_id").eq("order_id",id).maybeSingle();if(check.data){alert("Delete was blocked by database policy. Please enable the monthly DELETE policy.");await loadMonthlyOrders();return}monthlyOrders=monthlyOrders.filter(o=>o.order_id!==id);renderMonthlyOrders();setMsg("Monthly order "+id+" deleted ✓")}
 function render(){
   const f=document.getElementById("filter").value;
   const list=f==="ALL"?orders:orders.filter(o=>o.status===f);
@@ -238,7 +238,11 @@ async function setPayment(id,payment_status){
   const o=orders.find(x=>x.order_id===id);if(o)o.payment_status=payment_status;render();
 }
 async function setStatus(id,status){
-  const {error}=await db.from("daivik_car_wash_orders").update({status,updated_at:new Date().toISOString()}).eq("order_id",id);
+  const now=new Date().toISOString();
+  const patch={status,updated_at:now};
+  if(status==="Completed")patch.completed_at=now;
+  if(status==="Cancelled")patch.cancelled_at=now;
+  const {error}=await db.from("daivik_car_wash_orders").update(patch).eq("order_id",id);
   if(error){alert("Status update failed: "+error.message);return}
   const o=orders.find(x=>x.order_id===id);if(o)o.status=status;render();
 }
@@ -255,9 +259,10 @@ async function editOrder(id){
 async function deleteOrder(id){
   if(!confirm("Delete order "+id+" permanently?"))return;
   if(!db && !(await initDB()))return;
-  const {data,error}=await db.from("daivik_car_wash_orders").delete().eq("order_id",id).select("id,order_id").maybeSingle();
-  if(error){alert("Delete failed: "+error.message+"\\n\\nIf this is a database policy error, the Supabase DELETE policy needs to be enabled.");return}
-  if(!data){alert("Delete failed: order was not found or could not be deleted.");await loadOrders();return}
+  const {error}=await db.from("daivik_car_wash_orders").delete().eq("order_id",id);
+  if(error){alert("Delete failed: "+error.message+"\\n\\nCheck the Supabase DELETE policy.");return}
+  const check=await db.from("daivik_car_wash_orders").select("order_id").eq("order_id",id).maybeSingle();
+  if(check.data){alert("Delete was blocked by database policy. Please enable the one-time DELETE policy.");await loadOrders();return}
   orders=orders.filter(o=>o.order_id!==id);render();setMsg("Order "+id+" deleted ✓");
 }
 async function loadAdminGallery(){
