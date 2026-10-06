@@ -304,6 +304,7 @@ async function loadOwnerStaff(){
   if(count)count.textContent=rows.filter(s=>s.status==="Active").length;
   if(!rows.length){if(box)box.innerHTML='<p class="muted">No staff yet.</p>';return}
   if(box)box.innerHTML=rows.map(s=>'<div class="order"><b>'+esc(s.name)+'</b><br><span class="muted">'+esc(s.mobile||"No mobile")+' • '+esc(s.role||"wash_boy")+' • '+esc(s.status||"")+'</span><div class="row" style="margin-top:9px"><button class="btn" data-id="'+esc(s.id)+'" data-status="'+esc(s.status||"")+'" onclick="toggleOwnerStaff(this.dataset.id,this.dataset.status)">'+(s.status==="Active"?"Set Inactive":"Set Active")+'</button><button class="btn danger" data-id="'+esc(s.id)+'" data-name="'+esc(s.name)+'" onclick="deleteOwnerStaff(this.dataset.id,this.dataset.name)">Delete</button></div></div>').join("");
+  populateStaffAssignSelects();
 }
 async function ownerAddStaff(){
   const nameEl=document.getElementById("ownerStaffName"),mobileEl=document.getElementById("ownerStaffMobile"),msg=document.getElementById("ownerStaffMsg");
