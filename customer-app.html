@@ -30,8 +30,8 @@ async function verifyEmailOtp(){
  await boot(user);
 }
 let realtimeStarted=false;
-async document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user){loadOrders();loadMonthly();}});
-function boot(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");await loadProfile();await Promise.all([loadVehicles(),loadAddresses(),loadOrders(),loadMonthly()]);startRealtimeUpdates()}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user){loadOrders();loadMonthly();loadProfile();}});
+async function boot(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");await loadProfile();await claimLegacyOrders();await Promise.all([loadVehicles(),loadAddresses(),loadOrders(),loadMonthly()]);startRealtimeUpdates()}
 function startRealtimeUpdates(){if(realtimeStarted)return;realtimeStarted=true;db.channel("customer-orders-live").on("postgres_changes",{event:"*",schema:"public",table:"daivik_car_wash_orders"},()=>loadOrders()).on("postgres_changes",{event:"*",schema:"public",table:"daivik_monthly_orders"},()=>loadMonthly()).subscribe()}
 async function loadProfile(){
  const r=await db.from("daivik_customer_profiles").select("*").eq("id",user.id).maybeSingle();
