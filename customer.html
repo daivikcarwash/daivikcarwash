@@ -250,6 +250,16 @@ function startRealtimeTracking(orderId,userId){
    if(row.status) $("trackStatus").textContent=row.status;
    if(row.staff_lat!=null && row.staff_lng!=null) updateLiveStaff(Number(row.staff_lat),Number(row.staff_lng));
   }).subscribe();
+  if(window.daivikLivePoll)clearInterval(window.daivikLivePoll);
+  window.daivikLivePoll=setInterval(async()=>{
+   try{
+    const {data,error}=await db.from("daivik_car_wash_orders").select("*").eq("order_id",orderId).eq("customer_user_id",userId).maybeSingle();
+    if(error||!data)return;
+    currentCloudOrder=data;
+    if(data.status) $("trackStatus").textContent=data.status;
+    if(data.staff_lat!=null && data.staff_lng!=null) updateLiveStaff(Number(data.staff_lat),Number(data.staff_lng));
+   }catch(e){console.warn("Live GPS polling failed",e)}
+  },5000);
  }catch(e){console.error("Realtime tracking failed",e)}
 }
 let liveRouteBusy=false,lastLiveRouteAt=0;
@@ -262,7 +272,7 @@ async function updateLiveStaff(lat,lng){
  }else liveStaffMarker.setLatLng([lat,lng]);
  $("trackStatus").textContent="Wash Team Live Location";
  const now=Date.now();
- if(liveRouteBusy||now-lastLiveRouteAt<8000)return;
+ if(liveRouteBusy||now-lastLiveRouteAt<5000)return;
  liveRouteBusy=true;lastLiveRouteAt=now;
  try{
   const res=await fetch("https://router.project-osrm.org/route/v1/driving/"+lng+","+lat+";"+lastCustomerCoords.lng+","+lastCustomerCoords.lat+"?overview=full&geometries=geojson");
@@ -271,15 +281,24 @@ async function updateLiveStaff(lat,lng){
   const route=data.routes[0],km=route.distance/1000,minutes=Math.max(1,Math.round(route.duration/60));
   $("trackDistance").textContent=km.toFixed(1)+" KM";
   $("trackEta").textContent=minutes+" min";
-  $("trackStatus").textContent=km<=25?"Wash Team Live":"Outside 25 KM Service Area";
+  $("trackStatus").textContent="Wash Team Live";
   const coords=route.geometry.coordinates.map(p=>[p[1],p[0]]);
   if(routeLine)routeLine.setLatLngs(coords);
   if(carMarker)carMarker.setLatLng([lat,lng]);
   trackingMap.fitBounds([[lat,lng],[lastCustomerCoords.lat,lastCustomerCoords.lng]],{padding:[25,25]});
- }catch(e){console.warn("Live route update failed",e)}
- finally{liveRouteBusy=false}
+ }catch(e){
+  console.warn("Live route update failed",e);
+  const R=6371,a=Math.PI/180,dLat=(lastCustomerCoords.lat-lat)*a,dLng=(lastCustomerCoords.lng-lng)*a;
+  const h=Math.sin(dLat/2)**2+Math.cos(lat*a)*Math.cos(lastCustomerCoords.lat*a)*Math.sin(dLng/2)**2;
+  const km=2*R*Math.asin(Math.sqrt(h));
+  $("trackDistance").textContent=km.toFixed(1)+" KM";
+  $("trackEta").textContent=Math.max(1,Math.round(km/0.5))+" min";
+  $("trackStatus").textContent="Wash Team Live";
+  if(routeLine)routeLine.setLatLngs([[lat,lng],[lastCustomerCoords.lat,lastCustomerCoords.lng]]);
+  if(carMarker)carMarker.setLatLng([lat,lng]);
+  trackingMap.fitBounds([[lat,lng],[lastCustomerCoords.lat,lastCustomerCoords.lng]],{padding:[25,25]});
+ }finally{liveRouteBusy=false;lastLiveRouteAt=now}
 }
-
 let WASH_TEAM_LOCATION={lat:30.3165,lng:78.0322,name:"Daivik Wash Team"};
 let washTeamLocationLoaded=false;
 async function loadWashTeamLocation(){
