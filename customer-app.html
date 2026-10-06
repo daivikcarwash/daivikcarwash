@@ -30,7 +30,8 @@ async function verifyEmailOtp(){
  await boot(user);
 }
 let realtimeStarted=false;
-async function boot(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");await loadProfile();await Promise.all([loadVehicles(),loadAddresses(),loadOrders(),loadMonthly()]);startRealtimeUpdates()}
+async document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user){loadOrders();loadMonthly();}});
+function boot(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");await loadProfile();await Promise.all([loadVehicles(),loadAddresses(),loadOrders(),loadMonthly()]);startRealtimeUpdates()}
 function startRealtimeUpdates(){if(realtimeStarted)return;realtimeStarted=true;db.channel("customer-orders-live").on("postgres_changes",{event:"*",schema:"public",table:"daivik_car_wash_orders"},()=>loadOrders()).on("postgres_changes",{event:"*",schema:"public",table:"daivik_monthly_orders"},()=>loadMonthly()).subscribe()}
 async function loadProfile(){
  const r=await db.from("daivik_customer_profiles").select("*").eq("id",user.id).maybeSingle();
@@ -99,7 +100,7 @@ async function cancelOrder(id){
  const o=window.customerOrders?.find(x=>x.order_id===id);
  if(!o||!canCancel(o.status))return;
  if(!confirm("Cancel order "+id+"?"))return;
- const {error}=await db.from("daivik_car_wash_orders").update({status:"Cancelled",updated_at:new Date().toISOString()}).eq("order_id",id).eq("customer_user_id",user.id).in("status",["Booking Received","Confirmed"]);
+ const {error}=await db.from("daivik_car_wash_orders").update({status:"Cancelled",cancelled_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("order_id",id).eq("customer_user_id",user.id).in("status",["Booking Received","Confirmed"]);
  if(error){alert("Cancellation failed: "+error.message);return}
  await loadOrders();
 }
