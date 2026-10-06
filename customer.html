@@ -419,9 +419,9 @@ function renderCloudHistory(rows){
  $("orders").innerHTML=rows.map(data=>{
    const monthly=data._type==="Monthly";
    const cancel=monthly
-     ?(["Monthly Order Received","Confirmed","Active"].includes(String(data.status||"").trim())?'<button class="btn" style="margin-top:8px;background:#b63b3b" onclick="cancelOwnedMonthly(\\''+esc(data.order_id)+'\\')">Cancel Package</button>':"")
-     :(customerCanCancel(data)?'<button class="btn" style="margin-top:8px;background:#b63b3b" onclick="cancelOwnedOrder(\\''+esc(data.order_id)+'\\')">Cancel Order</button>':"");
-   const track=!monthly&&!["Cancelled","Completed"].includes(String(data.status||""))?'<button class="btn blue" style="margin-top:8px" onclick="quickTrack(\\''+esc(data.order_id)+'\\')">Track This Order</button>':"";
+     ?(["Monthly Order Received","Confirmed","Active"].includes(String(data.status||"").trim())?'<button class="btn" style="margin-top:8px;background:#b63b3b" data-id="'+esc(data.order_id)+'" onclick="cancelOwnedMonthly(this.dataset.id)">Cancel Package</button>':"")
+     :(customerCanCancel(data)?'<button class="btn" style="margin-top:8px;background:#b63b3b" data-id="'+esc(data.order_id)+'" onclick="cancelOwnedOrder(this.dataset.id)">Cancel Order</button>':"");
+   const track=!monthly&&!["Cancelled","Completed"].includes(String(data.status||""))?'<button class="btn blue" style="margin-top:8px" data-id="'+esc(data.order_id)+'" onclick="quickTrack(this.dataset.id)">Track This Order</button>':"";
    return '<div class="order"><div style="font-weight:700;color:var(--gold)">'+esc(data.order_id)+' • '+esc(data.status||"")+'</div><div class="muted" style="margin-top:5px">'+esc(data.service||"Monthly Care")+' • ₹'+esc(data.price||"—")+' • '+esc(data.vehicle||"")+'</div><div class="muted" style="margin-top:4px">📅 '+esc(data.service_date||"—")+' • '+esc(data.preferred_time||data.service_time||"")+'</div><div class="muted" style="margin-top:4px">📍 '+esc(data.address||"")+'</div>'+track+cancel+'</div>';
  }).join("")||"<p class='muted'>No active or recent orders.</p>";
 }
