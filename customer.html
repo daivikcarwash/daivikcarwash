@@ -28,7 +28,26 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <body>
 <header class="top"><div class="brand">Daivik Doorstep Car Wash</div><a class="back" href="index.html">← Home</a></header>
 <main class="wrap">
-<section id="customerLoginGate" class="card"><h2>✉️ Customer Login</h2><p class="muted">Booking aur order tracking ke liye pehle apna naam aur email enter karein. Email par verification code aayega. Verify karne ke baad aap logged in rahenge jab tak Logout nahi karte.</p><label>Full Name</label><input id="authName" type="text" placeholder="Your full name" autocomplete="name"><label>Email Address</label><input id="authEmail" type="email" placeholder="yourname@email.com" autocomplete="email"><div id="authOtpBox" class="hidden"><label>Email Verification Code</label><input id="authOtp" inputmode="numeric" maxlength="6" placeholder="6-digit verification code" autocomplete="one-time-code"></div><div class="row"><button id="authSendOtp" class="btn" onclick="sendBookingOtp()">Send Verification Code</button><button id="authVerifyOtp" class="btn green hidden" onclick="verifyBookingOtp()">Verify & Continue</button></div><p id="authMsg" class="muted" style="margin-top:10px"></p></section>
+<section id="customerLoginGate" class="card">
+<h2>👤 Customer Account</h2>
+<p id="authModeText" class="muted">Order karne ke liye pehle apna account banayein. Name, mobile number aur password set karein.</p>
+<div id="authSignupFields">
+<label>Full Name</label><input id="authName" type="text" placeholder="Your full name" autocomplete="name">
+<label>Mobile Number</label><input id="authMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+<label>Password</label><input id="authPassword" type="password" placeholder="Create password" autocomplete="new-password">
+<label>Confirm Password</label><input id="authPassword2" type="password" placeholder="Confirm password" autocomplete="new-password">
+<button id="authCreate" class="btn" onclick="createCustomerAccount()">Create Account</button>
+</div>
+<div id="authLoginFields" class="hidden">
+<label>Mobile Number</label><input id="authLoginMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+<label>Password</label><input id="authLoginPassword" type="password" placeholder="Your password" autocomplete="current-password">
+<button id="authLogin" class="btn" onclick="loginCustomerAccount()">Login & Continue</button>
+</div>
+<p id="authSwitch" class="muted" style="margin-top:12px;text-align:center">
+Already have an account? <button type="button" class="btn blue" style="width:auto;margin:0;padding:8px 12px" onclick="showCustomerLogin()">Login</button>
+</p>
+<p id="authMsg" class="muted" style="margin-top:10px"></p>
+</section>
 <section class="hero"><h1>Book Your Car Wash</h1><p>Choose your service, enter your details and place your booking.</p></section>
 
 <section class="card">
@@ -158,9 +177,9 @@ async function placeOrder(){
  const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value;let streetAddress=$("address").value.trim(),city=$("city").value.trim(),pincode=$("pincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("pincode").value=pincode;$("address").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="pay"]:checked').value;
  if(!selectedVehicleType){$("msg").textContent="Please choose your vehicle type first.";return}
  if(!selected){$("msg").textContent="Please choose a service first.";return}
- if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
+ if(!name||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
- const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.email||"").toLowerCase()!==email){window.daivikAuthUser=null;$("msg").textContent="Please verify your email before placing the booking.";return}window.daivikAuthUser=sessionUser;
+ const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.phone||"")!==normalizePhone(mobile)){window.daivikAuthUser=null;$("msg").textContent="Please login with your mobile number and password before placing the booking.";return}window.daivikAuthUser=sessionUser;
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.email===email);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
@@ -222,11 +241,11 @@ async function markCloudPayment(order){
   if(error)console.error("Payment verification update failed",error)
  }catch(e){console.error(e)}
 }
-function startRealtimeTracking(orderId,email){
+function startRealtimeTracking(orderId,userId){
  try{
   db.channel("daivik-live-"+orderId).on("postgres_changes",{event:"UPDATE",schema:"public",table:"daivik_car_wash_orders",filter:"order_id=eq."+orderId},payload=>{
    const row=payload.new;
-   if(String(row.customer_email).toLowerCase()!==email)return;
+   if(String(row.customer_user_id||"")!==String(userId||""))return;
    currentCloudOrder=row;
    if(row.status) $("trackStatus").textContent=row.status;
    if(row.staff_lat!=null && row.staff_lng!=null) updateLiveStaff(Number(row.staff_lat),Number(row.staff_lng));
@@ -519,7 +538,7 @@ async function placeMonthlyOrder(){
  const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value;let streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("mPincode").value=pincode;$("mAddress").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
- if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("monthlyMsg").textContent="Please verify your email before placing the monthly booking.";return}
+ if(!window.daivikAuthUser||String(window.daivikAuthUser.phone||"")!==normalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
@@ -645,83 +664,82 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  const AUTH_SUPABASE_URL="https://rgjymvvtrmzhznnreqog.supabase.co";
  const AUTH_SUPABASE_KEY="sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY";
  window.daivikAuthUser=null;
- const authEmail=()=>String(document.getElementById("authEmail")?.value||"").trim().toLowerCase();
+ const normalizePhone=v=>{const d=String(v||"").replace(/\D/g,"");return d.length===10?"+91"+d:(d.startsWith("91")&&d.length===12?"+"+d:d.startsWith("+")?d:"+"+d)};
  const authName=()=>String(document.getElementById("authName")?.value||"").trim();
+ const authMobile=()=>normalizePhone(document.getElementById("authMobile")?.value||"");
+ const authPassword=()=>String(document.getElementById("authPassword")?.value||"");
+ const validPhone=v=>/^\+91\d{10}$/.test(normalizePhone(v));
  const lock=on=>["#vehicleTypes","#bookBtn","#monthlyBooking"].forEach(sel=>{const el=document.querySelector(sel)?.closest(sel==="#monthlyBooking"?"#monthlyBooking":".card")||document.querySelector(sel);if(el)el.classList.toggle("auth-locked",on)});
  function setAuthUI(loggedIn){
    const gate=document.getElementById("customerLoginGate");if(gate)gate.classList.toggle("hidden",loggedIn);lock(!loggedIn);
    if(loggedIn){loadAuthProfile();loadAllCustomerOrders();const key=new URLSearchParams(location.search).get("order");if(key)setTimeout(()=>openOwnedOrder(key),250);}
  }
- let otpCooldownUntil=0,otpTimer=null;
- window.sendBookingOtp=async function(){
-   const email=authEmail(),name=authName(),msg=document.getElementById("authMsg"),btn=document.getElementById("authSendOtp");
+ function showCustomerLogin(){
+   document.getElementById("authSignupFields")?.classList.add("hidden");
+   document.getElementById("authLoginFields")?.classList.remove("hidden");
+   const sw=document.getElementById("authSwitch");if(sw)sw.innerHTML='New customer? <button type="button" class="btn blue" style="width:auto;margin:0;padding:8px 12px" onclick="showCustomerSignup()">Create Account</button>';
+   const t=document.getElementById("authModeText");if(t)t.textContent="Apna mobile number aur password dal kar login karein.";
+   const m=document.getElementById("authMsg");if(m)m.textContent="";
+ }
+ function showCustomerSignup(){
+   document.getElementById("authLoginFields")?.classList.add("hidden");
+   document.getElementById("authSignupFields")?.classList.remove("hidden");
+   const sw=document.getElementById("authSwitch");if(sw)sw.innerHTML='Already have an account? <button type="button" class="btn blue" style="width:auto;margin:0;padding:8px 12px" onclick="showCustomerLogin()">Login</button>';
+   const t=document.getElementById("authModeText");if(t)t.textContent="Order karne ke liye pehle apna account banayein. Name, mobile number aur password set karein.";
+   const m=document.getElementById("authMsg");if(m)m.textContent="";
+ }
+ window.showCustomerLogin=showCustomerLogin;window.showCustomerSignup=showCustomerSignup;
+ window.createCustomerAccount=async function(){
+   const name=authName(),phone=authMobile(),pass=authPassword(),pass2=String(document.getElementById("authPassword2")?.value||"").trim(),msg=document.getElementById("authMsg"),btn=document.getElementById("authCreate");
    if(!name){msg.textContent="Enter your full name.";return}
-   if(!validEmail(email)){msg.textContent="Enter a valid email address.";return}
-   if(Date.now()<otpCooldownUntil){msg.textContent="Please wait before requesting another code.";return}
-   btn.disabled=true;msg.textContent="Sending verification code…";
+   if(!validPhone(phone)){msg.textContent="Enter a valid 10-digit Indian mobile number.";return}
+   if(pass.length<6){msg.textContent="Password must be at least 6 characters.";return}
+   if(pass!==pass2){msg.textContent="Passwords do not match.";return}
+   btn.disabled=true;msg.textContent="Creating account…";
    try{
-     const r=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,data:{full_name:name}}});
-     if(r.error){msg.textContent="Verification code could not be sent: "+(r.error.message||"Unknown error");btn.disabled=false;return}
-     document.getElementById("authOtpBox").classList.remove("hidden");
-     document.getElementById("authVerifyOtp").classList.remove("hidden");
-     otpCooldownUntil=Date.now()+60000;
-     clearInterval(otpTimer);
-     otpTimer=setInterval(()=>{
-       const left=Math.max(0,Math.ceil((otpCooldownUntil-Date.now())/1000));
-       if(left>0){btn.disabled=true;btn.textContent="Resend in "+left+"s";}
-       else{clearInterval(otpTimer);btn.disabled=false;btn.textContent="Resend Verification Code";}
-     },1000);
-     btn.textContent="Resend in 60s";
-     msg.textContent="Verification code sent to "+email+" ✓ Check Inbox/Spam.";
-   }catch(e){
-     btn.disabled=false;
-     msg.textContent="Verification code could not be sent: "+(e?.message||String(e));
-   }
+     const r=await db.auth.signUp({phone,password:pass,options:{data:{full_name:name}}});
+     if(r.error){msg.textContent="Account creation failed: "+(r.error.message||"Please try again.");btn.disabled=false;return}
+     if(r.data?.session)await db.auth.signOut();
+     showCustomerLogin();
+     const lm=document.getElementById("authLoginMobile");if(lm)lm.value=phone.replace(/^\+91/,"");
+     msg.textContent="Account created ✓ Ab mobile number aur password se login karein.";
+   }catch(e){msg.textContent="Account creation failed: "+(e?.message||String(e));}
+   finally{btn.disabled=false}
  };
- window.verifyBookingOtp=async function(){
-   const email=authEmail(),name=authName(),token=(document.getElementById("authOtp")?.value||"").trim(),msg=document.getElementById("authMsg"),btn=document.getElementById("authVerifyOtp");
-   if(!name||!validEmail(email)||!/^[0-9]{6}$/.test(token)){msg.textContent="Enter the 6-digit verification code.";return}
-   btn.disabled=true;msg.textContent="Verifying email…";
+ window.loginCustomerAccount=async function(){
+   const phone=normalizePhone(document.getElementById("authLoginMobile")?.value||""),pass=String(document.getElementById("authLoginPassword")?.value||""),msg=document.getElementById("authMsg"),btn=document.getElementById("authLogin");
+   if(!validPhone(phone)){msg.textContent="Enter a valid 10-digit mobile number.";return}
+   if(!pass){msg.textContent="Enter your password.";return}
+   btn.disabled=true;msg.textContent="Logging in…";
    try{
-     const r=await db.auth.verifyOtp({email,token,type:"email"});
-     if(r.error){btn.disabled=false;msg.textContent="Email verification failed: "+(r.error.message||"Invalid or expired code.");return}
-     const sessionResult=await db.auth.getSession();
-     const session=sessionResult?.data?.session;
-     const user=session?.user||r.data?.user;
-     if(!user){btn.disabled=false;msg.textContent="Verification succeeded but login session was not created. Please try again.";return}
-     window.daivikAuthUser=user;
-     const p=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:name,email:email,mobile:document.getElementById("mobile")?.value?.trim()||null,updated_at:new Date().toISOString()});
-     if(p.error){console.warn("Profile save:",p.error.message)}
-     setAuthUI(true);
-     msg.textContent="Email verified ✓ You are logged in.";
-   }catch(e){
-     btn.disabled=false;
-     msg.textContent="Email verification failed: "+(e?.message||String(e));
-   }
+     const r=await db.auth.signInWithPassword({phone,password:pass});
+     if(r.error){msg.textContent="Login failed: "+(r.error.message||"Invalid mobile number or password.");return}
+     const u=r.data?.user;if(!u){msg.textContent="Login failed. Please try again.";return}
+     window.daivikAuthUser=u;setAuthUI(true);msg.textContent="Login successful ✓";
+   }catch(e){msg.textContent="Login failed: "+(e?.message||String(e));}
+   finally{btn.disabled=false}
  };
  async function loadAuthProfile(){
-   try{const u=window.daivikAuthUser;if(!u)return;const {data}=await db.from("daivik_customer_profiles").select("full_name,mobile,email").eq("id",u.id).maybeSingle();
-   const n=document.getElementById("name"),e=document.getElementById("email"),m=document.getElementById("mobile");
-   if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=data.email||u.email||"";if(m&&!m.value)m.value=data.mobile||""}
-   else{if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(e&&!e.value)e.value=u.email||""}
-   const mn=document.getElementById("mName"),me=document.getElementById("mEmail"),mm=document.getElementById("mMobile");
-   if(mn&&!mn.value)mn.value=data?.full_name||u.user_metadata?.full_name||"";
-   if(me&&!me.value)me.value=data?.email||u.email||"";
-   if(mm&&!mm.value)mm.value=data?.mobile||"";
-   const vr=await db.from("daivik_customer_vehicles").select("vehicle_number,vehicle_type").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
-   if(vr.data){
-     const v=document.getElementById("vehicle"),mv=document.getElementById("mVehicle");
-     if(v&&!v.value)v.value=vr.data.vehicle_number||"";
-     if(mv&&!mv.value)mv.value=vr.data.vehicle_number||"";
-   }
-   const ar=await db.from("daivik_customer_addresses").select("address,city,pincode").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
-   if(ar.data){
-     const vals={address:ar.data.address,city:ar.data.city,pincode:ar.data.pincode,mAddress:ar.data.address,mCity:ar.data.city,mPincode:ar.data.pincode};
-     Object.entries(vals).forEach(([id,val])=>{const el=document.getElementById(id);if(el&&!el.value)el.value=val||""});
-   }
+   try{
+     const u=window.daivikAuthUser;if(!u)return;
+     const {data}=await db.from("daivik_customer_profiles").select("full_name,mobile,email").eq("id",u.id).maybeSingle();
+     const n=document.getElementById("name"),e=document.getElementById("email"),m=document.getElementById("mobile");
+     const phone=(u.phone||"").replace(/^\+91/,"");
+     if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=data.email||"";if(m&&!m.value)m.value=(data.mobile||phone).replace(/^\+91/,"")}
+     else{
+       await db.from("daivik_customer_profiles").upsert({id:u.id,full_name:u.user_metadata?.full_name||"",email:u.email||null,mobile:u.phone||null,updated_at:new Date().toISOString()});
+       if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(m&&!m.value)m.value=phone;
+     }
+     const mn=document.getElementById("mName"),me=document.getElementById("mEmail"),mm=document.getElementById("mMobile");
+     if(mn&&!mn.value)mn.value=data?.full_name||u.user_metadata?.full_name||"";
+     if(me&&!me.value)me.value=data?.email||"";
+     if(mm&&!mm.value)mm.value=(data?.mobile||phone).replace(/^\+91/,"");
+     const vr=await db.from("daivik_customer_vehicles").select("vehicle_number,vehicle_type").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
+     if(vr.data){const v=document.getElementById("vehicle"),mv=document.getElementById("mVehicle");if(v&&!v.value)v.value=vr.data.vehicle_number||"";if(mv&&!mv.value)mv.value=vr.data.vehicle_number||""}
+     const ar=await db.from("daivik_customer_addresses").select("address,city,pincode").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
+     if(ar.data){const vals={address:ar.data.address,city:ar.data.city,pincode:ar.data.pincode,mAddress:ar.data.address,mCity:ar.data.city,mPincode:ar.data.pincode};Object.entries(vals).forEach(([id,val])=>{const el=document.getElementById(id);if(el&&!el.value)el.value=val||""})}
    }catch(e){console.warn("Profile load failed",e)}
- }
- function customerRecent(o){
+ } function customerRecent(o){
    const st=String(o.status||"").trim().toLowerCase();
    if(!["completed","cancelled","closed"].includes(st))return true;
    const at=o.completed_at||o.cancelled_at||o.updated_at||o.created_at;
@@ -767,7 +785,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    }
    document.getElementById("tracking").classList.remove("hidden");document.getElementById("trackVehicle").textContent=data.vehicle||"—";document.getElementById("trackStatus").textContent=data.status||"—";
    const found={id:data.order_id,service:data.service,price:Number(data.price),date:data.service_date,time:data.preferred_time,vehicle:data.vehicle,address:data.address,payment:data.payment_method,status:data.status};
-   currentCloudOrder=data;await startTracking(found,data);startRealtimeTracking(data.order_id,data.customer_email||"");document.getElementById("tracking").scrollIntoView({behavior:"smooth"});
+   currentCloudOrder=data;await startTracking(found,data);startRealtimeTracking(data.order_id,window.daivikAuthUser?.id);document.getElementById("tracking").scrollIntoView({behavior:"smooth"});
  };
  const gateStyle=document.createElement("style");gateStyle.textContent=".auth-locked{display:none!important}";document.head.appendChild(gateStyle);
  const originalBoot=async()=>{const s=await db.auth.getSession();if(s.data.session){window.daivikAuthUser=s.data.session.user;setAuthUI(true)}else setAuthUI(false)};
