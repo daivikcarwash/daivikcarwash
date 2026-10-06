@@ -99,7 +99,7 @@ async function cancelOrder(id){
  const o=window.customerOrders?.find(x=>x.order_id===id);
  if(!o||!canCancel(o.status))return;
  if(!confirm("Cancel order "+id+"?"))return;
- const {error}=await db.from("daivik_car_wash_orders").update({status:"Cancelled",cancelled_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("order_id",id).eq("customer_user_id",user.id).in("status",["Booking Received","Confirmed"]);
+ const {error}=await db.from("daivik_car_wash_orders").update({status:"Cancelled",updated_at:new Date().toISOString()}).eq("order_id",id).eq("customer_user_id",user.id).in("status",["Booking Received","Confirmed"]);
  if(error){alert("Cancellation failed: "+error.message);return}
  await loadOrders();
 }
