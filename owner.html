@@ -288,7 +288,7 @@ async function loadOwnerStaff(){
   const rows=data||[];
   if(count)count.textContent=rows.filter(s=>s.status==="Active").length;
   if(!rows.length){if(box)box.innerHTML='<p class="muted">No staff yet.</p>';return}
-  if(box)box.innerHTML=rows.map(s=>'<div class="order"><b>'+esc(s.name)+'</b><br><span class="muted">'+esc(s.mobile||"No mobile")+' • '+esc(s.role||"wash_boy")+' • '+esc(s.status||"")+'</span><div class="row" style="margin-top:9px"><button class="btn" data-id="'+esc(s.id)+'" data-status="'+esc(s.status||"")+'" onclick="toggleOwnerStaff(this.dataset.id,this.dataset.status)">'+(s.status==="Active"?"Set Inactive":"Set Active")+'</button></div></div>').join("");
+  if(box)box.innerHTML=rows.map(s=>'<div class="order"><b>'+esc(s.name)+'</b><br><span class="muted">'+esc(s.mobile||"No mobile")+' • '+esc(s.role||"wash_boy")+' • '+esc(s.status||"")+'</span><div class="row" style="margin-top:9px"><button class="btn" data-id="'+esc(s.id)+'" data-status="'+esc(s.status||"")+'" onclick="toggleOwnerStaff(this.dataset.id,this.dataset.status)">'+(s.status==="Active"?"Set Inactive":"Set Active")+'</button><button class="btn danger" data-id="'+esc(s.id)+'" data-name="'+esc(s.name)+'" onclick="deleteOwnerStaff(this.dataset.id,this.dataset.name)">Delete</button></div></div>').join("");
 }
 async function ownerAddStaff(){
   const nameEl=document.getElementById("ownerStaffName"),mobileEl=document.getElementById("ownerStaffMobile"),msg=document.getElementById("ownerStaffMsg");
@@ -297,6 +297,15 @@ async function ownerAddStaff(){
   const {error}=await db.from("daivik_staff").insert({name,mobile:mobile||null,role:"wash_boy",status:"Active"});
   if(error){msg.textContent="Add failed: "+error.message;return}
   nameEl.value="";mobileEl.value="";msg.textContent="Staff added ✓";await loadOwnerStaff();
+}
+async function deleteOwnerStaff(id,name){
+  if(!confirm("Delete staff "+name+" permanently?"))return;
+  const {error}=await db.from("daivik_staff").delete().eq("id",id);
+  if(error){const msg=document.getElementById("ownerStaffMsg");if(msg)msg.textContent="Delete failed: "+error.message;return}
+  const check=await db.from("daivik_staff").select("id").eq("id",id).maybeSingle();
+  if(check.data){const msg=document.getElementById("ownerStaffMsg");if(msg)msg.textContent="Delete was blocked by database policy.";return}
+  const msg=document.getElementById("ownerStaffMsg");if(msg)msg.textContent="Staff deleted ✓";
+  await loadOwnerStaff();
 }
 async function toggleOwnerStaff(id,status){
   const {error}=await db.from("daivik_staff").update({status:status==="Active"?"Inactive":"Active",updated_at:new Date().toISOString()}).eq("id",id);
