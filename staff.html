@@ -13,7 +13,7 @@
 <div class="card"><h2>📡 Live GPS</h2><p id="jobInfo" class="muted">Select a job to start location sharing.</p><p id="gpsStatus" class="muted">GPS not started.</p><p id="coords" class="muted"></p><div class="row"><button class="btn blue" onclick="startGPS()">📍 Start / Resume GPS</button><button class="btn red" onclick="stopGPS()">Stop GPS</button></div></div>
 </div>
 <script>
-const db=supabase.createClient("https://holelzxzhaiefaqezmce.supabase.co","sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ");
+const db=supabase.createClient("https://rgjymvvtrmzhznnreqog.supabase.co","sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ");
 let staff=[],jobs=[],watch=null,currentJobId="",currentJobType="one-time",lastGpsSend=0,channel=null;
 const params=new URLSearchParams(location.search);if(params.get("order"))currentJobId=params.get("order");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
