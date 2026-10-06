@@ -10,7 +10,7 @@
 <section class="card"><h2>🔔 Notifications</h2><p class="muted">Booking confirmation, assignment and service updates appear through the connected Daivik notification system.</p><div class="item">✓ New booking confirmation</div><div class="item">✓ Staff assignment / service updates</div><div class="item">✓ Monthly visit reminders</div></section>
 <button class="btn red" onclick="logout()">Logout</button>
 </div></main><nav class="nav"><a href="#top"><b>⌂</b>Home</a><a href="customer.html"><b>＋</b>Book</a><a href="monthly.html"><b>★</b>Plans</a><a href="#orders"><b>▣</b>Orders</a></nav>
-<script>const db=supabase.createClient("https://rgjymvvtrmzhznnreqog.supabase.co","sb_publishable_KoCQClKL582rggMuDJXhYQ_UhHOB4xZ");let user=null;const $=id=>document.getElementById(id);const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+<script>const db=supabase.createClient("https://rgjymvvtrmzhznnreqog.supabase.co","sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY");let user=null;const $=id=>document.getElementById(id);const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function sendEmailOtp(){
  const email=$("authEmail").value.trim().toLowerCase(),name=$("authName").value.trim();
  if(!name){$("loginMsg").textContent="Enter your full name.";return}
