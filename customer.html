@@ -179,7 +179,7 @@ async function placeOrder(){
  if(!selected){$("msg").textContent="Please choose a service first.";return}
  if(!name||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
- const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.phone||"")!==window.daivikNormalizePhone(mobile)){window.daivikAuthUser=null;$("msg").textContent="Please login with your mobile number and password before placing the booking.";return}window.daivikAuthUser=sessionUser;
+ const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.user_metadata?.customer_mobile||"")!==window.daivikNormalizePhone(mobile)){window.daivikAuthUser=null;$("msg").textContent="Please login with your mobile number and password before placing the booking.";return}window.daivikAuthUser=sessionUser;
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.mobile===mobile);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
@@ -538,7 +538,7 @@ async function placeMonthlyOrder(){
  const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value;let streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("mPincode").value=pincode;$("mAddress").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
  if(!name||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
- if(!window.daivikAuthUser||String(window.daivikAuthUser.phone||"")!==window.daivikNormalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
+ if(!window.daivikAuthUser||String(window.daivikAuthUser.user_metadata?.customer_mobile||"")!==window.daivikNormalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
@@ -726,10 +726,10 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
      const u=window.daivikAuthUser;if(!u)return;
      const {data}=await db.from("daivik_customer_profiles").select("full_name,mobile,email").eq("id",u.id).maybeSingle();
      const n=document.getElementById("name"),e=document.getElementById("email"),m=document.getElementById("mobile");
-     const phone=(u.phone||"").replace(/^\+91/,"");
+     const phone=String(u.user_metadata?.customer_mobile||"").replace(/^\+91/,"");
      if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=data.email||"";if(m&&!m.value)m.value=(data.mobile||phone).replace(/^\+91/,"")}
      else{
-       await db.from("daivik_customer_profiles").upsert({id:u.id,full_name:u.user_metadata?.full_name||"",email:u.email||null,mobile:u.phone||null,updated_at:new Date().toISOString()});
+       await db.from("daivik_customer_profiles").upsert({id:u.id,full_name:u.user_metadata?.full_name||"",email:u.email||null,mobile:u.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
        if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(m&&!m.value)m.value=phone;
      }
      const mn=document.getElementById("mName"),me=document.getElementById("mEmail"),mm=document.getElementById("mMobile");
