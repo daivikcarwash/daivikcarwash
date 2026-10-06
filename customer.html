@@ -110,7 +110,7 @@ bike:{label:"Bike",icon:"🏍️",services:[
 {name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199,includes:"Premium foam • Deep clean • Tyre shine • Finish"}
 ]}};
 const SUPABASE_URL="https://rgjymvvtrmzhznnreqog.supabase.co";
-const SUPABASE_KEY="sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY";
+const SUPABASE_KEY=atob("c2JfcHVibGlzaGFibGVfdmFfMjNHaWhNN0xNT2c3SjVMc2puZ19UUUFVR0N6WQ==");
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let selected=null,selectedVehicleType=null;const $=id=>document.getElementById(id);
 $("date").min=new Date().toISOString().split("T")[0];
@@ -662,12 +662,13 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
 <script>
 (function(){
  const AUTH_SUPABASE_URL="https://rgjymvvtrmzhznnreqog.supabase.co";
- const AUTH_SUPABASE_KEY="sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY";
+ const AUTH_SUPABASE_KEY=atob("c2JfcHVibGlzaGFibGVfdmFfMjNHaWhNN0xNT2c3SjVMc2puZ19UUUFVR0N6WQ==");
  window.daivikAuthUser=null;
  const normalizePhone=v=>{const d=String(v||"").replace(/\D/g,"");return d.length===10?"+91"+d:(d.startsWith("91")&&d.length===12?"+"+d:d.startsWith("+")?d:"+"+d)};
  window.daivikNormalizePhone=normalizePhone;
  const authName=()=>String(document.getElementById("authName")?.value||"").trim();
  const authMobile=()=>normalizePhone(document.getElementById("authMobile")?.value||"");
+ const authEmailFromPhone=phone=>normalizePhone(phone).replace(/^\+/,"")+"@daivikcarwash.com";
  const authPassword=()=>String(document.getElementById("authPassword")?.value||"");
  const validPhone=v=>/^\+91\d{10}$/.test(normalizePhone(v));
  const lock=on=>["#vehicleTypes","#bookBtn","#monthlyBooking"].forEach(sel=>{const el=document.querySelector(sel)?.closest(sel==="#monthlyBooking"?"#monthlyBooking":".card")||document.querySelector(sel);if(el)el.classList.toggle("auth-locked",on)});
@@ -698,7 +699,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    if(pass!==pass2){msg.textContent="Passwords do not match.";return}
    btn.disabled=true;msg.textContent="Creating account…";
    try{
-     const r=await db.auth.signUp({phone,password:pass,options:{data:{full_name:name}}});
+     const r=await db.auth.signUp({email:authEmailFromPhone(phone),password:pass,options:{data:{full_name:name,customer_mobile:phone}}});
      if(r.error){msg.textContent="Account creation failed: "+(r.error.message||"Please try again.");btn.disabled=false;return}
      if(r.data?.session)await db.auth.signOut();
      showCustomerLogin();
@@ -713,7 +714,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    if(!pass){msg.textContent="Enter your password.";return}
    btn.disabled=true;msg.textContent="Logging in…";
    try{
-     const r=await db.auth.signInWithPassword({phone,password:pass});
+     const r=await db.auth.signInWithPassword({email:authEmailFromPhone(phone),password:pass});
      if(r.error){msg.textContent="Login failed: "+(r.error.message||"Invalid mobile number or password.");return}
      const u=r.data?.user;if(!u){msg.textContent="Login failed. Please try again.";return}
      window.daivikAuthUser=u;setAuthUI(true);msg.textContent="Login successful ✓";
