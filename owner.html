@@ -364,7 +364,7 @@ async function uploadAdminGallery(files){
   loadAdminGallery();
 }
 
-function openStaff(id){window.open("staff.html?order="+encodeURIComponent(id),"_blank")}
+function openStaff(id){const o=orders.find(x=>x.order_id===id);const staffId=o?.assigned_staff_id||"";window.open("staff.html?order="+encodeURIComponent(id)+"&staff="+encodeURIComponent(staffId),"_blank")}
 function exportCSV(){
   const rows=[["Order ID","Name","Email","Mobile","Vehicle","Service","Price","Date","Time","Status","Payment","Address"]].concat(orders.map(o=>[o.order_id,o.customer_name,o.customer_email,o.customer_mobile,o.vehicle,o.service,o.price,o.service_date,o.preferred_time,o.status,o.payment_status,o.address]));
   const csv=rows.map(r=>r.map(x=>JSON.stringify(String(x??""))).join(",")).join("\n");
