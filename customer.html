@@ -626,7 +626,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
    });
  }
  window.daivikGoDetails=function(){
-   if(!window.selectedVehicleType || !window.selected){
+   if(!document.querySelector(".vehicle-type.selected") || !document.querySelector("#services .service.selected")){
      const m=document.getElementById("msg"); if(m)m.textContent="Please choose vehicle type and service first."; return;
    }
    vehicleCard.classList.add("booking-locked");
@@ -647,7 +647,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  if(typeof oldSelect==="function"){
    window.selectService=function(i){
      oldSelect(i);
-     cont.querySelector("button").disabled=!window.selected;
+     cont.querySelector("button").disabled=!document.querySelector("#services .service.selected");
    };
  }
  const oldPlace=window.placeOrder;
