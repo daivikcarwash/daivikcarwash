@@ -86,7 +86,7 @@ function renderJobs(){
   const canStart=o.accepted_at&&["Confirmed","Booking Received"].includes(o.status);
   const running=["On the Way","Arriving Soon","Running"].includes(o.status);
   return '<div class="job"><h3 style="margin:0 0 7px">'+esc(o.order_id)+' <span class="tag">'+esc(o.status)+'</span></h3>'+
-  '<div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">'+esc(o.vehicle)+' • '+esc(o.service)+'</div>'+
+  '<div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">👤 Assigned Staff: '+esc((staff.find(s=>s.id===o.assigned_staff_id)?.name)||"Unassigned")+(staff.find(s=>s.id===o.assigned_staff_id)?.mobile?' • '+esc(staff.find(s=>s.id===o.assigned_staff_id).mobile):'')+'</div><div class="muted" style="margin-top:5px">'+esc(o.vehicle)+' • '+esc(o.service)+'</div>'+
   '<div class="muted" style="margin-top:5px">📅 '+esc(o.service_date)+' • '+esc(o.preferred_time||"")+'</div><div class="muted" style="margin-top:5px">📍 '+esc(o.address)+'</div>'+
   '<div style="margin-top:9px"><b>₹'+esc(o.price)+'</b> • '+(collected?'<span class="ok">Payment Collected ✓</span>':'<span class="warn">Payment Pending</span>')+'</div>'+timeline(o)+
   '<div class="row" style="margin-top:12px">'+
