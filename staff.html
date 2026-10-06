@@ -29,7 +29,7 @@ async function loadStaff(){
  if(!staff.length){el.innerHTML='<option value="">No active staff found</option>';return}
  await loadJobs();
 }
-function saveStaff(){const id=document.getElementById("staffSelect").value;if(!id){setMsg("Select a staff member.",true);return}localStorage.setItem(staffKey,id);setMsg("Staff saved ✓");loadJobs();loadMonthlyJobs()}
+async function saveStaff(){const id=document.getElementById("staffSelect").value;if(!id){setMsg("Select a staff member.",true);return}localStorage.setItem(staffKey,id);if(currentJobId){const r=await db.from("daivik_car_wash_orders").update({assigned_staff_id:id,updated_at:new Date().toISOString()}).eq("order_id",currentJobId);if(r.error){setMsg("Staff saved, but order assignment failed: "+r.error.message,true);return}setMsg("Staff saved and order assigned ✓")}else{setMsg("Staff saved ✓")}await loadJobs();await loadMonthlyJobs()}
 function currentStaff(){return staff.find(s=>s.id===staffId())||null}
 async function loadMonthlyJobs(){
  const id=staffId(); if(!id){document.getElementById("monthlyJobs").innerHTML='<p class="muted">Select and save staff first.</p>';return}
