@@ -158,7 +158,6 @@ async function placeOrder(){
  const name=$("name").value.trim(),email=$("email").value.trim().toLowerCase(),mobile=$("mobile").value.trim(),vehicle=$("vehicle").value.trim().toUpperCase(),date=$("date").value;let streetAddress=$("address").value.trim(),city=$("city").value.trim(),pincode=$("pincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("pincode").value=pincode;$("address").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="pay"]:checked').value;
  if(!selectedVehicleType){$("msg").textContent="Please choose your vehicle type first.";return}
  if(!selected){$("msg").textContent="Please choose a service first.";return}
- if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("monthlyMsg").textContent="Please verify your email before placing the monthly booking.";return}
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
  if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("msg").textContent="Please verify your email before placing the booking.";return}
@@ -510,6 +509,7 @@ async function placeMonthlyOrder(){
  const name=$("mName").value.trim(),email=$("mEmail").value.trim().toLowerCase(),mobile=$("mMobile").value.trim(),vehicle=$("mVehicle").value.trim().toUpperCase(),date=$("mDate").value,time=$("mTime").value;let streetAddress=$("mAddress").value.trim(),city=$("mCity").value.trim(),pincode=$("mPincode").value.trim();if(/^\d{6}$/.test(streetAddress)&&!pincode){pincode=streetAddress;streetAddress="";$("mPincode").value=pincode;$("mAddress").value="";}const address=[streetAddress,city,pincode].filter(Boolean).join(", "),pay=document.querySelector('input[name="mpay"]:checked').value;
  if(!name||!validEmail(email)||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("monthlyMsg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
+ if(!window.daivikAuthUser||String(window.daivikAuthUser.email||"").toLowerCase()!==email){$("monthlyMsg").textContent="Please verify your email before placing the monthly booking.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
  btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
