@@ -582,4 +582,87 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  if(mb&&mb.parentNode)mb.parentNode.insertBefore(title,mb);
 })();
 </script>
-</body></html>
+<style>
+/* DAIVIK PROFESSIONAL BOOKING FLOW */
+.flow-progress{position:sticky;top:61px;z-index:8;margin:-8px 0 18px;padding:11px 14px;background:rgba(5,18,37,.94);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.flow-step{display:flex;align-items:center;gap:7px;color:#70869d;font-size:11px;font-weight:700}.flow-step i{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#122b44;border:1px solid #23445f;font-style:normal}.flow-step.active{color:#fff}.flow-step.active i{background:var(--gold);color:#111;border-color:var(--gold)}
+.booking-locked{display:none!important}.continue-wrap{margin-top:14px}.continue-wrap .btn{margin-top:0}.back-step{background:#173650!important;margin-top:8px!important}
+#services .service{position:relative}.service.selected:after{content:"✓";position:absolute;right:12px;top:12px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#111;font-weight:900;font-size:13px}
+@media(max-width:700px){.flow-progress{top:58px}.flow-step{justify-content:center;flex-direction:column;gap:3px;font-size:9px}.flow-step i{width:27px;height:27px}}
+</style>
+<script>
+(function(){
+ const wrap=document.querySelector("main.wrap");
+ if(!wrap)return;
+ const hero=wrap.querySelector(".hero");
+ const vehicleCard=document.getElementById("vehicleTypes")?.closest(".card");
+ const bookingCard=document.getElementById("bookBtn")?.closest(".card");
+ if(!hero||!vehicleCard||!bookingCard)return;
+
+ const progress=document.createElement("div");
+ progress.className="flow-progress";
+ progress.innerHTML='<div class="flow-step active" id="fp1"><i>1</i><span>Vehicle & Service</span></div><div class="flow-step" id="fp2"><i>2</i><span>Details & Slot</span></div><div class="flow-step" id="fp3"><i>3</i><span>Confirm</span></div>';
+ hero.after(progress);
+
+ const hint=document.getElementById("serviceHint");
+ const cont=document.createElement("div");
+ cont.className="continue-wrap";
+ cont.innerHTML='<button id="continueBooking" class="btn" disabled>Continue to booking details →</button>';
+ hint?.after(cont);
+
+ bookingCard.classList.add("booking-locked");
+
+ const back=document.createElement("button");
+ back.className="btn back-step";
+ back.type="button";
+ back.textContent="← Change vehicle / service";
+ const first=bookingCard.firstElementChild;
+ bookingCard.insertBefore(back,first);
+
+ function setProgress(n){
+   [1,2,3].forEach(i=>{
+     const x=document.getElementById("fp"+i);
+     if(x)x.classList.toggle("active",i===n);
+   });
+ }
+ window.daivikGoDetails=function(){
+   if(!window.selectedVehicleType || !window.selected){
+     const m=document.getElementById("msg"); if(m)m.textContent="Please choose vehicle type and service first."; return;
+   }
+   vehicleCard.classList.add("booking-locked");
+   bookingCard.classList.remove("booking-locked");
+   setProgress(2);
+   bookingCard.scrollIntoView({behavior:"smooth",block:"start"});
+ };
+ window.daivikBackToService=function(){
+   bookingCard.classList.add("booking-locked");
+   vehicleCard.classList.remove("booking-locked");
+   setProgress(1);
+   vehicleCard.scrollIntoView({behavior:"smooth",block:"start"});
+ };
+ cont.querySelector("button").onclick=window.daivikGoDetails;
+ back.onclick=window.daivikBackToService;
+
+ const oldSelect=window.selectService;
+ if(typeof oldSelect==="function"){
+   window.selectService=function(i){
+     oldSelect(i);
+     cont.querySelector("button").disabled=!window.selected;
+   };
+ }
+ const oldPlace=window.placeOrder;
+ if(typeof oldPlace==="function"){
+   window.placeOrder=async function(){
+     setProgress(3);
+     await oldPlace();
+   };
+ }
+ const success=document.getElementById("success");
+ if(success){
+   const obs=new MutationObserver(()=>{
+     if(!success.classList.contains("hidden"))setProgress(3);
+   });
+   obs.observe(success,{attributes:true,attributeFilter:["class"]});
+ }
+})();
+</script></body></html>
