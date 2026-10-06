@@ -534,8 +534,10 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  const main=document.querySelector("main.wrap");
  if(main){
    Array.from(main.children).forEach(el=>{
-     if(el.id!=="monthlyBooking")el.classList.add("one-time-only");
+     if(el.id!=="monthlyBooking" && el.id!=="customerLoginGate")el.classList.add("one-time-only");
    });
+   const monthlyProgress=document.querySelector(".flow-progress");
+   if(monthlyProgress)monthlyProgress.classList.add("one-time-only");
  }
  const title=document.createElement("div");title.className="monthly-only-title";title.textContent="📦 Monthly Package Booking";
  const mb=document.getElementById("monthlyBooking");
