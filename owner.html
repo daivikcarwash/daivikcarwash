@@ -250,7 +250,7 @@ function populateStaffAssignSelects(){
   document.querySelectorAll('select[data-id]').forEach(el=>{
     if(el.getAttribute('onchange')!=="assignStaff(this.dataset.id,this.value)")return;
     const id=el.dataset.id,o=orders.find(x=>x.order_id===id),current=o?.assigned_staff_id||"";
-    el.innerHTML='<option value="">Assign Staff</option><option value="__none__">Unassign</option>'+
+    el.innerHTML='<option value="">Select Staff</option>'+
       ownerStaff.filter(s=>s.status==="Active").map(s=>'<option value="'+esc(s.id)+'" '+(current===s.id?'selected':'')+'>'+esc(s.name)+(s.mobile?' • '+esc(s.mobile):'')+'</option>').join('');
   });
 }
