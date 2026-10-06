@@ -57,7 +57,7 @@ async function claimLegacyOrders(){
  const email=(user.email||"").toLowerCase();
  if(!email)return;
  try{
-  await db.from("daivik_car_wash_orders").update({customer_user_id:user.id,updated_at:new Date().toISOString()}).eq("customer_user_id",null).ilike("customer_email",email);
+  await db.from("daivik_car_wash_orders").update({customer_user_id:user.id,updated_at:new Date().toISOString()}).is("customer_user_id",null).ilike("customer_email",email);
   await db.from("daivik_monthly_orders").update({customer_user_id:user.id,updated_at:new Date().toISOString()}).eq("customer_user_id",null).ilike("customer_email",email);
  }catch(e){console.warn("Legacy order linking failed",e)}
 }
