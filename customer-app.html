@@ -85,7 +85,7 @@ async function saveProfile(){
  $("loginMsg").textContent=r.error?r.error.message:"Profile saved ✓";
 }
 async function claimLegacyOrders(){
- const phone=(user.phone||"").replace(/^\+91/,"");
+ const phone=String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"");
  if(!phone)return;
  try{
   await db.from("daivik_car_wash_orders").update({customer_user_id:user.id,updated_at:new Date().toISOString()}).is("customer_user_id",null).eq("customer_mobile",phone);
