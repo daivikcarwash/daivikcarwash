@@ -41,12 +41,12 @@ async function loadStaff(){
  }
  await loadJobs();
  if(!jobs.length){
-   const {data:assigned}=await db.from("daivik_car_wash_orders").select("order_id,assigned_staff_id,status,created_at").not("assigned_staff_id","is",null).order("created_at",{ascending:false}).limit(20);
-   const active=(assigned||[]).find(o=>o.status!=="Completed"&&o.status!=="Cancelled");
-   const assignedId=active?.assigned_staff_id;
-   if(assignedId && staff.some(s=>s.id===assignedId) && assignedId!==saved){
-     localStorage.setItem(staffKey,assignedId);
-     await loadJobs();
+   const picker=document.getElementById("staffPicker"),sel=document.getElementById("staffSelect");
+   if(picker&&sel){
+     sel.innerHTML='<option value="">Select Staff</option>'+staff.map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+(s.mobile?' • '+esc(s.mobile):'')+'</option>').join("");
+     sel.value=saved||"";
+     picker.style.display=staff.length?"block":"none";
+     setMsg("No job is linked to the selected staff. Select the staff assigned by Owner and tap Continue as Staff.",true);
    }
  }
 }
