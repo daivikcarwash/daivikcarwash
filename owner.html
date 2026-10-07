@@ -268,11 +268,23 @@ function populateStaffAssignSelects(){
 }
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 async function assignStaff(orderId,staffId){
-  const patch={assigned_staff_id:staffId==="__none__"?null:staffId,updated_at:new Date().toISOString()};
-  const {error}=await db.from("daivik_car_wash_orders").update(patch).eq("order_id",orderId);
+  const assignedId=staffId==="__none__"?null:staffId;
+  const patch={assigned_staff_id:assignedId,updated_at:new Date().toISOString()};
+  const {data,error}=await db.from("daivik_car_wash_orders")
+    .update(patch)
+    .eq("order_id",orderId)
+    .select("order_id,assigned_staff_id")
+    .maybeSingle();
   if(error){alert("Staff assignment failed: "+error.message);await loadOrders();return}
-  const o=orders.find(x=>x.order_id===orderId);if(o)o.assigned_staff_id=patch.assigned_staff_id;
+  if(!data || data.assigned_staff_id!==assignedId){
+    alert("Staff assignment was not saved. Please try again.");
+    await loadOrders();
+    return;
+  }
+  const o=orders.find(x=>x.order_id===orderId);
+  if(o)o.assigned_staff_id=data.assigned_staff_id;
   render();
+  setMsg("Staff assigned successfully ✓");
 }
 async function setPayment(id,payment_status){
   const {error}=await db.from("daivik_car_wash_orders").update({payment_status,updated_at:new Date().toISOString()}).eq("order_id",id);
