@@ -120,6 +120,18 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 </details>
 
 <details class="admin-section">
+<summary>Customer Accounts <span class="section-count" id="customerAccountCount">0</span></summary>
+<div class="section-body">
+<p class="muted">Registered customer accounts. Customers with no order for 90+ days are shown as inactive and can be removed here. Order history is kept separately.</p>
+<div class="row">
+<button class="btn homebtn" onclick="loadCustomerAccounts()">Refresh Customers</button>
+</div>
+<p id="customerAccountMsg" class="muted" style="margin-top:10px"></p>
+<div id="customerAccountList" style="margin-top:12px"><p class="muted">Open this section to load customer accounts.</p></div>
+</div>
+</details>
+
+<details class="admin-section">
 <summary>Service Gallery <span class="section-count" id="galleryCount">0</span></summary>
 <div class="section-body">
 <p class="muted">Yahan se aap real Daivik service ki photos aur videos upload kar sakte ho. Ye files customer website ke Service Gallery me automatically dikhengi.</p>
@@ -172,7 +184,7 @@ async function login(){
       return;
     }
     setMsg("Admin connected ✓ Loading orders...");
-    await Promise.all([loadOrders(),loadMonthlyOrders(),loadOwnerStaff()]);
+    await Promise.all([loadOrders(),loadMonthlyOrders(),loadOwnerStaff(),loadCustomerAccounts()]);
     setMsg("Admin ready ✓");
   }catch(e){
     console.error(e);
@@ -328,6 +340,66 @@ async function toggleOwnerStaff(id,status){
   if(error){const msg=document.getElementById("ownerStaffMsg");if(msg)msg.textContent="Update failed: "+error.message;return}
   await loadOwnerStaff();
 }
+async function loadCustomerAccounts(){
+  if(!(await initDB()))return;
+  const box=document.getElementById("customerAccountList"),msg=document.getElementById("customerAccountMsg"),countEl=document.getElementById("customerAccountCount");
+  if(box)box.innerHTML='<p class="muted">Loading customer accounts...</p>';
+  if(msg)msg.textContent="";
+  const [pRes,oRes,mRes]=await Promise.all([
+    db.from("daivik_customer_profiles").select("id,full_name,mobile,email,created_at,updated_at").order("created_at",{ascending:false}),
+    db.from("daivik_car_wash_orders").select("customer_user_id,created_at"),
+    db.from("daivik_monthly_orders").select("customer_user_id,created_at")
+  ]);
+  if(pRes.error){
+    if(msg)msg.textContent="Customer accounts could not be loaded: "+pRes.error.message;
+    return;
+  }
+  if(oRes.error||mRes.error){
+    if(msg)msg.textContent="Customer order data could not be loaded.";
+    return;
+  }
+  const stats=new Map();
+  [...(oRes.data||[]),...(mRes.data||[])].forEach(o=>{
+    if(!o.customer_user_id)return;
+    const s=stats.get(o.customer_user_id)||{count:0,last:null};
+    s.count++;
+    if(!s.last||new Date(o.created_at)>new Date(s.last))s.last=o.created_at;
+    stats.set(o.customer_user_id,s);
+  });
+  const now=Date.now(), ninety=90*24*60*60*1000;
+  const rows=(pRes.data||[]).map(p=>{
+    const s=stats.get(p.id)||{count:0,last:null};
+    const base=s.last||p.updated_at||p.created_at;
+    const inactive=base ? (now-new Date(base).getTime()>ninety) : true;
+    return {...p,order_count:s.count,last_order:s.last,inactive};
+  });
+  if(countEl)countEl.textContent=rows.length;
+  if(!rows.length){if(box)box.innerHTML='<p class="muted">No customer accounts yet.</p>';return}
+  if(box)box.innerHTML=rows.map(p=>{
+    const last=p.last_order?new Date(p.last_order).toLocaleDateString("en-IN"):"No orders";
+    const created=p.created_at?new Date(p.created_at).toLocaleDateString("en-IN"):"—";
+    const state=p.inactive?'Inactive 90+ days':'Active';
+    const action=p.inactive?'<button class="btn danger" data-id="'+esc(p.id)+'" data-name="'+esc(p.full_name||p.mobile||"Customer")+'" onclick="deleteCustomerAccount(this.dataset.id,this.dataset.name)">Delete Account</button>':'<span class="muted">Active account — delete disabled</span>';
+    return '<div class="order"><b>'+esc(p.full_name||"Unnamed Customer")+'</b><br><span class="muted">'+esc(p.mobile||"No mobile")+(p.email?' • '+esc(p.email):"")+'<br>Created: '+esc(created)+' • Orders: '+p.order_count+' • Last order: '+esc(last)+'<br>Status: '+esc(state)+'</span><div class="row" style="margin-top:9px">'+action+'</div></div>';
+  }).join("");
+}
+async function deleteCustomerAccount(id,name){
+  if(!confirm("Delete customer account for "+name+"?\n\nOnly the customer profile, saved vehicles and saved addresses will be removed. Order history will remain."))return;
+  if(!(await initDB()))return;
+  const msg=document.getElementById("customerAccountMsg");
+  if(msg)msg.textContent="Deleting "+name+"...";
+  const v=await db.from("daivik_customer_vehicles").delete().eq("customer_user_id",id);
+  if(v.error){if(msg)msg.textContent="Delete failed: "+v.error.message;return}
+  const a=await db.from("daivik_customer_addresses").delete().eq("customer_user_id",id);
+  if(a.error){if(msg)msg.textContent="Delete failed: "+a.error.message;return}
+  const p=await db.from("daivik_customer_profiles").delete().eq("id",id);
+  if(p.error){if(msg)msg.textContent="Delete failed: "+p.error.message;return}
+  const check=await db.from("daivik_customer_profiles").select("id").eq("id",id).maybeSingle();
+  if(check.data){if(msg)msg.textContent="Delete was blocked by database policy.";return}
+  if(msg)msg.textContent=name+" account removed ✓";
+  await loadCustomerAccounts();
+}
+
 async function loadAdminGallery(){
   if(!(await initDB()))return;
   const box=document.getElementById("adminGalleryList"),msg=document.getElementById("galleryAdminMsg");
