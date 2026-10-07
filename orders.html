@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071629"><link rel="manifest" href="manifest.webmanifest"><title>Daivik App</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>*{box-sizing:border-box}body{margin:0;background:#061326;color:#fff;font-family:Poppins,Arial,sans-serif}.wrap{max-width:850px;margin:auto;padding:14px 14px 90px}.top{position:sticky;top:0;z-index:5;background:rgba(5,18,37,.96);padding:14px;border-bottom:1px solid #31516f}.brand{font-weight:800;color:#d4af37;font-size:20px}.card{background:#102b49;border:1px solid #31516f;border-radius:20px;padding:18px;margin:14px 0}.hero{background:linear-gradient(135deg,#123b60,#10233b)}h1,h2{margin:0 0 8px}.gold{color:#d4af37}.muted{color:#aebbd0;font-size:12px}input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #31516f;background:#071629;color:#fff;margin:5px 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{display:inline-block;border:0;border-radius:11px;padding:12px 15px;background:#d4af37;color:#fff;font-weight:700;text-decoration:none;cursor:pointer}.btn.blue{background:#274a68}.btn.green{background:#198754}.btn.red{background:#a63b3b}.row{display:flex;gap:8px;flex-wrap:wrap}.item{padding:12px;border:1px solid #31516f;border-radius:12px;margin:8px 0;background:#0b2037}.hidden{display:none!important}.nav{position:fixed;bottom:0;left:0;right:0;background:#071629;border-top:1px solid #31516f;display:flex;justify-content:space-around;padding:10px;z-index:10}.nav a{color:#fff;text-decoration:none;font-size:12px;text-align:center}.nav b{display:block;color:#d4af37;font-size:19px}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style></head><body><div class="top"><div class="wrap" style="padding:0"><div class="brand">🚗 Daivik Doorstep</div></div></div><main class="wrap">
+<section class="card hero"><h1>📦 My Recent Orders</h1><p class="muted">Your latest one-time bookings are shown here. Live tracking is available from the order.</p><div id="orders">Loading...</div></section>
+<section class="card"><h2>⭐ Monthly Care</h2><div id="monthly">Loading...</div></section>
+<section class="card"><h2>🔔 Notifications</h2><p class="muted">Booking confirmation, assignment and service updates appear through the connected Daivik notification system.</p><div class="item">✓ New booking confirmation</div><div class="item">✓ Staff assignment / service updates</div><div class="item">✓ Monthly visit reminders</div></section>
+</main><nav class="nav"><a href="app.html"><b>⌂</b>Home</a><a href="customer-app.html"><b>👤</b>Profile</a></nav>
+<script><script>const db=supabase.createClient("https://rgjymvvtrmzhznnreqog.supabase.co",atob("c2JfcHVibGlzaGFibGVfdmFfMjNHaWhNN0xNT2c3SjVMc2puZ19UUUFVR0N6WQ=="));let user=null;const $=id=>document.getElementById(id);const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const normalizePhone=v=>{const d=String(v||"").replace(/\D/g,"");return d.length===10?"+91"+d:(d.startsWith("91")&&d.length===12?"+"+d:d.startsWith("+")?d:"+"+d)};const authEmailFromPhone=phone=>normalizePhone(phone).replace(/^\+/,"")+"@daivikcarwash.com";const validPhone=v=>/^\+91\d{10}$/.test(normalizePhone(v));
+function showSignup(){ $("signupFields").classList.remove("hidden");$("loginFields").classList.add("hidden");$("authTitle").textContent="👤 Create Customer Account";$("authDesc").textContent="Name, mobile number aur password set karke account banayein.";$("loginMsg").textContent=""; }
+function showLogin(){ $("signupFields").classList.add("hidden");$("loginFields").classList.remove("hidden");$("authTitle").textContent="👤 Customer Login";$("authDesc").textContent="Apna mobile number aur password dal kar login karein.";$("loginMsg").textContent=""; }
+async function signupCustomer(){
+ const name=$("signupName").value.trim(),phone=normalizePhone($("signupMobile").value),pass=$("signupPassword").value,pass2=$("signupPassword2").value,btn=$("signupBtn");
+ if(!name){$("loginMsg").textContent="Enter your full name.";return}
+ if(!validPhone(phone)){$("loginMsg").textContent="Enter a valid 10-digit Indian mobile number.";return}
+ if(pass.length<6){$("loginMsg").textContent="Password must be at least 6 characters.";return}
+ if(pass!==pass2){$("loginMsg").textContent="Passwords do not match.";return}
+ btn.disabled=true;$("loginMsg").textContent="Creating account…";
+ try{
+  const r=await db.auth.signUp({email:authEmailFromPhone(phone),password:pass,options:{data:{full_name:name,customer_mobile:phone}}});
+  if(r.error){$("loginMsg").textContent="Account creation failed: "+(r.error.message||"Please try again.");return}
+  if(r.data?.session)await db.auth.signOut();
+  $("loginMobile").value=phone.replace(/^\+91/,"");showLogin();$("loginMsg").textContent="Account created ✓ Ab login karein.";
+ }catch(e){$("loginMsg").textContent="Account creation failed: "+(e?.message||String(e));}
+ finally{btn.disabled=false}
+}
+async function loginCustomer(){
+ const phone=normalizePhone($("loginMobile").value),pass=$("loginPassword").value,btn=$("loginBtn");
+ if(!validPhone(phone)){$("loginMsg").textContent="Enter a valid 10-digit Indian mobile number.";return}
+ if(!pass){$("loginMsg").textContent="Enter your password.";return}
+ btn.disabled=true;$("loginMsg").textContent="Logging in…";
+ try{
+  const r=await db.auth.signInWithPassword({email:authEmailFromPhone(phone),password:pass});
+  if(r.error){$("loginMsg").textContent="Login failed: "+(r.error.message||"Invalid mobile number or password.");return}
+  user=r.data.user;await boot(user);
+ }catch(e){$("loginMsg").textContent="Login failed: "+(e?.message||String(e));}
+ finally{btn.disabled=false}
+}
+let realtimeStarted=false;
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&user){loadOrders();loadMonthly();loadProfile();}});
+
+async function boot(u){if(!u){location.href="customer.html";return}user=u;await claimLegacyOrders();await Promise.all([loadOrders(),loadMonthly()]);startRealtimeUpdates()}
+db.auth.getSession().then(r=>{if(r.data.session)boot(r.data.session.user);else location.href="customer.html"});
+db.auth.onAuthStateChange((event,session)=>{if(session&&event!=="INITIAL_SESSION")boot(session);else if(event==="SIGNED_OUT")location.href="customer.html"});
+setInterval(()=>{if(user){loadOrders();loadMonthly()}},10000);</script></body></html>
