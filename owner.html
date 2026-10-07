@@ -345,21 +345,13 @@ async function loadCustomerAccounts(){
   const box=document.getElementById("customerAccountList"),msg=document.getElementById("customerAccountMsg"),countEl=document.getElementById("customerAccountCount");
   if(box)box.innerHTML='<p class="muted">Loading customer accounts...</p>';
   if(msg)msg.textContent="";
-  const [pRes,oRes,mRes]=await Promise.all([
-    db.from("daivik_customer_profiles").select("id,full_name,mobile,email,created_at,updated_at").order("created_at",{ascending:false}),
-    db.from("daivik_car_wash_orders").select("customer_user_id,created_at"),
-    db.from("daivik_monthly_orders").select("customer_user_id,created_at")
-  ]);
+  const pRes=await db.from("daivik_customer_profiles").select("id,full_name,mobile,email,created_at,updated_at").order("created_at",{ascending:false});
   if(pRes.error){
     if(msg)msg.textContent="Customer accounts could not be loaded: "+pRes.error.message;
     return;
   }
-  if(oRes.error||mRes.error){
-    if(msg)msg.textContent="Customer order data could not be loaded.";
-    return;
-  }
   const stats=new Map();
-  [...(oRes.data||[]),...(mRes.data||[])].forEach(o=>{
+  [...orders,...monthlyOrders].forEach(o=>{
     if(!o.customer_user_id)return;
     const s=stats.get(o.customer_user_id)||{count:0,last:null};
     s.count++;
