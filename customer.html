@@ -191,7 +191,8 @@ async function placeOrder(){
  let list=customers(),customer=list.find(c=>c.mobile===mobile);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
  const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
- const cloudSaved=await syncOrderToCloud(order,name,email,mobile);\n if(cloudSaved)sendDaivikBookingAlert({orderId:order.id,name,service:order.service,price:order.price,date:order.date,time:order.time,vehicle:order.vehicle,type:"One-Time"});
+ const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
+ if(cloudSaved)sendDaivikBookingAlert({orderId:order.id,name,service:order.service,price:order.price,date:order.date,time:order.time,vehicle:order.vehicle,type:"One-Time"});
  if(!cloudSaved){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent="We could not save your booking to the server. Please check your internet connection and try again.";return}
  customer.orders.push(order);saveCustomers(list);renderHistory(customer);
  if(pay==="UPI"){showPayment(order);btn.disabled=false;btn.textContent="Booking Saved ✓";return}
@@ -570,7 +571,8 @@ async function placeMonthlyOrder(){
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule,customer_user_id:window.daivikAuthUser?.id});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
- localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));\n sendDaivikBookingAlert({orderId,name,service:pack.name,price:pack.price,date,time,vehicle,type:"Monthly"});
+ localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
+ sendDaivikBookingAlert({orderId,name,service:pack.name,price:pack.price,date,time,vehicle,type:"Monthly"});
  if(pay==="UPI"){showMonthlyPayment(orderId,pack.price,pack,schedule);return}
  monthlySuccess(orderId,pack,schedule);
 }
