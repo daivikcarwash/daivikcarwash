@@ -453,7 +453,13 @@ function exportCSV(){
 }
 function subscribe(){
   channelStarted=true;
-  db.channel("owner-orders").on("postgres_changes",{event:"*",schema:"public",table:"daivik_car_wash_orders"},()=>loadOrders()).subscribe();
+  db.channel("owner-orders").on("postgres_changes",{event:"*",schema:"public",table:"daivik_car_wash_orders"},payload=>{
+    if(payload.eventType==="INSERT"){
+      const o=payload.new||{};
+      alert("🔔 New Customer Order Received!\\n\\nOrder: "+(o.order_id||"New Order")+"\\nCustomer: "+(o.customer_name||"Customer")+"\\nService: "+(o.service||"Car Wash"));
+    }
+    loadOrders();
+  }).subscribe();
 }
 </script>
 </body>
