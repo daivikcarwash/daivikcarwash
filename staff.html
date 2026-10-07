@@ -5,7 +5,7 @@
 <style>
 *{box-sizing:border-box}body{font-family:Poppins,Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{max-width:900px;margin:auto;padding:16px}.card{background:#102b49;border:1px solid #31516f;border-radius:20px;padding:18px;margin-bottom:16px}h1,h2{color:#d4af37;margin:0 0 8px}.muted{color:#aebbd0;font-size:13px}.ok{color:#8ff0b8}.warn{color:#ffe29a}.error{color:#ff8585}.btn{padding:11px 14px;border:0;border-radius:10px;background:#d4af37;color:#fff;font-weight:700;cursor:pointer}.btn:disabled{opacity:.5}.btn.blue{background:#274a68}.btn.green{background:#198754}.btn.red{background:#b63b3b}.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#0b2037;padding:13px;border-radius:12px}.stat b{display:block;font-size:21px;color:#d4af37;margin-top:3px}.job{background:#0b2037;border:1px solid #294863;border-radius:15px;padding:15px;margin:11px 0}.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:#d4af37;font-size:11px}select,input{background:#071629;color:#fff;border:1px solid #31516f;border-radius:10px;padding:11px;width:100%}.staffbox{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.timeline{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.step{font-size:11px;padding:5px 8px;border-radius:20px;background:#173a59;color:#aebbd0}.step.done{background:#185b43;color:#9cf2bd}@media(max-width:650px){.grid{grid-template-columns:1fr 1fr}.staffbox{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
-<div class="card"><h1>📍 Daivik Staff App</h1><p class="muted">Jobs assigned by Owner/Admin will appear here automatically. Staff management is handled from the Owner Dashboard.</p><p id="msg" class="muted" style="margin-top:10px"></p></div>
+<div class="card"><h1>📍 Daivik Staff App</h1><p class="muted">Jobs assigned by Owner/Admin will appear here automatically. Staff management is handled from the Owner Dashboard.</p><p id="msg" class="muted" style="margin-top:10px"></p><div id="staffPicker" style="display:none;margin-top:12px"><select id="staffSelect"><option value="">Select Staff</option></select><button class="btn" style="margin-top:9px" onclick="useSelectedStaff()">Continue as Staff</button></div></div>
 <div class="grid"><div class="stat">My Jobs<b id="activeCount">0</b></div><div class="stat">Payment Pending<b id="pendingCount">0</b></div><div class="stat">Completed<b id="collectedCount">0</b></div></div>
 <div class="card"><h2>📦 My Monthly Visits</h2><p class="muted">Recurring monthly customers assigned by Admin appear here. Accept → Start GPS → Complete Visit.</p><div id="monthlyJobs"><p class="muted">Loading...</p></div></div><div class="card"><h2>🚗 My Assigned Jobs</h2><p class="muted">Accept → Start Service → Complete. GPS becomes live after you start/choose a job.</p><div id="jobs"><p class="muted">Loading...</p></div></div>
 <div class="card"><h2>📡 Live GPS</h2><p id="jobInfo" class="muted">Select a job to start location sharing.</p><p id="gpsStatus" class="muted">GPS not started.</p><p id="coords" class="muted"></p><div class="row"><button class="btn blue" onclick="startGPS()">📍 Start / Resume GPS</button><button class="btn red" onclick="stopGPS()">Stop GPS</button></div></div>
@@ -31,7 +31,14 @@ async function loadStaff(){
  if(requested&&staff.some(s=>s.id===requested))localStorage.setItem(staffKey,requested);
  const saved=staffId();
  const selected=staff.find(s=>s.id===saved);
- if(!saved||!staff.some(s=>s.id===saved)){setMsg("Open the assigned job from Owner Dashboard to load the assigned staff.",true);document.getElementById("jobs").innerHTML='<p class="muted">No staff selected. Owner/Admin assigns staff from the Owner Dashboard.</p>';return}
+ if(!saved||!staff.some(s=>s.id===saved)){
+   const picker=document.getElementById("staffPicker"),sel=document.getElementById("staffSelect");
+   sel.innerHTML='<option value="">Select Staff</option>'+staff.map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+(s.mobile?' • '+esc(s.mobile):'')+'</option>').join("");
+   picker.style.display=staff.length?"block":"none";
+   setMsg(staff.length?"Select your staff name and mobile number to open assigned jobs.":"No active staff found.",true);
+   document.getElementById("jobs").innerHTML='<p class="muted">Select staff above to load assigned jobs.</p>';
+   return
+ }
  await loadJobs();
  if(!jobs.length){
    const {data:assigned}=await db.from("daivik_car_wash_orders").select("assigned_staff_id,created_at").not("assigned_staff_id","is",null).not("status","in","(Completed,Cancelled)").order("created_at",{ascending:false}).limit(1);
@@ -43,6 +50,15 @@ async function loadStaff(){
  }
 }
 
+function useSelectedStaff(){
+ const id=document.getElementById("staffSelect")?.value||"";
+ if(!id)return setMsg("Please select your staff name.",true);
+ localStorage.setItem(staffKey,id);
+ document.getElementById("staffPicker").style.display="none";
+ setMsg("Staff selected ✓");
+ loadJobs();
+ loadMonthlyJobs();
+}
 function currentStaff(){return staff.find(s=>s.id===staffId())||null}
 async function loadMonthlyJobs(){
  const id=staffId(); if(!id){document.getElementById("monthlyJobs").innerHTML='<p class="muted">Select and save staff first.</p>';return}
