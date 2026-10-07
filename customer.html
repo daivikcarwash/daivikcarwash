@@ -111,7 +111,14 @@ bike:{label:"Bike",icon:"🏍️",services:[
 ]}};
 const SUPABASE_URL="https://rgjymvvtrmzhznnreqog.supabase.co";
 const SUPABASE_KEY="sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const DAIVIK_NTFY_TOPIC="daivik-booking-20a898c7803fe44bfb94f3208fc020d4";
+async function sendDaivikBookingAlert({orderId,name,service,price,date,time,vehicle,type="One-Time"}){
+ try{
+  const body="Order ID: "+orderId+"\\nCustomer: "+name+"\\nService: "+service+"\\nVehicle: "+(vehicle||"—")+"\\nAmount: ₹"+price+"\\nDate/Time: "+date+" • "+time+"\\nType: "+type;
+  await fetch("https://ntfy.sh/"+DAIVIK_NTFY_TOPIC,{method:"POST",headers:{"Title":"Daivik Doorstep - New Booking","Priority":"high","Tags":"car,booking"},body});
+ }catch(e){console.warn("ntfy booking alert failed",e)}
+}
+
 let selected=null,selectedVehicleType=null;const $=id=>document.getElementById(id);
 $("date").min=new Date().toISOString().split("T")[0];
 function renderServices(){
@@ -184,7 +191,7 @@ async function placeOrder(){
  let list=customers(),customer=list.find(c=>c.mobile===mobile);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
  const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
- const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
+ const cloudSaved=await syncOrderToCloud(order,name,email,mobile);\n if(cloudSaved)sendDaivikBookingAlert({orderId:order.id,name,service:order.service,price:order.price,date:order.date,time:order.time,vehicle:order.vehicle,type:"One-Time"});
  if(!cloudSaved){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent="We could not save your booking to the server. Please check your internet connection and try again.";return}
  customer.orders.push(order);saveCustomers(list);renderHistory(customer);
  if(pay==="UPI"){showPayment(order);btn.disabled=false;btn.textContent="Booking Saved ✓";return}
@@ -563,7 +570,7 @@ async function placeMonthlyOrder(){
  btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule,customer_user_id:window.daivikAuthUser?.id});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
- localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
+ localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));\n sendDaivikBookingAlert({orderId,name,service:pack.name,price:pack.price,date,time,vehicle,type:"Monthly"});
  if(pay==="UPI"){showMonthlyPayment(orderId,pack.price,pack,schedule);return}
  monthlySuccess(orderId,pack,schedule);
 }
