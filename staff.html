@@ -41,8 +41,9 @@ async function loadStaff(){
  }
  await loadJobs();
  if(!jobs.length){
-   const {data:assigned}=await db.from("daivik_car_wash_orders").select("assigned_staff_id,created_at").not("assigned_staff_id","is",null).not("status","in","(Completed,Cancelled)").order("created_at",{ascending:false}).limit(1);
-   const assignedId=assigned?.[0]?.assigned_staff_id;
+   const {data:assigned}=await db.from("daivik_car_wash_orders").select("order_id,assigned_staff_id,status,created_at").not("assigned_staff_id","is",null).order("created_at",{ascending:false}).limit(20);
+   const active=(assigned||[]).find(o=>o.status!=="Completed"&&o.status!=="Cancelled");
+   const assignedId=active?.assigned_staff_id;
    if(assignedId && staff.some(s=>s.id===assignedId) && assignedId!==saved){
      localStorage.setItem(staffKey,assignedId);
      await loadJobs();
