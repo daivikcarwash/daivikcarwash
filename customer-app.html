@@ -21,7 +21,7 @@
 </section>
 <div id="app" class="hidden">
 <section class="card hero"><h1>Welcome, <span class="gold" id="hello">Customer</span> 👋</h1><p class="muted">Book, manage and track your Daivik doorstep services from one place.</p></section>
-<section class="card"><h2>👤 Profile</h2><div class="grid"><div><label class="muted">Full Name</label><input id="fullName"></div><div><label class="muted">Email</label><input id="profileEmail" type="email" readonly></div><div><label class="muted">Mobile</label><input id="mobile" inputmode="numeric" maxlength="10"></div></div><button class="btn" onclick="saveProfile()">Save Profile</button></section>
+<section class="card"><h2>👤 Profile</h2><div class="grid"><div><label class="muted">Full Name</label><input id="fullName"></div><div><label class="muted">Email</label><input id="profileEmail" type="email" placeholder="Enter your real email address" autocomplete="email"></div><div><label class="muted">Mobile</label><input id="mobile" inputmode="numeric" maxlength="10"></div></div><button class="btn" onclick="saveProfile()">Save Profile</button></section>
 <section class="card"><h2>🚘 My Vehicles</h2><div class="grid"><div><input id="vehicleNo" placeholder="Vehicle number"></div><div><select id="vehicleType"><option value="car">Hatchback / Sedan</option><option value="suv">SUV</option><option value="bike">Bike</option></select></div></div><button class="btn" onclick="addVehicle()">+ Add Vehicle</button><div id="vehicles"></div></section>
 <section class="card"><h2>📍 Saved Addresses</h2><div class="grid"><div><input id="addressLabel" placeholder="Home / Office"></div><div><input id="addressCity" placeholder="City"></div></div><input id="addressText" placeholder="Street / Area / House"><input id="addressPin" inputmode="numeric" maxlength="6" placeholder="6-digit PIN"><button class="btn" onclick="addAddress()">+ Save Address</button><div id="addresses"></div></section>
 <section class="card"><h2>📦 My Recent Orders</h2><p class="muted">Your latest one-time bookings are shown here. Live tracking is available from the order.</p><div id="orders">Loading...</div></section>
@@ -80,11 +80,16 @@ async function loadProfile(){
  }
 }
 async function saveProfile(){
- const n=$("fullName").value.trim(),m=$("mobile").value.trim();
+ const n=$("fullName").value.trim(),m=$("mobile").value.trim(),email=$("profileEmail").value.trim().toLowerCase();
  if(!n||!/^[0-9]{10}$/.test(m)){ $("loginMsg").textContent="Enter your full name and valid 10-digit mobile number."; return; }
- const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email:user.user_metadata?.real_email||null,mobile:m,updated_at:new Date().toISOString()});
- $("hello").textContent=n||String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"")||"Customer";
- $("loginMsg").textContent=r.error?r.error.message:"Profile saved ✓";
+ if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){ $("loginMsg").textContent="Enter a valid real email address."; return; }
+ const authUpdate=await db.auth.updateUser({data:{real_email:email}});
+ if(authUpdate.error){$("loginMsg").textContent="Could not update email: "+authUpdate.error.message;return;}
+ const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email,mobile:m,updated_at:new Date().toISOString()});
+ if(r.error){$("loginMsg").textContent="Profile save failed: "+r.error.message;return;}
+ user=authUpdate.data.user||user;
+ $("hello").textContent=n||String(user.user_metadata?.customer_mobile||"").replace(/^\\+91/,"")||"Customer";
+ $("loginMsg").textContent="Profile saved ✓";
 }
 async function claimLegacyOrders(){
  const phone=String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"");
