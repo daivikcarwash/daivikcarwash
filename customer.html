@@ -34,6 +34,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:13px 0 6px}input,se
 <div id="authSignupFields">
 <label>Full Name</label><input id="authName" type="text" placeholder="Your full name" autocomplete="name">
 <label>Mobile Number</label><input id="authMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+<label>Email Address</label><input id="authRealEmail" type="email" placeholder="Your real email address" autocomplete="email">
 <label>Password</label><input id="authPassword" type="password" placeholder="Create password" autocomplete="new-password">
 <label>Confirm Password</label><input id="authPassword2" type="password" placeholder="Confirm password" autocomplete="new-password">
 <button id="authCreate" class="btn" onclick="createCustomerAccount()">Create Account</button>
@@ -720,14 +721,15 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
  }
  window.showCustomerLogin=showCustomerLogin;window.showCustomerSignup=showCustomerSignup;
  window.createCustomerAccount=async function(){
-   const name=authName(),phone=authMobile(),pass=authPassword(),pass2=String(document.getElementById("authPassword2")?.value||"").trim(),msg=document.getElementById("authMsg"),btn=document.getElementById("authCreate");
+   const name=authName(),phone=authMobile(),realEmail=String(document.getElementById("authRealEmail")?.value||"").trim().toLowerCase(),pass=authPassword(),pass2=String(document.getElementById("authPassword2")?.value||"").trim(),msg=document.getElementById("authMsg"),btn=document.getElementById("authCreate");
    if(!name){msg.textContent="Enter your full name.";return}
    if(!validPhone(phone)){msg.textContent="Enter a valid 10-digit Indian mobile number.";return}
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(realEmail)){msg.textContent="Enter a valid email address.";return}
    if(pass.length<6){msg.textContent="Password must be at least 6 characters.";return}
    if(pass!==pass2){msg.textContent="Passwords do not match.";return}
    btn.disabled=true;msg.textContent="Creating account…";
    try{
-     const r=await db.auth.signUp({email:authEmailFromPhone(phone),password:pass,options:{data:{full_name:name,customer_mobile:phone}}});
+     const r=await db.auth.signUp({email:authEmailFromPhone(phone),password:pass,options:{data:{full_name:name,customer_mobile:phone,real_email:realEmail}}});
      if(r.error){msg.textContent="Account creation failed: "+(r.error.message||"Please try again.");btn.disabled=false;return}
      if(r.data?.session)await db.auth.signOut();
      showCustomerLogin();
@@ -755,14 +757,14 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
      const {data}=await db.from("daivik_customer_profiles").select("full_name,mobile,email").eq("id",u.id).maybeSingle();
      const n=document.getElementById("name"),e=document.getElementById("email"),m=document.getElementById("mobile");
      const phone=String(u.user_metadata?.customer_mobile||"").replace(/^\+91/,"");
-     if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=data.email||"";if(m&&!m.value)m.value=(data.mobile||phone).replace(/^\+91/,"")}
+     if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=u.user_metadata?.real_email||(data.email&&!String(data.email).endsWith("@daivikcarwash.com")?data.email:"")||"";if(m&&!m.value)m.value=(data.mobile||phone).replace(/^\+91/,"")}
      else{
-       await db.from("daivik_customer_profiles").upsert({id:u.id,full_name:u.user_metadata?.full_name||"",email:u.email||null,mobile:u.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
+       await db.from("daivik_customer_profiles").upsert({id:u.id,full_name:u.user_metadata?.full_name||"",email:u.user_metadata?.real_email||null,mobile:u.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
        if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(m&&!m.value)m.value=phone;
      }
      const mn=document.getElementById("mName"),me=document.getElementById("mEmail"),mm=document.getElementById("mMobile");
      if(mn&&!mn.value)mn.value=data?.full_name||u.user_metadata?.full_name||"";
-     if(me&&!me.value)me.value=data?.email||"";
+     if(me&&!me.value)me.value=u.user_metadata?.real_email||(data?.email&&!String(data.email).endsWith("@daivikcarwash.com")?data.email:"")||"";
      if(mm&&!mm.value)mm.value=(data?.mobile||phone).replace(/^\+91/,"");
      const vr=await db.from("daivik_customer_vehicles").select("vehicle_number,vehicle_type").eq("customer_id",u.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
      if(vr.data){const v=document.getElementById("vehicle"),mv=document.getElementById("mVehicle");if(v&&!v.value)v.value=vr.data.vehicle_number||"";if(mv&&!mv.value)mv.value=vr.data.vehicle_number||""}
