@@ -188,9 +188,7 @@ async function placeOrder(){
  if(!name||!/^[0-9]{10}$/.test(mobile)||!vehicle||!date||!streetAddress||!city||!/^[0-9]{6}$/.test(pincode)){$("msg").textContent="Please enter your complete address, city and 6-digit PIN code.";return}
  if(new Date(date+"T23:59:59")<new Date()){$("msg").textContent="Please select today or a future service date.";return}
  const sessionCheck=await db.auth.getSession();const sessionUser=sessionCheck?.data?.session?.user||null;if(!sessionUser||String(sessionUser.user_metadata?.customer_mobile||"")!==window.daivikNormalizePhone(mobile)){window.daivikAuthUser=null;$("msg").textContent="Please login with your mobile number and password before placing the booking.";return}window.daivikAuthUser=sessionUser;
- btn.disabled=true;btn.textContent="Checking service area…";$("msg").textContent="Checking whether your address is within our 25 KM service area…";
- try{await validateServiceArea(streetAddress,city,pincode)}catch(e){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent=e?.message||"We could not verify this address. Please check the address and try again.";return}
- btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
+ btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Submitting your booking. Our team will check the 25 KM service area and confirm or reject the order."; btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.mobile===mobile);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
  const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
@@ -654,9 +652,7 @@ async function placeMonthlyOrder(){
  if(new Date(date+"T23:59:59")<new Date()){$("monthlyMsg").textContent="Please select today or a future date.";return}
  if(!window.daivikAuthUser||String(window.daivikAuthUser.user_metadata?.customer_mobile||"")!==window.daivikNormalizePhone(mobile)){$("monthlyMsg").textContent="Please login with your mobile number and password before placing the monthly booking.";return}
  const schedule=buildMonthlySchedule(date,pack,time),orderId="MON"+Date.now();
- btn.disabled=true;btn.textContent="Checking service area…";$("monthlyMsg").textContent="Checking whether your address is within our 25 KM service area…";
- try{await validateServiceArea(streetAddress,city,pincode)}catch(e){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent=e?.message||"We could not verify this address. Please check the address and try again.";return}
- btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
+ btn.disabled=true;btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Submitting your package order. Our team will check the 25 KM service area and confirm or reject the order."; btn.textContent="Saving Monthly Order…";$("monthlyMsg").textContent="Saving your package order…";
  const {error}=await db.from("daivik_monthly_orders").insert({order_id:orderId,customer_name:name,customer_email:email,customer_mobile:mobile,vehicle,package_name:pack.name,price:pack.price,service_date:date,service_time:time,address,payment_method:pay,payment_status:"Pending",status:"Monthly Order Received",schedule,customer_user_id:window.daivikAuthUser?.id});
  if(error){btn.disabled=false;btn.textContent="Confirm Monthly Package";$("monthlyMsg").textContent="Could not save order: "+error.message;return}
  localStorage.setItem("daivikMonthlyLastOrder",JSON.stringify({orderId,name,email,mobile,vehicle,packageName:pack.name,price:pack.price,schedule,status:"Monthly Order Received"}));
