@@ -293,17 +293,36 @@ async function setPayment(id,payment_status){
 }
 async function setStatus(id,status){
   if(status==="Cannot Serve Today" && !confirm("Confirm: service is not available today for this customer? The customer will see this status in My Orders.")){
-    render();
+    await loadOrders();
     return;
   }
   const now=new Date().toISOString();
   const patch={status,updated_at:now};
   if(status==="Completed")patch.completed_at=now;
   if(status==="Cancelled")patch.cancelled_at=now;
-  const {error}=await db.from("daivik_car_wash_orders").update(patch).eq("order_id",id);
-  if(error){alert("Status update failed: "+error.message);await loadOrders();return}
-  const o=orders.find(x=>x.order_id===id);if(o)o.status=status;render();
-  setMsg(status==="Cannot Serve Today"?"Customer has been notified through their order status ✓":"Order status updated ✓");
+  const {data,error}=await db.from("daivik_car_wash_orders")
+    .update(patch)
+    .eq("order_id",id)
+    .select("order_id,status")
+    .maybeSingle();
+  if(error){
+    alert("Status was not saved: "+error.message);
+    await loadOrders();
+    return;
+  }
+  if(!data){
+    alert("Status was not saved: database returned no updated order. Check owner permissions/RLS and try again.");
+    await loadOrders();
+    return;
+  }
+  if(String(data.status||"")!==status){
+    alert("Status was not saved as selected. Saved status: "+String(data.status||"unknown"));
+    await loadOrders();
+    return;
+  }
+  const o=orders.find(x=>x.order_id===id);if(o)o.status=data.status;
+  render();
+  setMsg("Status saved ✓ Customer will see this status in My Orders after refresh.");
 }
 async function editOrder(id){
   const o=orders.find(x=>x.order_id===id);if(!o)return;
