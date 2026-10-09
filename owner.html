@@ -52,8 +52,9 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 <p class="muted">Owner control centre · Orders · Payments · Status · Reports</p>
 <div class="row">
 <a class="btn homebtn" href="index.html">Main Website</a>
-<input id="pin" type="password" inputmode="numeric" placeholder="Owner PIN" onkeydown="if(event.key==='Enter')login()">
-<button class="btn" onclick="login()">Open Admin</button>
+<input id="ownerEmail" type="email" autocomplete="username" placeholder="Owner/Admin Email" onkeydown="if(event.key==='Enter')login()">
+<input id="ownerPassword" type="password" autocomplete="current-password" placeholder="Owner/Admin Password" onkeydown="if(event.key==='Enter')login()">
+<button class="btn" onclick="login()">Sign In</button>
 </div>
 <p id="msg" class="muted"></p>
 </div>
@@ -153,8 +154,8 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 </div>
 
 <script>
-const OWNER_PIN="7906199445";
 let db=null,orders=[],monthlyOrders=[],ownerStaff=[],channelStarted=false,monthlyChannelStarted=false;
+let ownerAuthUser=null;
 
 async function initDB(){
   if(db)return true;
@@ -172,24 +173,25 @@ async function initDB(){
 }
 function setMsg(t,error=false){const el=document.getElementById("msg");el.textContent=t;el.className="muted "+(error?"error":"ok")}
 async function login(){
-  const pinEl=document.getElementById("pin");
+  const email=(document.getElementById("ownerEmail")?.value||"").trim().toLowerCase();
+  const password=document.getElementById("ownerPassword")?.value||"";
   const appEl=document.getElementById("app");
-  if(!pinEl||!appEl){return}
-  if(pinEl.value!==OWNER_PIN){setMsg("Invalid owner PIN.",true);return}
-  appEl.style.display="block";
-  setMsg("Connecting to Daivik Admin...");
+  if(!email||!password){setMsg("Enter your Supabase Owner/Admin email and password.",true);return}
+  setMsg("Signing in securely with Supabase...");
   try{
-    if(!initDB()){
-      setMsg("Admin opened, but database connection failed. Please refresh and try again.",true);
-      return;
-    }
-    setMsg("Admin connected ✓ Loading orders...");
+    if(!(await initDB()))return;
+    const {data:authData,error:authError}=await db.auth.signInWithPassword({email,password});
+    if(authError||!authData?.user){setMsg("Sign-in failed: "+(authError?.message||"Supabase did not return a user."),true);return}
+    const {data:roleRow,error:roleError}=await db.from("user_roles").select("role").eq("user_id",authData.user.id).maybeSingle();
+    if(roleError){await db.auth.signOut();setMsg("Signed in, but admin role could not be verified: "+roleError.message,true);return}
+    const role=String(roleRow?.role||"").toLowerCase();
+    if(!["admin","owner"].includes(role)){await db.auth.signOut();setMsg("This account is signed in but is not marked admin/owner in user_roles. Ask me to set the correct owner role safely.",true);return}
+    ownerAuthUser=authData.user;
+    appEl.style.display="block";
+    setMsg("Owner authenticated ✓ Loading orders...");
     await Promise.all([loadOrders(),loadMonthlyOrders(),loadOwnerStaff(),loadCustomerAccounts()]);
-    setMsg("Admin ready ✓");
-  }catch(e){
-    console.error(e);
-    setMsg("Admin opened, but data loading failed: "+(e?.message||e),true);
-  }
+    setMsg("Admin ready ✓ Signed in as "+(authData.user.email||email));
+  }catch(e){console.error(e);setMsg("Admin sign-in failed: "+(e?.message||e),true)}
 }
 
 
