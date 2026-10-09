@@ -390,37 +390,70 @@ async function geocodeAddress(streetAddress,city,pincode){
   }catch(e){console.warn("Address lookup attempt failed",e)}
  }
 
- // Try both documented and alternate live API paths; API deployments have used both.
- const pinUrls=[
-  "https://api.pincodeapi.in/api/v1/pincode/"+encodeURIComponent(pin),
-  "https://api.pincodeapi.in/v1/pincode/"+encodeURIComponent(pin)
- ];
- for(const url of pinUrls){
-  try{
-   const res=await fetch(url);
-   if(!res.ok)continue;
-   const data=await res.json();
-   const offices=Array.isArray(data?.data?.post_offices)?data.data.post_offices:
-    Array.isArray(data?.post_offices)?data.post_offices:
-    Array.isArray(data?.data)?data.data:
-    Array.isArray(data?.offices)?data.offices:[];
-   const cityNeedle=cityName.toLowerCase();
-   const compatible=offices.filter(o=>{
-    const officeName=o.office_name||o.officeName||o.officename||"";
-    const district=o.district||o.district_name||"";
-    const state=o.state||o.statename||"";
-    const hay=[officeName,district,state,o.taluk].filter(Boolean).join(" ").toLowerCase();
-    return !cityNeedle||hay.includes(cityNeedle)||cityNeedle.includes(String(district).toLowerCase());
-   });
-   if(offices.length&&compatible.length===0)continue;
-   for(const o of (compatible.length?compatible:offices)){
-    const lat=Number(o.latitude??o.lat),lng=Number(o.longitude??o.lon??o.lng);
-    if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
-    if(distKm(lat,lng)>120)continue;
-    return {lat,lng,label:[o.office_name||o.officeName||o.officename,o.district||o.district_name,o.state||o.statename,pin].filter(Boolean).join(", ")};
+ // India Post PIN lookup is the authoritative fallback for Indian postal areas.
+ // The postal API gives post-office names (not coordinates), so geocode those names with Photon.
+ try{
+  const res=await fetch("https://api.postalpincode.in/pincode/"+encodeURIComponent(pin));
+  if(res.ok){
+   const payload=await res.json();
+   const record=Array.isArray(payload)?payload[0]:payload;
+   const offices=Array.isArray(record?.PostOffice)?record.PostOffice:[];
+   if(offices.length){
+    const cityNeedle=cityName.toLowerCase();
+    const compatible=offices.filter(o=>{
+     const district=String(o.District||"").toLowerCase();
+     const state=String(o.State||"").toLowerCase();
+     const name=String(o.Name||"").toLowerCase();
+     return !cityNeedle||district.includes(cityNeedle)||cityNeedle.includes(district)||name.includes(cityNeedle)||state.includes(cityNeedle);
+    });
+    const candidates=compatible.length?compatible:offices;
+    for(const office of candidates.slice(0,8)){
+     const officeName=String(office.Name||"").trim();
+     const district=String(office.District||"").trim();
+     const state=String(office.State||"").trim();
+     const query=[officeName,district,state,"India"].filter(Boolean).join(", ");
+     try{
+      const geoRes=await fetch("https://photon.komoot.io/api/?limit=5&q="+encodeURIComponent(query));
+      if(!geoRes.ok)continue;
+      const geo=await geoRes.json();
+      const features=Array.isArray(geo.features)?geo.features:[];
+      for(const f of features){
+       const p=f.properties||{},coords=f.geometry&&f.geometry.coordinates;
+       if(!coords||coords.length<2)continue;
+       const lat=Number(coords[1]),lng=Number(coords[0]);
+       if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
+       const hay=[p.name,p.city,p.district,p.county,p.state,p.country].filter(Boolean).join(" ").toLowerCase();
+       if(!hay.includes("india")&&!String(p.country||"").toLowerCase().includes("india"))continue;
+       if(state&&p.state&&!String(p.state).toLowerCase().includes(state)&&!state.includes(String(p.state).toLowerCase()))continue;
+       if(distKm(lat,lng)>120)continue;
+       return {lat,lng,label:[officeName,district,state,pin].filter(Boolean).join(", ")};
+      }
+     }catch(e){console.warn("Post-office geocoding attempt failed",e)}
+    }
    }
-  }catch(e){console.warn("PIN lookup attempt failed",e)}
- }
+  }
+ }catch(e){console.warn("India Post PIN lookup failed",e)}
+
+ // Last fallback: try the entered city + PIN directly without demanding that the map
+ // provider include a postcode tag in its result.
+ try{
+  const res=await fetch("https://photon.komoot.io/api/?limit=10&q="+encodeURIComponent([cityName,"India"].join(", ")));
+  if(res.ok){
+   const data=await res.json();
+   const features=Array.isArray(data.features)?data.features:[];
+   for(const f of features){
+    const p=f.properties||{},coords=f.geometry&&f.geometry.coordinates;
+    if(!coords||coords.length<2)continue;
+    const lat=Number(coords[1]),lng=Number(coords[0]);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
+    const country=String(p.country||"").toLowerCase();
+    const hay=[p.city,p.district,p.county,p.state,p.name].filter(Boolean).join(" ").toLowerCase();
+    if(!country.includes("india")||!hay.includes(cityName.toLowerCase()))continue;
+    if(distKm(lat,lng)>120)continue;
+    return {lat,lng,label:[p.name,p.city||p.district,p.state,p.country,p.postcode||pin].filter(Boolean).join(", ")};
+   }
+  }
+ }catch(e){console.warn("City geocoding fallback failed",e)}
  throw new Error("Customer address could not be located. Please check the street/area, city and 6-digit PIN code. If these are correct, please try again in a moment.");
 }
 async function validateServiceArea(streetAddress,city,pincode){
