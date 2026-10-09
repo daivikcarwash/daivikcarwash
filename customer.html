@@ -549,11 +549,16 @@ function renderCloudHistory(rows){
  $("history").classList.remove("hidden");
  $("orders").innerHTML=rows.map(data=>{
    const monthly=data._type==="Monthly";
+   const status=String(data.status||"").trim();
+   const unavailable=status==="Cannot Serve Today";
+   const statusNote=unavailable
+     ?'<div style="margin-top:9px;padding:10px 12px;border-radius:10px;background:#fff4e5;color:#8a4b08;font-weight:600">⚠️ Our team cannot provide the service today. Please contact Daivik to arrange another suitable time.</div>'
+     :"";
    const cancel=monthly
-     ?(["Monthly Order Received","Confirmed","Active"].includes(String(data.status||"").trim())?'<button class="btn" style="margin-top:8px;background:#b63b3b" data-id="'+esc(data.order_id)+'" onclick="cancelOwnedMonthly(this.dataset.id)">Cancel Package</button>':"")
-     :(customerCanCancel(data)?'<button class="btn" style="margin-top:8px;background:#b63b3b" data-id="'+esc(data.order_id)+'" onclick="cancelOwnedOrder(this.dataset.id)">Cancel Order</button>':"");
-   const track=!monthly&&!["Cancelled","Completed"].includes(String(data.status||""))?'<button class="btn blue" style="margin-top:8px" data-id="'+esc(data.order_id)+'" onclick="quickTrack(this.dataset.id)">Track This Order</button>':"";
-   return '<div class="order"><div style="font-weight:700;color:var(--gold)">'+esc(data.order_id)+' • '+esc(data.status||"")+'</div><div class="muted" style="margin-top:5px">'+esc(data.service||"Monthly Care")+' • ₹'+esc(data.price||"—")+' • '+esc(data.vehicle||"")+'</div><div class="muted" style="margin-top:4px">📅 '+esc(data.service_date||"—")+' • '+esc(data.preferred_time||data.service_time||"")+'</div><div class="muted" style="margin-top:4px">📍 '+esc(data.address||"")+'</div>'+track+cancel+'</div>';
+     ?(["Monthly Order Received","Confirmed","Active"].includes(status)?'<button class="btn" style="margin-top:8px;background:#b63b3b" data-id="'+esc(data.order_id)+'" onclick="cancelOwnedMonthly(this.dataset.id)">Cancel Package</button>':"")
+     :(!unavailable&&customerCanCancel(data)?'<button class="btn" style="margin-top:8px;background:#b63b3b" data-id="'+esc(data.order_id)+'" onclick="cancelOwnedOrder(this.dataset.id)">Cancel Order</button>':"");
+   const track=!monthly&&!unavailable&&!["Cancelled","Completed"].includes(status)?'<button class="btn blue" style="margin-top:8px" data-id="'+esc(data.order_id)+'" onclick="quickTrack(this.dataset.id)">Track This Order</button>':"";
+   return '<div class="order"><div style="font-weight:700;color:var(--gold)">'+esc(data.order_id)+' • '+esc(status)+'</div>'+statusNote+'<div class="muted" style="margin-top:5px">'+esc(data.service||"Monthly Care")+' • ₹'+esc(data.price||"—")+' • '+esc(data.vehicle||"")+'</div><div class="muted" style="margin-top:4px">📅 '+esc(data.service_date||"—")+' • '+esc(data.preferred_time||data.service_time||"")+'</div><div class="muted" style="margin-top:4px">📍 '+esc(data.address||"")+'</div>'+track+cancel+'</div>';
  }).join("")||"<p class='muted'>No active or recent orders.</p>";
 }
 async function quickTrack(id){return openOwnedOrder(id)}
