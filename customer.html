@@ -760,7 +760,7 @@ body.monthly-mode .top{border-bottom-color:rgba(212,175,55,.45)}
      if(data){if(n&&!n.value)n.value=data.full_name||u.user_metadata?.full_name||"";if(e&&!e.value)e.value=u.user_metadata?.real_email||(data.email&&!String(data.email).endsWith("@daivikcarwash.com")?data.email:"")||"";if(m&&!m.value)m.value=(data.mobile||phone).replace(/^\+91/,"")}
      else{
        await db.from("daivik_customer_profiles").upsert({id:u.id,full_name:u.user_metadata?.full_name||"",email:u.user_metadata?.real_email||null,mobile:u.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
-       if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(m&&!m.value)m.value=phone;
+       if(n&&!n.value)n.value=u.user_metadata?.full_name||"";if(e&&!e.value)e.value=u.user_metadata?.real_email||"";if(m&&!m.value)m.value=phone;
      }
      const mn=document.getElementById("mName"),me=document.getElementById("mEmail"),mm=document.getElementById("mMobile");
      if(mn&&!mn.value)mn.value=data?.full_name||u.user_metadata?.full_name||"";
