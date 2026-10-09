@@ -82,13 +82,13 @@ async function loadProfile(){
 async function saveProfile(){
  const n=$("fullName").value.trim(),m=$("mobile").value.trim(),email=$("profileEmail").value.trim().toLowerCase();
  if(!n||!/^[0-9]{10}$/.test(m)){ $("loginMsg").textContent="Enter your full name and valid 10-digit mobile number."; return; }
- if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){ $("loginMsg").textContent="Enter a valid real email address."; return; }
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ $("loginMsg").textContent="Enter a valid real email address."; return; }
  const authUpdate=await db.auth.updateUser({data:{real_email:email}});
  if(authUpdate.error){$("loginMsg").textContent="Could not update email: "+authUpdate.error.message;return;}
  const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email,mobile:m,updated_at:new Date().toISOString()});
  if(r.error){$("loginMsg").textContent="Profile save failed: "+r.error.message;return;}
  user=authUpdate.data.user||user;
- $("hello").textContent=n||String(user.user_metadata?.customer_mobile||"").replace(/^\\+91/,"")||"Customer";
+ $("hello").textContent=n||String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"")||"Customer";
  $("loginMsg").textContent="Profile saved ✓";
 }
 async function claimLegacyOrders(){
