@@ -342,67 +342,86 @@ async function geocodeAddress(streetAddress,city,pincode){
  };
  if(!street||!cityName||!/^[0-9]{6}$/.test(pin))throw new Error("Please enter a complete street/area, city and 6-digit PIN code.");
 
- // First try Photon for the exact address. It accepts free-form addresses and is used only
- // after the customer submits the form, not as an autocomplete service.
- const exactQuery=[street,cityName,pin,"India"].filter(Boolean).join(", ");
- try{
-  const res=await fetch("https://photon.komoot.io/api/?limit=10&q="+encodeURIComponent(exactQuery));
-  if(res.ok){
+ // Try the full address first, then city + PIN. Some geocoders do not return postcode
+ // even when the address is valid, so a missing postcode alone must not reject a match.
+ const queries=[
+  [street,cityName,pin,"India"].filter(Boolean).join(", "),
+  [cityName,pin,"India"].filter(Boolean).join(", "),
+  [street,cityName,"India"].filter(Boolean).join(", ")
+ ];
+ for(const query of queries){
+  try{
+   const res=await fetch("https://photon.komoot.io/api/?limit=10&q="+encodeURIComponent(query));
+   if(!res.ok)continue;
    const data=await res.json();
    const features=Array.isArray(data.features)?data.features:[];
    const wantedCity=cityName.toLowerCase();
+   const streetTokens=street.toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>2);
    const scored=features.map(f=>{
-    const p=f.properties||{},hay=JSON.stringify(p).toLowerCase();
+    const p=f.properties||{};
+    const hay=JSON.stringify(p).toLowerCase();
     const postcode=String(p.postcode||p.postalcode||"");
+    const country=String(p.country||"").toLowerCase();
     let score=0;
     if(postcode===pin)score+=100;
+    else if(postcode&&postcode!==pin)score-=100;
     if(hay.includes(wantedCity))score+=60;
-    const streetTokens=street.toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>2);
-    for(const t of streetTokens)if(hay.includes(t))score+=8;
-    return {f,score};
+    if(country.includes("india"))score+=20;
+    let matchedStreetTokens=0;
+    for(const t of streetTokens)if(hay.includes(t)){score+=8;matchedStreetTokens++;}
+    return {f,score,postcode,matchedStreetTokens,hay};
    }).sort((a,b)=>b.score-a.score);
    for(const item of scored){
     const f=item.f,p=f.properties||{},coords=f.geometry&&f.geometry.coordinates;
     if(!coords||coords.length<2)continue;
     const lat=Number(coords[1]),lng=Number(coords[0]);
     if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
-    const postcode=String(p.postcode||p.postalcode||"");
-    if(postcode&&postcode!==pin)continue;
-    if(item.score<100)continue;
-    const d=distKm(lat,lng);
-    if(d>120)continue;
+    if(item.postcode&&item.postcode!==pin)continue;
+    // Accept exact PIN matches, or a clear city/street match when the map provider
+    // has no postcode tag. Never accept a result that contradicts the supplied PIN.
+    const exactPin=item.postcode===pin;
+    const cityStreetMatch=item.hay.includes(wantedCity)&&item.matchedStreetTokens>0;
+    const cityPinSearch=query===queries[1]&&item.hay.includes(wantedCity);
+    if(!exactPin&&!cityStreetMatch&&!cityPinSearch)continue;
+    if(!String(p.country||"").toLowerCase().includes("india"))continue;
+    if(distKm(lat,lng)>120)continue;
     return {lat,lng,label:[p.name,p.street,p.city||p.district,p.state,p.country,p.postcode].filter(Boolean).join(", ")};
    }
-  }
- }catch(e){console.warn("Exact address lookup failed",e)}
+  }catch(e){console.warn("Address lookup attempt failed",e)}
+ }
 
- // Reliable Indian PIN fallback. This also fixes old saved addresses such as "249403"
- // that were previously placed into the street field.
- try{
-  const res=await fetch("https://api.pincodeapi.in/api/v1/pincode/"+encodeURIComponent(pin));
-  if(res.ok){
+ // Try both documented and alternate live API paths; API deployments have used both.
+ const pinUrls=[
+  "https://api.pincodeapi.in/api/v1/pincode/"+encodeURIComponent(pin),
+  "https://api.pincodeapi.in/v1/pincode/"+encodeURIComponent(pin)
+ ];
+ for(const url of pinUrls){
+  try{
+   const res=await fetch(url);
+   if(!res.ok)continue;
    const data=await res.json();
-   const offices=data&&data.data&&Array.isArray(data.data.post_offices)?data.data.post_offices:[];
+   const offices=Array.isArray(data?.data?.post_offices)?data.data.post_offices:
+    Array.isArray(data?.post_offices)?data.post_offices:
+    Array.isArray(data?.data)?data.data:
+    Array.isArray(data?.offices)?data.offices:[];
    const cityNeedle=cityName.toLowerCase();
    const compatible=offices.filter(o=>{
-    const hay=[o.office_name,o.district,o.state,o.taluk].filter(Boolean).join(" ").toLowerCase();
-    return !cityNeedle||hay.includes(cityNeedle)||cityNeedle.includes(String(o.district||"").toLowerCase());
+    const officeName=o.office_name||o.officeName||o.officename||"";
+    const district=o.district||o.district_name||"";
+    const state=o.state||o.statename||"";
+    const hay=[officeName,district,state,o.taluk].filter(Boolean).join(" ").toLowerCase();
+    return !cityNeedle||hay.includes(cityNeedle)||cityNeedle.includes(String(district).toLowerCase());
    });
-   if(offices.length&&compatible.length===0)throw new Error("City and PIN code do not match. Please check both fields.");
-   const pool=compatible;
-   for(const o of pool){
-    const lat=Number(o.latitude??o.lat),lng=Number(o.longitude??o.lon??o.longitude);
+   if(offices.length&&compatible.length===0)continue;
+   for(const o of (compatible.length?compatible:offices)){
+    const lat=Number(o.latitude??o.lat),lng=Number(o.longitude??o.lon??o.lng);
     if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
-    const d=distKm(lat,lng);
-    if(d>120)continue;
-    return {lat,lng,label:[o.office_name,o.district,o.state,pin].filter(Boolean).join(", ")};
+    if(distKm(lat,lng)>120)continue;
+    return {lat,lng,label:[o.office_name||o.officeName||o.officename,o.district||o.district_name,o.state||o.statename,pin].filter(Boolean).join(", ")};
    }
-  }
- }catch(e){
-  if(e.message&&e.message.includes("City and PIN"))throw e;
-  console.warn("PIN lookup failed",e);
+  }catch(e){console.warn("PIN lookup attempt failed",e)}
  }
- throw new Error("Customer address could not be located. Please check the street/area, city and 6-digit PIN code.");
+ throw new Error("Customer address could not be located. Please check the street/area, city and 6-digit PIN code. If these are correct, please try again in a moment.");
 }
 async function validateServiceArea(streetAddress,city,pincode){
  await loadWashTeamLocation();
