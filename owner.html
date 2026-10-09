@@ -290,33 +290,40 @@ async function setStatus(id,status){
     await loadOrders();
     return;
   }
-  const now=new Date().toISOString();
-  const patch={status,updated_at:now};
-  if(status==="Completed")patch.completed_at=now;
-  if(status==="Cancelled")patch.cancelled_at=now;
-  const {data,error}=await db.from("daivik_car_wash_orders")
-    .update(patch)
-    .eq("order_id",id)
-    .select("order_id,status")
-    .maybeSingle();
-  if(error){
-    alert("Status was not saved: "+error.message);
+  if(!db && !(await initDB())) return;
+  const statusSelect=[...document.querySelectorAll('#orders select[data-id]')].find(el=>el.dataset.id===id && el.getAttribute('onchange')?.includes('setStatus'));
+  if(statusSelect)statusSelect.disabled=true;
+  try{
+    const {data,error}=await db.functions.invoke("owner-update-order-status",{
+      body:{password:OWNER_PIN,order_id:id,status}
+    });
+    if(error){
+      let detail=error.message||"Function request failed";
+      try{
+        if(error.context && typeof error.context.json==="function"){
+          const body=await error.context.json();
+          if(body?.error)detail=body.error;
+        }
+      }catch(_){}
+      alert("Status was not saved: "+detail);
+      await loadOrders();
+      return;
+    }
+    if(!data?.success || data.status!==status){
+      alert("Status was not saved: "+(data?.error||"Server did not confirm the selected status."));
+      await loadOrders();
+      return;
+    }
+    const o=orders.find(x=>x.order_id===id);
+    if(o)o.status=data.status;
+    render();
+    setMsg("Status saved ✓ Customer will see this status in My Orders after refresh.");
+  }catch(e){
+    alert("Status was not saved: "+(e?.message||String(e)));
     await loadOrders();
-    return;
+  }finally{
+    if(statusSelect)statusSelect.disabled=false;
   }
-  if(!data){
-    alert("Status was not saved: database returned no updated order. Check owner permissions/RLS and try again.");
-    await loadOrders();
-    return;
-  }
-  if(String(data.status||"")!==status){
-    alert("Status was not saved as selected. Saved status: "+String(data.status||"unknown"));
-    await loadOrders();
-    return;
-  }
-  const o=orders.find(x=>x.order_id===id);if(o)o.status=data.status;
-  render();
-  setMsg("Status saved ✓ Customer will see this status in My Orders after refresh.");
 }
 async function editOrder(id){
   const o=orders.find(x=>x.order_id===id);if(!o)return;
