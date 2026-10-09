@@ -454,6 +454,30 @@ async function geocodeAddress(streetAddress,city,pincode){
    }
   }
  }catch(e){console.warn("City geocoding fallback failed",e)}
+ // Final public geocoder fallback. Use structured address fields because many Indian
+ // localities are not indexed as full street addresses in Photon.
+ try{
+  const params=new URLSearchParams({
+   format:"jsonv2",addressdetails:"1",limit:"5",countrycodes:"in",
+   street:street,city:cityName,postalcode:pin,country:"India"
+  });
+  const res=await fetch("https://nominatim.openstreetmap.org/search?"+params.toString(),{
+   headers:{"Accept":"application/json"}
+  });
+  if(res.ok){
+   const rows=await res.json();
+   for(const row of (Array.isArray(rows)?rows:[])){
+    const lat=Number(row.lat),lng=Number(row.lon),a=row.address||{};
+    if(!Number.isFinite(lat)||!Number.isFinite(lng))continue;
+    const resultPin=String(a.postcode||"").replace(/\s/g,"");
+    if(resultPin&&resultPin!==pin)continue;
+    const country=String(a.country_code||"").toLowerCase();
+    if(country&&country!=="in")continue;
+    if(distKm(lat,lng)>120)continue;
+    return {lat,lng,label:row.display_name||[street,cityName,pin,"India"].join(", ")};
+   }
+  }
+ }catch(e){console.warn("Structured address lookup failed",e)}
  throw new Error("Customer address could not be located. Please check the street/area, city and 6-digit PIN code. If these are correct, please try again in a moment.");
 }
 async function validateServiceArea(streetAddress,city,pincode){
