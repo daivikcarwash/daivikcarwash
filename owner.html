@@ -442,9 +442,7 @@ async function loadAdminGallery(){
 }
 async function deleteAdminGallery(id,path){
   if(!confirm("Delete this photo/video from Service Gallery?"))return;
-  const pin=prompt("Enter Admin PIN to delete:");
-  if(pin===null)return;
-  if(pin!==OWNER_PIN){alert("Invalid Admin PIN.");return}
+  if(!ownerAuthUser){alert("Please sign in with the Owner/Admin account first.");return}
   const msg=document.getElementById("galleryAdminMsg"); if(msg)msg.textContent="Deleting...";
   try{
     if(path){
