@@ -5,6 +5,7 @@
 <div id="signupFields" class="hidden">
 <label class="muted">Full Name</label><input id="signupName" type="text" placeholder="Your full name" autocomplete="name">
 <label class="muted">Mobile Number</label><input id="signupMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+<label class="muted">Email Address</label><input id="signupEmail" type="email" placeholder="Your real email address" autocomplete="email">
 <label class="muted">Password</label><input id="signupPassword" type="password" placeholder="Create password" autocomplete="new-password">
 <label class="muted">Confirm Password</label><input id="signupPassword2" type="password" placeholder="Confirm password" autocomplete="new-password">
 <button id="signupBtn" class="btn" onclick="signupCustomer()">Create Account</button>
@@ -32,14 +33,15 @@
 function showSignup(){ $("signupFields").classList.remove("hidden");$("loginFields").classList.add("hidden");$("authTitle").textContent="👤 Create Customer Account";$("authDesc").textContent="Name, mobile number aur password set karke account banayein.";$("loginMsg").textContent=""; }
 function showLogin(){ $("signupFields").classList.add("hidden");$("loginFields").classList.remove("hidden");$("authTitle").textContent="👤 Customer Login";$("authDesc").textContent="Apna mobile number aur password dal kar login karein.";$("loginMsg").textContent=""; }
 async function signupCustomer(){
- const name=$("signupName").value.trim(),phone=normalizePhone($("signupMobile").value),pass=$("signupPassword").value,pass2=$("signupPassword2").value,btn=$("signupBtn");
+ const name=$("signupName").value.trim(),phone=normalizePhone($("signupMobile").value),realEmail=$("signupEmail").value.trim().toLowerCase(),pass=$("signupPassword").value,pass2=$("signupPassword2").value,btn=$("signupBtn");
  if(!name){$("loginMsg").textContent="Enter your full name.";return}
  if(!validPhone(phone)){$("loginMsg").textContent="Enter a valid 10-digit Indian mobile number.";return}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(realEmail)){$("loginMsg").textContent="Enter a valid email address.";return}
  if(pass.length<6){$("loginMsg").textContent="Password must be at least 6 characters.";return}
  if(pass!==pass2){$("loginMsg").textContent="Passwords do not match.";return}
  btn.disabled=true;$("loginMsg").textContent="Creating account…";
  try{
-  const r=await db.auth.signUp({email:authEmailFromPhone(phone),password:pass,options:{data:{full_name:name,customer_mobile:phone}}});
+  const r=await db.auth.signUp({email:authEmailFromPhone(phone),password:pass,options:{data:{full_name:name,customer_mobile:phone,real_email:realEmail}}});
   if(r.error){$("loginMsg").textContent="Account creation failed: "+(r.error.message||"Please try again.");return}
   if(r.data?.session)await db.auth.signOut();
   $("loginMobile").value=phone.replace(/^\+91/,"");showLogin();$("loginMsg").textContent="Account created ✓ Ab login karein.";
@@ -67,12 +69,12 @@ async function loadProfile(){
  const phone=String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"");
  if(r.data){
   $("fullName").value=r.data.full_name||user.user_metadata?.full_name||"";
-  $("profileEmail").value=r.data.email||"";
+  $("profileEmail").value=user.user_metadata?.real_email||(r.data.email&&!String(r.data.email).endsWith("@daivikcarwash.com")?r.data.email:"")||"";
   $("mobile").value=(r.data.mobile||phone).replace(/^\+91/,"");
   $("hello").textContent=r.data.full_name||phone||"Customer";
  }else{
-  await db.from("daivik_customer_profiles").upsert({id:user.id,email:user.email||null,full_name:user.user_metadata?.full_name||"Customer",mobile:user.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
-  $("profileEmail").value=user.email||"";
+  await db.from("daivik_customer_profiles").upsert({id:user.id,email:user.user_metadata?.real_email||null,full_name:user.user_metadata?.full_name||"Customer",mobile:user.user_metadata?.customer_mobile||null,updated_at:new Date().toISOString()});
+  $("profileEmail").value=user.user_metadata?.real_email||"";
   $("mobile").value=phone;
   $("hello").textContent=user.user_metadata?.full_name||phone||"Customer";
  }
@@ -80,7 +82,7 @@ async function loadProfile(){
 async function saveProfile(){
  const n=$("fullName").value.trim(),m=$("mobile").value.trim();
  if(!n||!/^[0-9]{10}$/.test(m)){ $("loginMsg").textContent="Enter your full name and valid 10-digit mobile number."; return; }
- const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email:user.email||null,mobile:m,updated_at:new Date().toISOString()});
+ const r=await db.from("daivik_customer_profiles").upsert({id:user.id,full_name:n,email:user.user_metadata?.real_email||null,mobile:m,updated_at:new Date().toISOString()});
  $("hello").textContent=n||String(user.user_metadata?.customer_mobile||"").replace(/^\+91/,"")||"Customer";
  $("loginMsg").textContent=r.error?r.error.message:"Profile saved ✓";
 }
