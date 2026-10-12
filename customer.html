@@ -55,8 +55,8 @@ Already have an account? <button type="button" class="btn blue" style="width:aut
 <h2>1. Choose Vehicle Type</h2>
 <p class="muted">Pricing is shown according to your vehicle. First choose your vehicle type, then select the service.</p>
 <div id="vehicleTypes" class="vehicle-types" style="margin-top:14px">
-  <div class="vehicle-type" data-type="car" onclick="selectVehicleType('car')"><span class="icon">🚗</span><b>Hatchback / Sedan</b><small class="muted" style="display:block;margin-top:4px">Starting ₹149</small></div>
-  <div class="vehicle-type" data-type="suv" onclick="selectVehicleType('suv')"><span class="icon">🚙</span><b>SUV</b><small class="muted" style="display:block;margin-top:4px">Starting ₹199</small></div>
+  <div class="vehicle-type" data-type="car" onclick="selectVehicleType('car')"><span class="icon">🚗</span><b>Hatchback / Sedan</b><small class="muted" style="display:block;margin-top:4px">Starting ₹199</small></div>
+  <div class="vehicle-type" data-type="suv" onclick="selectVehicleType('suv')"><span class="icon">🚙</span><b>SUV</b><small class="muted" style="display:block;margin-top:4px">Starting ₹249</small></div>
   <div class="vehicle-type" data-type="bike" onclick="selectVehicleType('bike')"><span class="icon">🏍️</span><b>Bike</b><small class="muted" style="display:block;margin-top:4px">Starting ₹149</small></div>
 </div>
 <div id="services" class="services" style="margin-top:18px"></div>
@@ -93,18 +93,18 @@ Already have an account? <button type="button" class="btn blue" style="width:aut
 <script>
 const SERVICE_CATALOG={
 car:{label:"Hatchback / Sedan",icon:"🚗",services:[
-{name:"Interior Vacuum & Dashboard Cleaning",desc:"Interior vacuum + dashboard cleaning",price:149,includes:"Interior vacuum • Dashboard cleaning"},
-{name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:249,includes:"Ceramic foam • Body rinse • Tyre/rim cleaning"},
-{name:"Complete Car Wash (Exterior + Interior)",desc:"Complete exterior + interior cleaning",price:399,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
-{name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:649,includes:"Deep interior cleaning • Foam wash • Glass cleaning"},
-{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:749,includes:"Premium wash • Body polish • Tyre shine • Final detailing"}
-]},
-suv:{label:"SUV",icon:"🚙",services:[
 {name:"Interior Vacuum & Dashboard Cleaning",desc:"Interior vacuum + dashboard cleaning",price:199,includes:"Interior vacuum • Dashboard cleaning"},
 {name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:299,includes:"Ceramic foam • Body rinse • Tyre/rim cleaning"},
 {name:"Complete Car Wash (Exterior + Interior)",desc:"Complete exterior + interior cleaning",price:449,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
 {name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:699,includes:"Deep interior cleaning • Foam wash • Glass cleaning"},
 {name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:799,includes:"Premium wash • Body polish • Tyre shine • Final detailing"}
+]},
+suv:{label:"SUV",icon:"🚙",services:[
+{name:"Interior Vacuum & Dashboard Cleaning",desc:"Interior vacuum + dashboard cleaning",price:249,includes:"Interior vacuum • Dashboard cleaning"},
+{name:"Exterior Ceramic Foam Wash",desc:"Paint-safe exterior foam wash",price:349,includes:"Ceramic foam • Body rinse • Tyre/rim cleaning"},
+{name:"Complete Car Wash (Exterior + Interior)",desc:"Complete exterior + interior cleaning",price:549,includes:"Exterior foam • Interior vacuum • Dashboard cleaning"},
+{name:"Deep Cleaning + Foam Wash",desc:"Deep interior + foam wash",price:849,includes:"Deep interior cleaning • Foam wash • Glass cleaning"},
+{name:"Premium Spa + Body Polish",desc:"Premium spa and body polish",price:899,includes:"Premium wash • Body polish • Tyre shine • Final detailing"}
 ]},
 bike:{label:"Bike",icon:"🏍️",services:[
 {name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149,includes:"Ceramic foam • Rinse • Tyre cleaning"},
