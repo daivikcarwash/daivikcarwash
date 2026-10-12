@@ -19,6 +19,9 @@ h2{font:700 24px 'Playfair Display',serif;color:#fff}
 h3{font-weight:700}
 input,select{padding:12px 14px;border-radius:10px;border:1px solid #3c5973;background:#071b2e;color:#fff;font:500 14px 'DM Sans',sans-serif;outline:none}
 input{min-width:230px}
+.pin-wrap{position:relative;display:inline-flex;align-items:center;min-width:230px;flex:0 1 300px}
+.pin-wrap input{width:100%;min-width:0;padding-right:46px}
+.pin-toggle{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#fff;cursor:pointer;font-size:18px;padding:5px;line-height:1}
 input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.10)}
 .btn{padding:11px 17px;border:1px solid transparent;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font:700 14px 'DM Sans',sans-serif;cursor:pointer;transition:.2s;box-shadow:0 7px 18px rgba(0,0,0,.16)}
 .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
@@ -52,7 +55,7 @@ details.admin-section{background:rgba(5,22,38,.58);border:1px solid var(--line);
 <p class="muted">Owner control centre · Orders · Payments · Status · Reports</p>
 <div class="row">
 <a class="btn homebtn" href="index.html">Main Website</a>
-<input id="pin" type="password" inputmode="numeric" placeholder="Owner PIN" onkeydown="if(event.key==='Enter')login()">
+<span class="pin-wrap"><input id="pin" type="password" inputmode="numeric" placeholder="Owner PIN" onkeydown="if(event.key==='Enter')login()"><button type="button" class="pin-toggle" id="pinToggle" aria-label="Show PIN" title="Show PIN" onclick="togglePinVisibility()">👁</button></span>
 <button class="btn" onclick="login()">Open Admin</button>
 </div>
 <p id="msg" class="muted"></p>
@@ -171,6 +174,14 @@ async function initDB(){
   }
 }
 function setMsg(t,error=false){const el=document.getElementById("msg");el.textContent=t;el.className="muted "+(error?"error":"ok")}
+function togglePinVisibility(){
+  const input=document.getElementById("pin"),button=document.getElementById("pinToggle");
+  const show=input.type==="password";
+  input.type=show?"text":"password";
+  button.textContent=show?"🙈":"👁";
+  button.setAttribute("aria-label",show?"Hide PIN":"Show PIN");
+  button.title=show?"Hide PIN":"Show PIN";
+}
 async function login(){
   const pinEl=document.getElementById("pin");
   const appEl=document.getElementById("app");
