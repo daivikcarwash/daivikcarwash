@@ -177,6 +177,20 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
  body{padding-bottom:78px}
 }
 
+
+/* How-it-works card replaces the temporary photo comparison showcase */
+.booking-steps{width:min(1080px,94%);margin:28px auto;padding:28px;border:1px solid rgba(212,175,55,.45);border-radius:20px;background:linear-gradient(135deg,#061426,#0c2945);box-shadow:0 18px 44px rgba(4,17,31,.16);color:#fff;text-align:center}
+.booking-steps h2{color:#f5d66e;text-align:center;padding:0;margin:0 0 8px}
+.steps-intro{color:#d7e0ea;font-size:14px;line-height:1.6;margin:0 auto 22px}
+.steps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;text-align:left}
+.step-card{position:relative;padding:20px 17px;border-radius:14px;border:1px solid rgba(212,175,55,.38);background:rgba(255,255,255,.06)}
+.step-number{position:absolute;top:12px;right:13px;color:#e4c45c;font-size:12px;font-weight:800;letter-spacing:1px}
+.step-icon{font-size:27px;margin-bottom:12px}
+.step-card h3{font-size:16px;color:#f5d66e;margin:0 0 8px}
+.step-card p{font-size:13px;line-height:1.65;color:#d7e0ea;margin:0}
+.steps-book{display:inline-block;margin-top:20px;padding:12px 22px;border-radius:9px;text-decoration:none;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#d4af37,#a98118)}
+@media(max-width:700px){.booking-steps{padding:24px 14px;margin:22px auto;border-radius:15px}.steps-grid{grid-template-columns:1fr;gap:10px}.step-card{padding:16px}.step-icon{display:inline-block;margin:0 10px 0 0;vertical-align:middle}.step-card h3{display:inline-block;vertical-align:middle;margin:0 28px 0 0}.step-card p{margin-top:8px}.steps-book{width:100%}}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#061426"></head>
 <body>
@@ -187,14 +201,15 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
 <div class="hero-actions"><a class="hero-book" href="customer.html">Book Your Car Wash</a><a class="hero-call" href="tel:7906199445">Call Now</a></div>
 </header><nav><a href="#" onclick="openStory();return false;">Why Choose Us</a><a href="#" onclick="openGallery();return false;">Service Gallery</a><a href="app.html">App</a></nav>
 <div id="galleryModal" class="gallery-modal" onclick="if(event.target===this)closeGallery()"><div class="gallery-panel"><div class="gallery-head"><span class="gallery-close" onclick="closeGallery()">×</span><h2>Service Gallery</h2><p>Real service photos and videos from Daivik Doorstep Car Wash.</p></div><div class="gallery-tools"><span id="galleryStatus" class="gallery-status">Gallery is loading…</span><span class="gallery-status">Photos & videos are managed from Admin.</span></div><div id="galleryGrid" class="gallery-grid"></div><div class="gallery-note">Owner upload • Photos/videos are saved in the Daivik gallery database and storage.</div></div></div>
-<section class="before-after-showcase" aria-label="Car care photo showcase">
-<h2>See the Daivik Difference</h2>
-<p class="ba-intro">From a thorough foam wash to a clean, glossy finish — doorstep car care made convenient.</p>
-<div class="ba-grid">
-<div class="ba-card"><span class="ba-label">FOAM WASH</span><img loading="lazy" src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&fm=jpg&q=80&w=1000" alt="Car being cleaned during a professional wash"><div class="ba-caption">Careful exterior cleaning with attention to detail.</div></div>
-<div class="ba-card"><span class="ba-label">GLOSS FINISH</span><img loading="lazy" src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&fm=jpg&q=80&w=1000" alt="Glossy clean car finish"><div class="ba-caption">A clean finish that makes your vehicle look its best.</div></div>
+<section class="booking-steps" aria-label="How doorstep car wash booking works">
+<h2>Car Care, Made Easy</h2>
+<p class="steps-intro">Your car wash, right at your doorstep in Haridwar.</p>
+<div class="steps-grid">
+<div class="step-card"><span class="step-number">01</span><div class="step-icon" aria-hidden="true">🚘</div><h3>Choose Your Service</h3><p>Select a wash or monthly plan that suits your vehicle.</p></div>
+<div class="step-card"><span class="step-number">02</span><div class="step-icon" aria-hidden="true">📲</div><h3>Book in Minutes</h3><p>Place your booking online or contact us directly.</p></div>
+<div class="step-card"><span class="step-number">03</span><div class="step-icon" aria-hidden="true">✨</div><h3>We Come to You</h3><p>Get convenient doorstep car care in your service area.</p></div>
 </div>
-<p class="ba-note">Illustrative car-care photos. Real Daivik before/after photos can replace these as they become available.</p>
+<a class="steps-book" href="customer.html">Book Your Wash</a>
 </section>
 <section id="about" class="box"><h2>About Us</h2><p>Daivik Doorstep Car Wash brings premium car cleaning directly to your home in Haridwar. We offer foam washing, interior vacuuming, dashboard cleaning, tyre shine, polishing and detailing — with fast online booking.<br><br>100% Reliable · Best Price · Professional Team · Home Service</p></section>
 <section id="services" class="box"><h2>Our Services</h2><div class="service-item">Exterior Foam Wash</div><div class="service-item">Interior Vacuum Cleaning</div><div class="service-item">Dashboard Polishing</div><div class="service-item">Alloy Cleaning + Tyre Shine</div><div class="service-item">Deep Interior Cleaning</div><div class="service-item">Full Body Polishing</div></section>
