@@ -155,6 +155,28 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
  section#about,section#services,section#monthly,section#contact,section#reviews{padding:28px 17px;margin:22px auto;border-radius:15px;background-position:center}
 }
 
+
+/* Visual-only additions: before/after showcase and mobile booking bar */
+.before-after-showcase{width:min(1080px,94%);margin:28px auto;padding:26px;border:1px solid rgba(212,175,55,.45);border-radius:20px;background:linear-gradient(135deg,#061426,#0c2945);box-shadow:0 18px 44px rgba(4,17,31,.16);color:#fff}
+.before-after-showcase h2{color:#f5d66e;text-align:center;padding:0;margin:0 0 8px}
+.before-after-showcase .ba-intro{text-align:center;color:#d7e0ea;font-size:14px;line-height:1.6;margin:0 auto 20px;max-width:650px}
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ba-card{position:relative;overflow:hidden;border-radius:13px;border:1px solid rgba(212,175,55,.35);background:#0a1a2c}
+.ba-card img{display:block;width:100%;height:250px;object-fit:cover}
+.ba-label{position:absolute;left:12px;top:12px;padding:7px 11px;border-radius:7px;background:rgba(4,17,31,.88);border:1px solid rgba(212,175,55,.75);color:#f5d66e;font-size:11px;font-weight:800;letter-spacing:.7px}
+.ba-caption{padding:12px 14px;color:#e8edf4;font-size:13px;line-height:1.5}
+.ba-note{margin:14px 0 0;text-align:center;color:#b9c5d3;font-size:11px;line-height:1.5}
+.mobile-booking-bar{display:none}
+@media(max-width:700px){
+ .before-after-showcase{padding:22px 14px;margin:22px auto;border-radius:15px}
+ .ba-grid{gap:9px}.ba-card img{height:155px}.ba-caption{padding:10px;font-size:12px}
+ .mobile-booking-bar{position:fixed;left:10px;right:10px;bottom:10px;z-index:1001;display:grid;grid-template-columns:.8fr .8fr 1.25fr;gap:7px;padding:8px;background:rgba(4,17,31,.97);border:1px solid rgba(212,175,55,.55);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.32);backdrop-filter:blur(12px)}
+ .mobile-booking-bar a{display:flex;align-items:center;justify-content:center;min-height:42px;padding:8px 5px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800;color:#fff;border:1px solid rgba(255,255,255,.2)}
+ .mobile-booking-bar a.book{background:linear-gradient(135deg,#d4af37,#a98118);border-color:#d4af37}
+ .whatsapp{bottom:78px}
+ body{padding-bottom:78px}
+}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#061426"></head>
 <body>
@@ -165,6 +187,15 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
 <div class="hero-actions"><a class="hero-book" href="customer.html">Book Your Car Wash</a><a class="hero-call" href="tel:7906199445">Call Now</a></div>
 </header><nav><a href="#" onclick="openStory();return false;">Why Choose Us</a><a href="#" onclick="openGallery();return false;">Service Gallery</a><a href="app.html">App</a></nav>
 <div id="galleryModal" class="gallery-modal" onclick="if(event.target===this)closeGallery()"><div class="gallery-panel"><div class="gallery-head"><span class="gallery-close" onclick="closeGallery()">×</span><h2>Service Gallery</h2><p>Real service photos and videos from Daivik Doorstep Car Wash.</p></div><div class="gallery-tools"><span id="galleryStatus" class="gallery-status">Gallery is loading…</span><span class="gallery-status">Photos & videos are managed from Admin.</span></div><div id="galleryGrid" class="gallery-grid"></div><div class="gallery-note">Owner upload • Photos/videos are saved in the Daivik gallery database and storage.</div></div></div>
+<section class="before-after-showcase" aria-label="Car care photo showcase">
+<h2>See the Daivik Difference</h2>
+<p class="ba-intro">From a thorough foam wash to a clean, glossy finish — doorstep car care made convenient.</p>
+<div class="ba-grid">
+<div class="ba-card"><span class="ba-label">FOAM WASH</span><img loading="lazy" src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&fm=jpg&q=80&w=1000" alt="Car being cleaned during a professional wash"><div class="ba-caption">Careful exterior cleaning with attention to detail.</div></div>
+<div class="ba-card"><span class="ba-label">GLOSS FINISH</span><img loading="lazy" src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&fm=jpg&q=80&w=1000" alt="Glossy clean car finish"><div class="ba-caption">A clean finish that makes your vehicle look its best.</div></div>
+</div>
+<p class="ba-note">Illustrative car-care photos. Real Daivik before/after photos can replace these as they become available.</p>
+</section>
 <section id="about" class="box"><h2>About Us</h2><p>Daivik Doorstep Car Wash brings premium car cleaning directly to your home in Haridwar. We offer foam washing, interior vacuuming, dashboard cleaning, tyre shine, polishing and detailing — with fast online booking.<br><br>100% Reliable · Best Price · Professional Team · Home Service</p></section>
 <section id="services" class="box"><h2>Our Services</h2><div class="service-item">Exterior Foam Wash</div><div class="service-item">Interior Vacuum Cleaning</div><div class="service-item">Dashboard Polishing</div><div class="service-item">Alloy Cleaning + Tyre Shine</div><div class="service-item">Deep Interior Cleaning</div><div class="service-item">Full Body Polishing</div></section>
 <section id="monthly" class="box">
@@ -192,6 +223,8 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
 <footer>© 2026 Daivik Doorstep Car Wash • Haridwar • Premium Car Cleaning at Your Doorstep</footer>
 <div class="footer-logo" aria-label="Daivik Doorstep Car Wash logo"><img src="images/dlogo.jpeg" alt="Daivik Doorstep Car Wash" onclick="handleSecretLogoClick()" title="Daivik Doorstep Car Wash"></div>
 <a class="whatsapp" href="https://wa.me/7906199445">WA</a>
+<div class="mobile-booking-bar" aria-label="Quick booking actions"><a href="tel:7906199445">Call</a><a href="https://wa.me/7906199445" target="_blank" rel="noopener">WhatsApp</a><a class="book" href="customer.html">Book Now</a></div>
+
 <div id="logoPopup" class="logo-popup"><span class="close-btn" onclick="closeLogo()">×</span><img src="images/dlogo.jpeg" alt="Logo"></div>
 <script>
 let secretLogoClicks=0,secretLogoTimer=null;function handleSecretLogoClick(){secretLogoClicks++;clearTimeout(secretLogoTimer);if(secretLogoClicks>=5){secretLogoClicks=0;window.location.href="owner.html";return}secretLogoTimer=setTimeout(()=>{secretLogoClicks=0},2200)}
