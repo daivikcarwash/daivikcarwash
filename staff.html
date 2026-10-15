@@ -3,7 +3,7 @@
 <title>Daivik Staff App</title><meta name="theme-color" content="#071629">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{font-family:Poppins,Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{max-width:900px;margin:auto;padding:16px}.card{background:#102b49;border:1px solid #31516f;border-radius:20px;padding:18px;margin-bottom:16px}h1,h2{color:#d4af37;margin:0 0 8px}.muted{color:#aebbd0;font-size:13px}.ok{color:#8ff0b8}.warn{color:#ffe29a}.error{color:#ff8585}.btn{padding:11px 14px;border:0;border-radius:10px;background:#d4af37;color:#fff;font-weight:700;cursor:pointer}.btn:disabled{opacity:.5}.btn.blue{background:#274a68}.btn.green{background:#198754}.btn.red{background:#b63b3b}.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#0b2037;padding:13px;border-radius:12px}.stat b{display:block;font-size:21px;color:#d4af37;margin-top:3px}.job{background:#0b2037;border:1px solid #294863;border-radius:15px;padding:15px;margin:11px 0}.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:#d4af37;font-size:11px}select,input{background:#071629;color:#fff;border:1px solid #31516f;border-radius:10px;padding:11px;width:100%}.staffbox{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.timeline{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.step{font-size:11px;padding:5px 8px;border-radius:20px;background:#173a59;color:#aebbd0}.step.done{background:#185b43;color:#9cf2bd}@media(max-width:650px){.grid{grid-template-columns:1fr 1fr}.staffbox{grid-template-columns:1fr}}
+*{box-sizing:border-box}body{font-family:Poppins,Arial,sans-serif;background:#071629;color:#fff;margin:0}.wrap{max-width:900px;margin:auto;padding:16px}.card{background:#102b49;border:1px solid #31516f;border-radius:20px;padding:18px;margin-bottom:16px}h1,h2{color:#d4af37;margin:0 0 8px}.muted{color:#aebbd0;font-size:13px}.ok{color:#8ff0b8}.warn{color:#ffe29a}.error{color:#ff8585}.btn{padding:11px 14px;border:0;border-radius:10px;background:#d4af37;color:#fff;font-weight:700;cursor:pointer}.btn:disabled{opacity:.5}.btn.blue{background:#274a68}.btn.green{background:#198754}.btn.red{background:#b63b3b}.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#0b2037;padding:13px;border-radius:12px}.stat b{display:block;font-size:21px;color:#d4af37;margin-top:3px}.job{background:#0b2037;border:1px solid #294863;border-radius:15px;padding:15px;margin:11px 0}.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:rgba(212,175,55,.15);color:#d4af37;font-size:11px}select,input{background:#071629;color:#fff;border:1px solid #31516f;border-radius:10px;padding:11px;width:100%}.staffbox{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.timeline{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.step{font-size:11px;padding:5px 8px;border-radius:20px;background:#173a59;color:#aebbd0}.step.done{background:#185b43;color:#9cf2bd}.checklist{margin-top:12px;padding:12px;border:1px solid #294863;border-radius:12px;background:#081c30}.checklist h4{margin:0 0 8px;color:#d4af37}.checkrow{display:flex;align-items:flex-start;gap:9px;margin:9px 0;color:#dbe6f5;font-size:13px;line-height:1.4}.checkrow input{width:18px;height:18px;flex:0 0 18px;margin:0;accent-color:#198754}.checkprogress{font-size:12px;color:#aebbd0;margin-top:8px}.checkdone{color:#8ff0b8}@media(max-width:650px){.grid{grid-template-columns:1fr 1fr}.staffbox{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <div class="card"><h1>📍 Daivik Staff App</h1><p class="muted">Jobs assigned by Owner/Admin will appear here automatically. Staff management is handled from the Owner Dashboard.</p><p id="msg" class="muted" style="margin-top:10px"></p><div id="staffPicker" style="display:none;margin-top:12px"><select id="staffSelect"><option value="">Select Staff</option></select><button class="btn" style="margin-top:9px" onclick="useSelectedStaff()">Continue as Staff</button></div></div>
 <div class="grid"><div class="stat">My Jobs<b id="activeCount">0</b></div><div class="stat">Payment Pending<b id="pendingCount">0</b></div><div class="stat">Completed<b id="collectedCount">0</b></div></div>
@@ -61,6 +61,38 @@ function useSelectedStaff(){
  loadMonthlyJobs();
 }
 function currentStaff(){return staff.find(s=>s.id===staffId())||null}
+function checklistItems(packageName){
+ const p=String(packageName||"").toLowerCase();
+ const interior=["Vacuum seats, mats and accessible carpets","Brush accessible interior corners and crevices","Wipe dashboard and door panels with suitable cloth","Clean interior glass and mirrors"];
+ const exterior=["Rinse loose dirt and apply car shampoo/foam","Wash body gently with clean wash mitt","Clean wheels and tyre sidewalls with separate tools","Rinse thoroughly and dry body with clean microfiber","Clean exterior glass and mirrors"];
+ const final=["Check vehicle condition and note existing damage","Final quality check with customer"];
+ if(p.includes("premium")||p.includes("spa")||p.includes("wax"))return [...exterior,"Apply a thin layer of carnauba wax to clean, cool, dry paint","Buff wax as directed; keep wax off glass, pedals and tyre tread",...interior.slice(0,3),"Apply tyre dressing to sidewalls only",...final];
+ if(p.includes("deep"))return [...exterior,...interior,"Detail accessible vents, cup holders and door pockets","Vacuum seat seams and accessible gaps",...final];
+ if(p.includes("complete"))return [...exterior,...interior,...final];
+ if(p.includes("interior")||p.includes("refresh")||p.includes("vacuum"))return [...interior.slice(0,3),"Check mats and footwells are free of loose dust",...final];
+ return [...exterior,...final];
+}
+function checklistKey(kind,id){return "daivikStaffChecklist:"+staffId()+":"+kind+":"+id}
+function checklistState(kind,id){try{return JSON.parse(localStorage.getItem(checklistKey(kind,id))||"[]")}catch(e){return []}}
+function renderServiceChecklist(kind,id,packageName){
+ const items=checklistItems(packageName),done=checklistState(kind,id);
+ return '<div class="checklist" data-check-kind="'+kind+'" data-check-job="'+esc(id)+'" data-package="'+esc(packageName||"")+'"><h4>☑ Service Checklist</h4>'+items.map((label,i)=>'<label class="checkrow"><input type="checkbox" data-kind="'+kind+'" data-job="'+esc(id)+'" data-idx="'+i+'" '+(done.includes(i)?'checked':'')+' onchange="toggleChecklist(this)"><span>'+esc(label)+'</span></label>').join("")+'<div class="checkprogress '+(done.length===items.length?'checkdone':'')+'">'+done.length+' / '+items.length+' completed'+(done.length===items.length?' ✓ Ready to complete':' — complete all items before finishing')+'</div></div>';
+}
+function toggleChecklist(input){
+ const kind=input.dataset.kind,id=input.dataset.job,idx=Number(input.dataset.idx);
+ let done=checklistState(kind,id).filter(n=>n!==idx);if(input.checked)done.push(idx);
+ localStorage.setItem(checklistKey(kind,id),JSON.stringify(done));
+ const card=input.closest(".job"),all=card?.querySelectorAll(".checkrow input")||[],count=Array.from(all).filter(x=>x.checked).length,progress=card?.querySelector(".checkprogress");
+ if(progress){progress.textContent=count+" / "+all.length+" completed"+(count===all.length?" ✓ Ready to complete":" — complete all items before finishing");progress.className="checkprogress "+(count===all.length?"checkdone":"")}
+ const complete=card?.querySelector(".complete-job-btn");if(complete)complete.disabled=count!==all.length;
+}
+function checklistComplete(kind,id,packageName){
+ const box=document.querySelector('.checklist[data-check-kind="'+kind+'"][data-check-job="'+CSS.escape(id)+'"]');
+ const name=packageName||box?.dataset.package||"";
+ const total=checklistItems(name).length,done=checklistState(kind,id);
+ if(done.length<total){alert("Service checklist abhi complete nahi hai. Pehle har item tick karo.");return false}
+ return true;
+}
 async function loadMonthlyJobs(){
  const id=staffId(); if(!id){document.getElementById("monthlyJobs").innerHTML='<p class="muted">Select and save staff first.</p>';return}
  const {data,error}=await db.from("daivik_monthly_orders").select("*").eq("assigned_staff_id",id).not("status","in","(Closed,Cancelled,Completed)").order("service_date");
@@ -68,11 +100,12 @@ async function loadMonthlyJobs(){
  const rows=data||[];
  document.getElementById("monthlyJobs").innerHTML=rows.length?rows.map(o=>{
    const running=["Confirmed","On the Way","Running","Monthly Order Received"].includes(o.status);
-   return '<div class="job"><h3 style="margin:0 0 7px">'+esc(o.order_id)+' <span class="tag">MONTHLY</span></h3><div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">'+esc(o.package_name)+' • ₹'+esc(o.price)+'</div><div class="muted" style="margin-top:5px">📅 '+esc(o.service_date)+' • '+esc(o.service_time||'')+'</div><div class="muted" style="margin-top:5px">📍 '+esc(o.address)+'</div><div class="row" style="margin-top:12px"><button class="btn" data-id="'+esc(o.order_id)+'" onclick="startMonthlyVisit(this.dataset.id)">▶ Start Visit / GPS</button><button class="btn green" data-id="'+esc(o.order_id)+'" onclick="completeMonthlyVisit(this.dataset.id)">✓ Visit Completed</button><button class="btn blue" data-id="'+esc(o.order_id)+'" onclick="openMonthlyMaps(this.dataset.id)">🗺️ Route</button></div></div>';
+   return '<div class="job"><h3 style="margin:0 0 7px">'+esc(o.order_id)+' <span class="tag">MONTHLY</span></h3><div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">'+esc(o.package_name)+' • ₹'+esc(o.price)+'</div><div class="muted" style="margin-top:5px">📅 '+esc(o.service_date)+' • '+esc(o.service_time||'')+'</div><div class="muted" style="margin-top:5px">📍 '+esc(o.address)+'</div>'+renderServiceChecklist("monthly",o.order_id,o.package_name)+'<div class="row" style="margin-top:12px"><button class="btn" data-id="'+esc(o.order_id)+'" onclick="startMonthlyVisit(this.dataset.id)">▶ Start Visit / GPS</button><button class="btn green complete-job-btn" data-id="'+esc(o.order_id)+'" onclick="completeMonthlyVisit(this.dataset.id)">✓ Visit Completed</button><button class="btn blue" data-id="'+esc(o.order_id)+'" onclick="openMonthlyMaps(this.dataset.id)">🗺️ Route</button></div></div>';
  }).join(""):'<p class="muted">No active monthly visits assigned.</p>';
 }
 async function startMonthlyVisit(id){currentJobId=id;currentJobType="monthly";document.getElementById("jobInfo").textContent=id+" • Monthly visit GPS active";document.getElementById("gpsStatus").textContent="Starting GPS for monthly visit…";startGPS();}
 async function completeMonthlyVisit(id){
+ if(!checklistComplete('monthly',id))return;
  if(!confirm("Complete this monthly visit for "+id+"?"))return;
  stopGPS();
  const {data,error}=await db.rpc("daivik_complete_monthly_visit",{p_order_id:id});
@@ -111,13 +144,13 @@ function renderJobs(){
   return '<div class="job"><h3 style="margin:0 0 7px">'+esc(o.order_id)+' <span class="tag">'+esc(o.status)+'</span></h3>'+
   '<div>'+esc(o.customer_name)+' • '+esc(o.customer_mobile)+'</div><div class="muted" style="margin-top:5px">👤 Assigned Staff: '+esc((staff.find(s=>s.id===o.assigned_staff_id)?.name)||"Unassigned")+(staff.find(s=>s.id===o.assigned_staff_id)?.mobile?' • '+esc(staff.find(s=>s.id===o.assigned_staff_id).mobile):'')+'</div><div class="muted" style="margin-top:5px">'+esc(o.vehicle)+' • '+esc(o.service)+'</div>'+
   '<div class="muted" style="margin-top:5px">📅 '+esc(o.service_date)+' • '+esc(o.preferred_time||"")+'</div><div class="muted" style="margin-top:5px">📍 '+esc(o.address)+'</div>'+
-  '<div style="margin-top:9px"><b>₹'+esc(o.price)+'</b> • '+(collected?'<span class="ok">Payment Collected ✓</span>':'<span class="warn">Payment Pending</span>')+'</div>'+timeline(o)+
+  '<div style="margin-top:9px"><b>₹'+esc(o.price)+'</b> • '+(collected?'<span class="ok">Payment Collected ✓</span>':'<span class="warn">Payment Pending</span>')+'</div>'+timeline(o)+renderServiceChecklist("one-time",o.order_id,o.service)+
   '<div class="row" style="margin-top:12px">'+
   (accept?'<button class="btn" data-id="'+esc(o.order_id)+'" onclick="acceptJob(this.dataset.id)">✓ Accept Job</button>':'<button class="btn blue" disabled>✓ Accepted</button>')+
   (canStart?'<button class="btn green" data-id="'+esc(o.order_id)+'" onclick="startService(this.dataset.id)">▶ Start Service</button>':'')+
   (running?'<button class="btn blue" data-id="'+esc(o.order_id)+'" onclick="selectJob(this.dataset.id)">📍 GPS</button>':'')+
   (!collected?'<button class="btn green" data-id="'+esc(o.order_id)+'" onclick="collectPayment(this.dataset.id)">💰 Collect Payment</button>':'')+
-  (running?'<button class="btn" data-id="'+esc(o.order_id)+'" onclick="completeJob(this.dataset.id)">✓ Complete</button>':'')+
+  (running?'<button class="btn complete-job-btn" data-id="'+esc(o.order_id)+'" onclick="completeJob(this.dataset.id)" '+(checklistState("one-time",o.order_id).length<checklistItems(o.service).length?'disabled':'')+'>✓ Complete</button>':'')+
   '<button class="btn blue" data-id="'+esc(o.order_id)+'" onclick="openMaps(this.dataset.id)">🗺️ Route</button></div></div>'
  }).join("");
 }
@@ -127,7 +160,7 @@ async function updateOrder(id,patch){
 }
 async function acceptJob(id){currentJobType="one-time";const d=await updateOrder(id,{accepted_at:new Date().toISOString(),status:"Confirmed"});if(d){currentJobId=id;renderJobs();setMsg("Job accepted ✓");startGPS()}}
 async function startService(id){currentJobType="one-time";const d=await updateOrder(id,{status:"On the Way",started_at:new Date().toISOString()});if(d){currentJobId=id;document.getElementById("jobInfo").textContent=id+" • GPS active for this job";renderJobs();startGPS();setMsg("Service started. Customer can now see live movement ✓")}}
-async function completeJob(id){if(!confirm("Service completed for "+id+"?"))return;const d=await updateOrder(id,{status:"Completed",completed_at:new Date().toISOString()});if(d){if(currentJobId===id){stopGPS();currentJobId="";currentJobType="one-time"}await loadJobs();setMsg("Job completed ✓")}}
+async function completeJob(id){const o=jobs.find(x=>x.order_id===id);if(!checklistComplete('one-time',id,o?.service))return;if(!confirm("Service completed for "+id+"?"))return;const d=await updateOrder(id,{status:"Completed",completed_at:new Date().toISOString()});if(d){if(currentJobId===id){stopGPS();currentJobId="";currentJobType="one-time"}await loadJobs();setMsg("Job completed ✓")}}
 async function collectPayment(id){const o=jobs.find(x=>x.order_id===id);if(!o||o.payment_status==="Collected")return;if(!confirm("Confirm you actually received ₹"+o.price+" for "+id+"?"))return;const d=await updateOrder(id,{payment_status:"Collected"});if(d){await loadJobs();setMsg("Payment marked collected ✓")}}
 function selectJob(id){currentJobType="one-time";currentJobId=id;const o=jobs.find(x=>x.order_id===id);if(o)document.getElementById("jobInfo").textContent=o.order_id+" • "+o.customer_name+" • "+o.address;startGPS()}
 function startGPS(){if(!currentJobId){alert("Pehle job select/accept karo.");return}if(!navigator.geolocation){document.getElementById("gpsStatus").textContent="GPS is not supported.";return}document.getElementById("gpsStatus").textContent="Requesting GPS…";if(watch)navigator.geolocation.clearWatch(watch);watch=navigator.geolocation.watchPosition(sendPosition,e=>{document.getElementById("gpsStatus").textContent="GPS error: "+e.message},{enableHighAccuracy:true,maximumAge:5000,timeout:15000})}
