@@ -191,6 +191,28 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
 .steps-book{display:inline-block;margin-top:20px;padding:12px 22px;border-radius:9px;text-decoration:none;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#d4af37,#a98118)}
 @media(max-width:700px){.booking-steps{padding:24px 14px;margin:22px auto;border-radius:15px}.steps-grid{grid-template-columns:1fr;gap:10px}.step-card{padding:16px}.step-icon{display:inline-block;margin:0 10px 0 0;vertical-align:middle}.step-card h3{display:inline-block;vertical-align:middle;margin:0 28px 0 0}.step-card p{margin-top:8px}.steps-book{width:100%}}
 
+
+/* One-time service packages — scoped additions only */
+#one-time-packages .one-time-intro{color:#d7e0ea;line-height:1.7;margin:0 0 18px}
+#one-time-packages .one-time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+#one-time-packages .one-time-card{background:rgba(255,255,255,.055);border:1px solid rgba(212,175,55,.35);border-radius:15px;padding:18px;display:flex;flex-direction:column;min-width:0}
+#one-time-packages .one-time-card.featured{border-color:#e7c85f;box-shadow:0 10px 28px rgba(212,175,55,.12)}
+#one-time-packages .one-time-card h3{color:#f5d66e!important;font-family:'Playfair Display',serif;font-size:21px;margin:0 0 7px}
+#one-time-packages .one-time-card .ot-desc{color:#d7e0ea;font-size:13px;line-height:1.6;margin:0 0 12px}
+#one-time-packages .ot-prices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 13px}
+#one-time-packages .ot-price{padding:10px;background:#fff9df;color:#172235;border-radius:9px;font-size:12px}
+#one-time-packages .ot-price b{display:block;font-size:20px;color:#071a31;margin-top:3px}
+#one-time-packages .ot-list{list-style:none;padding:0;margin:0 0 14px}
+#one-time-packages .ot-list li{color:#e4ebf3;font-size:12px;line-height:1.55;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+#one-time-packages .ot-list li:before{content:"✓";color:#f5d66e;font-weight:900;margin-right:8px}
+#one-time-packages .ot-excludes{color:#b9c5d3;font-size:11px;line-height:1.6;margin-top:auto;padding-top:9px}
+#one-time-packages .ot-time{font-size:11px;color:#f5d66e;margin:10px 0}
+#one-time-packages .ot-book{display:block;text-align:center;text-decoration:none;background:linear-gradient(135deg,#d4af37,#a98118);color:#fff;padding:11px 12px;border-radius:9px;font-weight:800;font-size:13px;margin-top:10px}
+#one-time-packages .ot-utility{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+#one-time-packages .ot-utility div{border:1px solid rgba(212,175,55,.28);border-radius:10px;padding:12px;color:#d7e0ea;font-size:11px;line-height:1.6}
+#one-time-packages .ot-utility b{display:block;color:#f5d66e;font-size:12px;margin-bottom:4px}
+@media(max-width:700px){#one-time-packages .one-time-grid{grid-template-columns:1fr}#one-time-packages .one-time-card{padding:16px}#one-time-packages .ot-utility{grid-template-columns:1fr}}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#061426"></head>
 <body>
@@ -213,6 +235,45 @@ footer{background:#04111f!important;color:#e8edf4!important;border-top:1px solid
 </section>
 <section id="about" class="box"><h2>About Us</h2><p>Daivik Doorstep Car Wash brings premium car cleaning directly to your home in Haridwar. We offer foam washing, interior vacuuming, dashboard cleaning, tyre shine, polishing and detailing — with fast online booking.<br><br>100% Reliable · Best Price · Professional Team · Home Service</p></section>
 <section id="services" class="box"><h2>Our Services</h2><div class="service-item">Exterior Foam Wash</div><div class="service-item">Interior Vacuum Cleaning</div><div class="service-item">Dashboard Polishing</div><div class="service-item">Alloy Cleaning + Tyre Shine</div><div class="service-item">Deep Interior Cleaning</div><div class="service-item">Full Body Polishing</div></section>
+
+<section id="one-time-packages" class="box">
+<h2>One-Time Car Wash Packages</h2>
+<p class="one-time-intro">Choose a one-time doorstep service for your vehicle. All prices are shown clearly for Hatchback / Sedan and SUV. Select Book This Service to continue through the existing customer login and booking process.</p>
+<div class="one-time-grid">
+<article class="one-time-card">
+<h3>Interior Refresh</h3><p class="ot-desc">A quick refresh to keep your cabin neat, fresh and comfortable.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹199</b></div><div class="ot-price">SUV<b>₹249</b></div></div>
+<ul class="ot-list"><li>Vacuum seats, mats and carpet</li><li>Clean footwell and floor area</li><li>Dust dashboard and door panels</li><li>Brush interior corners and accessible gaps</li></ul>
+<p class="ot-excludes">Not included: exterior wash, wet seat shampooing, deep stain removal or roof-liner cleaning.</p><p class="ot-time">Estimated time: 20–30 minutes</p><a class="ot-book" href="customer.html">Book This Service</a>
+</article>
+<article class="one-time-card">
+<h3>Exterior Foam Wash</h3><p class="ot-desc">A thorough exterior wash for a cleaner, brighter-looking vehicle.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹299</b></div><div class="ot-price">SUV<b>₹349</b></div></div>
+<ul class="ot-list"><li>Car shampoo / foam wash</li><li>Rinse and microfiber drying</li><li>Basic wheel and tyre-sidewall cleaning</li><li>Clean exterior glass and mirrors</li><li>Number plate and exterior trim wipe</li></ul>
+<p class="ot-excludes">Not included: interior vacuuming, wax application, machine polishing or scratch repair.</p><p class="ot-time">Estimated time: 25–40 minutes</p><a class="ot-book" href="customer.html">Book This Service</a>
+</article>
+<article class="one-time-card featured">
+<h3>Complete Car Wash</h3><p class="ot-desc">A balanced inside-and-out clean for regular vehicle maintenance.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹449</b></div><div class="ot-price">SUV<b>₹549</b></div></div>
+<ul class="ot-list"><li>Exterior wash and microfiber drying</li><li>Interior vacuum for seats, mats and floor</li><li>Dashboard and door-panel cleaning</li><li>Interior and exterior glass cleaning</li><li>Basic tyre-sidewall cleaning</li><li>Final visual inspection</li></ul>
+<p class="ot-excludes">Not included: deep stain removal, wet seat extraction, waxing or machine polishing.</p><p class="ot-time">Estimated time: 40–55 minutes</p><a class="ot-book" href="customer.html">Book This Service</a>
+</article>
+<article class="one-time-card">
+<h3>Deep Cleaning + Foam Wash</h3><p class="ot-desc">Extra attention to interior corners and frequently touched areas, plus an exterior foam wash.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹699</b></div><div class="ot-price">SUV<b>₹849</b></div></div>
+<ul class="ot-list"><li>Everything in Complete Car Wash</li><li>Brush clean vents and accessible crevices</li><li>Clean door pockets and cup holders</li><li>Vacuum seat seams and gaps</li><li>Extra attention to mats and footwells</li><li>Detailed accessible-surface cleaning</li></ul>
+<p class="ot-excludes">Not included: wet extraction / seat shampooing, roof-liner cleaning or guaranteed removal of stubborn stains.</p><p class="ot-time">Estimated time: 60–90 minutes</p><a class="ot-book" href="customer.html">Book This Service</a>
+</article>
+<article class="one-time-card">
+<h3>Premium Spa + Body Wax</h3><p class="ot-desc">A premium finish with wax protection and buffing on clean, dry exterior paint.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹799</b></div><div class="ot-price">SUV<b>₹899</b></div></div>
+<ul class="ot-list"><li>Complete exterior wash and basic interior clean</li><li>Carnauba body-wax application</li><li>Wax buffing for a glossy finish</li><li>Tyre-sidewall dressing</li><li>Dashboard and interior touch-up</li><li>Final quality inspection</li></ul>
+<p class="ot-excludes">Not included: machine polishing, scratch repair, ceramic coating or paint correction.</p><p class="ot-time">Estimated time: 60–90 minutes</p><a class="ot-book" href="customer.html">Book This Service</a>
+</article>
+</div>
+<div class="ot-utility"><div><b>Water Required</b>Customer to provide approximately 3–4 buckets (about 30–40 litres) of water.</div><div><b>Electricity Required</b>A suitable nearby power connection; a normal 5A socket only if compatible with the equipment used.</div><div><b>Important Notes</b>Prices cover normal dirt levels. Heavy dirt or special requirements may cost extra with prior approval. Doorstep service is subject to area and slot availability.</div></div>
+</section>
+
 <section id="monthly" class="box">
 <h2>Monthly Car Wash Packages</h2><p>Regular doorstep car care with simple monthly plans. Choose by vehicle size and how often you want the service.</p>
 <div class="package-grid">
