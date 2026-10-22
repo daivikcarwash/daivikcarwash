@@ -228,6 +228,16 @@ section#one-time-packages .one-time-card .ot-excludes{color:#c4d0dc!important}
 #one-time-packages .ot-utility div{border:1px solid rgba(212,175,55,.28);border-radius:10px;padding:12px;color:#d7e0ea;font-size:11px;line-height:1.6}
 #one-time-packages .ot-utility b{display:block;color:#f5d66e;font-size:12px;margin-bottom:4px}
 @media(max-width:700px){#one-time-packages .one-time-grid{grid-template-columns:1fr}#one-time-packages .one-time-card{padding:16px}#one-time-packages .ot-utility{grid-template-columns:1fr}}
+/* Add-ons intentionally reuse the same premium navy/gold card system as one-time packages. */
+#addons-pricing .addon-grid{margin-top:20px}
+#addons-pricing .one-time-card{min-height:100%;background:linear-gradient(145deg,#0a2038,#061426)!important}
+#addons-pricing .one-time-card h3{color:#f5d66e!important}
+#addons-pricing .one-time-card .ot-desc,#addons-pricing .one-time-card .ot-list li{color:#e4ebf3!important}
+#addons-pricing .one-time-card .ot-excludes{color:#c4d0dc!important}
+#addons-pricing .addon-note{margin-top:18px;padding:13px 15px;border:1px solid rgba(212,175,55,.28);border-radius:10px;background:rgba(255,255,255,.04)}
+#addons-pricing .addon-main-book{max-width:320px;margin:18px auto 0}
+@media(max-width:700px){#addons-pricing .addon-grid{grid-template-columns:1fr}#addons-pricing .one-time-card{padding:16px}}
+
 
 </style>
 <link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#061426"></head>
@@ -293,20 +303,47 @@ section#one-time-packages .one-time-card .ot-excludes{color:#c4d0dc!important}
 
 <section id="addons-pricing" class="box">
 <h2>Optional Add-on Services</h2>
-<p>Enhance any one-time wash with optional Wavex car-care extras. Add-on prices are charged in addition to your selected wash package.</p>
-<div class="package-grid">
-<div class="package-card"><div class="package-head"><span>Wavex Glass Cleaning</span><small>All Cars</small></div><div class="package"><div><b>Extra glass cleaning</b><span>₹79</span></div><p>Additional streak-free cleaning for suitable glass surfaces.</p></div></div>
-<div class="package-card"><div class="package-head"><span>Wavex Dashboard Protectant</span><small>All Cars</small></div><div class="package"><div><b>Dashboard care</b><span>₹99</span></div><p>Care and finish for suitable interior dashboard surfaces.</p></div></div>
-<div class="package-card"><div class="package-head"><span>Wavex Tyre Shine</span><small>All Cars</small></div><div class="package"><div><b>Tyre-sidewall finish</b><span>₹99</span></div><p>Clean, dark finish for tyre sidewalls.</p></div></div>
-<div class="package-card"><div class="package-head"><span>Wavex Spray Wax / Paint Gloss</span><small>By Vehicle Size</small></div>
-<div class="package"><div><b>Hatchback / Sedan</b><span>₹199</span></div><div><b>Mid-Size SUV</b><span>₹249</span></div><div><b>Large SUV</b><span>₹299</span></div><p>Extra exterior gloss. Result depends on paint condition and product instructions.</p></div></div>
-<div class="package-card"><div class="package-head"><span>Extra Interior Vacuuming</span><small>By Vehicle Size</small></div>
-<div class="package"><div><b>Hatchback / Sedan</b><span>₹149</span></div><div><b>Mid-Size SUV</b><span>₹199</span></div><div><b>Large SUV</b><span>₹249</span></div><p>Extra vacuuming of seats, mats and accessible corners.</p></div></div>
-<div class="package-card"><div class="package-head"><span>Wavex Exterior Trim Dressing</span><small>By Vehicle Size</small></div>
-<div class="package"><div><b>Hatchback / Sedan</b><span>₹149</span></div><div><b>Mid-Size SUV</b><span>₹199</span></div><div><b>Large SUV</b><span>₹249</span></div><p>Refresh suitable exterior plastic trim.</p></div></div>
+<p class="one-time-intro">Give your wash an extra premium finish with optional add-on services. Choose only what you need; add-on prices are charged in addition to your selected wash package.</p>
+<div class="one-time-grid addon-grid">
+<article class="one-time-card">
+<h3>Wavex Glass Cleaning</h3><p class="ot-desc">An extra glass-cleaning touch for a clearer, streak-free finish.</p>
+<div class="ot-prices"><div class="ot-price">All Cars<b>₹79</b></div></div>
+<ul class="ot-list"><li>Additional glass cleaning</li><li>Suitable interior or exterior glass surfaces</li></ul>
+<a class="ot-book" href="customer.html">Add to My Booking</a>
+</article>
+<article class="one-time-card">
+<h3>Wavex Dashboard Protectant</h3><p class="ot-desc">A neat, cared-for finish for suitable interior dashboard surfaces.</p>
+<div class="ot-prices"><div class="ot-price">All Cars<b>₹99</b></div></div>
+<ul class="ot-list"><li>Dashboard surface care</li><li>Applied according to product instructions</li></ul>
+<a class="ot-book" href="customer.html">Add to My Booking</a>
+</article>
+<article class="one-time-card">
+<h3>Wavex Tyre Shine</h3><p class="ot-desc">A clean, dark finish for tyre sidewalls.</p>
+<div class="ot-prices"><div class="ot-price">All Cars<b>₹99</b></div></div>
+<ul class="ot-list"><li>Tyre-sidewall finish</li><li>Helps complete the clean exterior look</li></ul>
+<a class="ot-book" href="customer.html">Add to My Booking</a>
+</article>
+<article class="one-time-card featured">
+<h3>Wavex Spray Wax / Paint Gloss</h3><p class="ot-desc">An extra gloss boost for clean exterior paint. Results depend on paint condition.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹199</b></div><div class="ot-price">Mid-Size SUV<b>₹249</b></div><div class="ot-price">Large SUV<b>₹299</b></div></div>
+<ul class="ot-list"><li>Spray-wax gloss finish</li><li>Applied to suitable clean paintwork</li></ul>
+<a class="ot-book" href="customer.html">Add to My Booking</a>
+</article>
+<article class="one-time-card">
+<h3>Extra Interior Vacuuming</h3><p class="ot-desc">Extra attention for seats, mats and accessible interior corners.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹149</b></div><div class="ot-price">Mid-Size SUV<b>₹199</b></div><div class="ot-price">Large SUV<b>₹249</b></div></div>
+<ul class="ot-list"><li>Additional vacuuming pass</li><li>Seats, mats and accessible corners</li></ul>
+<a class="ot-book" href="customer.html">Add to My Booking</a>
+</article>
+<article class="one-time-card">
+<h3>Wavex Exterior Trim Dressing</h3><p class="ot-desc">Refresh the appearance of suitable exterior plastic trim.</p>
+<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹149</b></div><div class="ot-price">Mid-Size SUV<b>₹199</b></div><div class="ot-price">Large SUV<b>₹249</b></div></div>
+<ul class="ot-list"><li>Exterior plastic trim care</li><li>Used on suitable trim surfaces only</li></ul>
+<a class="ot-book" href="customer.html">Add to My Booking</a>
+</article>
 </div>
-<p class="package-note">Add-ons are optional and are not included in the base package price. Final add-on selection and total are shown during booking. Suggested service prices; Wavex product names and availability may vary by stock.</p>
-<a class="btn" href="customer.html">Book a Wash + Add-ons</a>
+<p class="ot-excludes addon-note">Add-ons are optional and are not included in the base package price. Select them during booking to see your final total. Wavex product names and availability may vary by stock.</p>
+<a class="ot-book addon-main-book" href="customer.html">Book a Wash + Add-ons</a>
 
 
 <section id="monthly" class="box">
