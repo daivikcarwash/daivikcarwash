@@ -313,6 +313,27 @@ section#monthly .daily-features span{font-size:12px!important}
  section#monthly .daily-package{padding:18px 14px!important}
 }
 
+
+/* Add-on prices are the action: clickable cream price tiles, styled exactly like One-Time */
+#addons-pricing .ot-prices{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch}
+#addons-pricing .ot-price.addon-price-link{
+ display:block;text-decoration:none!important;cursor:pointer;
+ background:#fff9df!important;color:#172235!important;
+ border:1px solid rgba(212,175,55,.35);border-radius:9px;
+ padding:10px!important;font-size:12px!important;line-height:1.35!important;
+ transition:transform .18s,box-shadow .18s,background .18s;
+}
+#addons-pricing .ot-price.addon-price-link:hover,
+#addons-pricing .ot-price.addon-price-link:focus-visible{
+ transform:translateY(-2px);box-shadow:0 7px 18px rgba(212,175,55,.2);
+ background:#fff2b8!important;outline:2px solid #e7c85f;outline-offset:1px;
+}
+#addons-pricing .ot-price.addon-price-link b{display:block!important;color:#071a31!important;font-size:20px!important;line-height:1.2!important;margin-top:4px!important}
+#addons-pricing .ot-price.addon-price-link:after{content:"Tap to book";display:block;font-size:10px;font-weight:700;color:#80651a;margin-top:5px}
+#addons-pricing .one-time-card .ot-list{list-style:none!important}
+#addons-pricing .one-time-card .ot-list li:before{content:"✓"!important;color:#f5d66e!important;font-weight:900;margin-right:8px}
+@media(max-width:700px){#addons-pricing .ot-price.addon-price-link{padding:10px!important}#addons-pricing .ot-price.addon-price-link b{font-size:20px!important}}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#061426"></head>
 <body>
@@ -381,43 +402,43 @@ section#monthly .daily-features span{font-size:12px!important}
 <div class="one-time-grid addon-grid">
 <article class="one-time-card">
 <h3>Wavex Glass Cleaning</h3><p class="ot-desc">An extra glass-cleaning touch for a clearer, streak-free finish.</p>
-<div class="ot-prices"><div class="ot-price">All Cars<b>₹79</b></div></div>
+<div class="ot-prices"><a class="ot-price addon-price-link" href="customer.html">All Cars<b>₹79</b></a></div>
 <ul class="ot-list"><li>Additional glass cleaning</li><li>Suitable interior or exterior glass surfaces</li></ul>
-<a class="ot-book" href="customer.html">Add to My Booking</a>
+
 </article>
 <article class="one-time-card">
 <h3>Wavex Dashboard Protectant</h3><p class="ot-desc">A neat, cared-for finish for suitable interior dashboard surfaces.</p>
-<div class="ot-prices"><div class="ot-price">All Cars<b>₹99</b></div></div>
+<div class="ot-prices"><a class="ot-price addon-price-link" href="customer.html">All Cars<b>₹99</b></a></div>
 <ul class="ot-list"><li>Dashboard surface care</li><li>Applied according to product instructions</li></ul>
-<a class="ot-book" href="customer.html">Add to My Booking</a>
+
 </article>
 <article class="one-time-card">
 <h3>Wavex Tyre Shine</h3><p class="ot-desc">A clean, dark finish for tyre sidewalls.</p>
-<div class="ot-prices"><div class="ot-price">All Cars<b>₹99</b></div></div>
+<div class="ot-prices"><a class="ot-price addon-price-link" href="customer.html">All Cars<b>₹99</b></a></div>
 <ul class="ot-list"><li>Tyre-sidewall finish</li><li>Helps complete the clean exterior look</li></ul>
-<a class="ot-book" href="customer.html">Add to My Booking</a>
+
 </article>
 <article class="one-time-card featured">
 <h3>Wavex Spray Wax / Paint Gloss</h3><p class="ot-desc">An extra gloss boost for clean exterior paint. Results depend on paint condition.</p>
-<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹199</b></div><div class="ot-price">Mid-Size SUV<b>₹249</b></div><div class="ot-price">Large SUV<b>₹299</b></div></div>
+<div class="ot-prices"><a class="ot-price addon-price-link" href="customer.html">Hatchback / Sedan<b>₹199</b></a><a class="ot-price addon-price-link" href="customer.html">Mid-Size SUV<b>₹249</b></a><a class="ot-price addon-price-link" href="customer.html">Large SUV<b>₹299</b></a></div>
 <ul class="ot-list"><li>Spray-wax gloss finish</li><li>Applied to suitable clean paintwork</li></ul>
-<a class="ot-book" href="customer.html">Add to My Booking</a>
+
 </article>
 <article class="one-time-card">
 <h3>Extra Interior Vacuuming</h3><p class="ot-desc">Extra attention for seats, mats and accessible interior corners.</p>
-<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹149</b></div><div class="ot-price">Mid-Size SUV<b>₹199</b></div><div class="ot-price">Large SUV<b>₹249</b></div></div>
+<div class="ot-prices"><a class="ot-price addon-price-link" href="customer.html">Hatchback / Sedan<b>₹149</b></a><a class="ot-price addon-price-link" href="customer.html">Mid-Size SUV<b>₹199</b></a><a class="ot-price addon-price-link" href="customer.html">Large SUV<b>₹249</b></a></div>
 <ul class="ot-list"><li>Additional vacuuming pass</li><li>Seats, mats and accessible corners</li></ul>
-<a class="ot-book" href="customer.html">Add to My Booking</a>
+
 </article>
 <article class="one-time-card">
 <h3>Wavex Exterior Trim Dressing</h3><p class="ot-desc">Refresh the appearance of suitable exterior plastic trim.</p>
-<div class="ot-prices"><div class="ot-price">Hatchback / Sedan<b>₹149</b></div><div class="ot-price">Mid-Size SUV<b>₹199</b></div><div class="ot-price">Large SUV<b>₹249</b></div></div>
+<div class="ot-prices"><a class="ot-price addon-price-link" href="customer.html">Hatchback / Sedan<b>₹149</b></a><a class="ot-price addon-price-link" href="customer.html">Mid-Size SUV<b>₹199</b></a><a class="ot-price addon-price-link" href="customer.html">Large SUV<b>₹249</b></a></div>
 <ul class="ot-list"><li>Exterior plastic trim care</li><li>Used on suitable trim surfaces only</li></ul>
-<a class="ot-book" href="customer.html">Add to My Booking</a>
+
 </article>
 </div>
 <p class="ot-excludes addon-note">Add-ons are optional and are not included in the base package price. Select them during booking to see your final total. Wavex product names and availability may vary by stock.</p>
-<a class="ot-book addon-main-book" href="customer.html">Book a Wash + Add-ons</a>
+
 
 
 <section id="monthly" class="box">
