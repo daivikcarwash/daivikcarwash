@@ -62,6 +62,7 @@ Already have an account? <button type="button" class="btn blue" style="width:aut
   <div class="vehicle-type" data-type="bike" onclick="selectVehicleType('bike')"><span class="icon">🏍️</span><b>Bike</b><small class="muted" style="display:block;margin-top:4px">Starting ₹149</small></div>
 </div>
 <div id="services" class="services" style="margin-top:18px"></div>
+<div id="addonsWrap" class="hidden" style="margin-top:22px"><div class="service-title"><b>✨ Add-on Services (Optional)</b><span>Select extra services</span></div><p class="muted" style="margin-bottom:12px">Extra services are optional. Selected add-ons will be added to your bill.</p><div id="addons" class="services"></div></div>
 <div id="serviceHint" class="note">Select a vehicle type to see its services and exact prices.</div>
 </section>
 
@@ -126,6 +127,41 @@ bike:{label:"Bike",icon:"🏍️",services:[
 {name:"Normal Bike Ceramic Wash",desc:"Standard bike ceramic wash",price:149,includes:"Ceramic foam • Rinse • Tyre cleaning"},
 {name:"Premium Bike Ceramic Wash",desc:"Premium bike ceramic wash",price:199,includes:"Premium foam • Deep clean • Tyre shine • Finish"}
 ]}};
+const ADDON_CATALOG=[
+{id:"glass",name:"Wavex Glass Cleaning",desc:"Extra streak-free glass cleaning",price:{all:79},includes:"Glass surfaces"},
+{id:"dashboard",name:"Wavex Dashboard Protectant",desc:"Interior dashboard care and finish",price:{all:99},includes:"Suitable dashboard surfaces"},
+{id:"tyre",name:"Wavex Tyre Shine",desc:"Clean, dark tyre finish",price:{all:99},includes:"Tyre sidewalls"},
+{id:"wax",name:"Wavex Spray Wax / Paint Gloss",desc:"Extra exterior gloss; product-dependent finish",price:{hatchback:199,sedan:199,midsuv:249,largesuv:299},includes:"Exterior paint"},
+{id:"vacuum",name:"Extra Interior Vacuuming",desc:"Extra vacuuming of accessible interior areas",price:{hatchback:149,sedan:149,midsuv:199,largesuv:249},includes:"Seats, mats and accessible corners"},
+{id:"trim",name:"Wavex Exterior Trim Dressing",desc:"Refresh suitable exterior plastic trim",price:{hatchback:149,sedan:149,midsuv:199,largesuv:249},includes:"Suitable exterior plastic trim"}
+];
+let selectedAddons=[];
+function addonPrice(a,type){return a.price.all??a.price[type]??a.price.all??0}
+function renderAddons(){
+ const wrap=$("addonsWrap"),el=$("addons");if(!wrap||!el)return;
+ if(!selectedVehicleType||selectedVehicleType==="bike"){wrap.classList.add("hidden");selectedAddons=[];return}
+ wrap.classList.remove("hidden");
+ el.innerHTML=ADDON_CATALOG.map(a=>{const price=addonPrice(a,selectedVehicleType),checked=selectedAddons.includes(a.id);
+ return '<div class="service '+(checked?'selected':'')+'" style="display:flex;gap:10px;align-items:flex-start" onclick="toggleAddon(\''+a.id+'\')"><input type="checkbox" '+(checked?'checked':'')+' style="width:18px;min-width:18px;margin-top:3px;accent-color:var(--gold);pointer-events:none"><div><h3>'+a.name+'</h3><p>'+a.desc+'</p><p style="color:#dfe8f5">✓ '+a.includes+'</p><div class="price">₹'+price+'</div></div></div>';
+ }).join("");
+}
+function getAddonTotal(){return ADDON_CATALOG.filter(a=>selectedAddons.includes(a.id)).reduce((sum,a)=>sum+addonPrice(a,selectedVehicleType),0)}
+function updateBookingSummary(){
+ const box=$("bookingSummary");if(!box)return;
+ if(!selected){box.innerHTML="Choose a service to see the final amount.";return}
+ const addonTotal=getAddonTotal(),total=selected.price+addonTotal;
+ const addonNames=ADDON_CATALOG.filter(a=>selectedAddons.includes(a.id)).map(a=>a.name);
+ box.innerHTML="<b>Selected:</b> "+selected.vehicleTypeLabel+" — "+selected.name+
+ (addonNames.length?"<div style='margin-top:8px'><b>Add-ons:</b> "+addonNames.join(", ")+" <span style='color:var(--gold)'>+₹"+addonTotal+"</span></div>":"")+
+ "<div style='margin-top:8px;border-top:1px solid var(--border);padding-top:9px'><b>Total payable</b><strong style='float:right;color:var(--gold);font-size:20px'>₹"+total+"</strong></div>";
+}
+function toggleAddon(id){
+ if(!selected)return;
+ selectedAddons=selectedAddons.includes(id)?selectedAddons.filter(x=>x!==id):[...selectedAddons,id];
+ renderAddons();updateBookingSummary();
+ $("msg").textContent="Add-ons updated • Total ₹"+(selected.price+getAddonTotal());
+}
+
 const SUPABASE_URL="https://rgjymvvtrmzhznnreqog.supabase.co";
 const SUPABASE_KEY="sb_publishable_va_23GihM7LMOg7J5Lsjng_TQAUGCzY";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const DAIVIK_NTFY_TOPIC="daivik-booking-20a898c7803fe44bfb94f3208fc020d4";
@@ -146,20 +182,20 @@ function renderServices(){
  group.services.map((s,i)=>'<div class="service" data-service-index="'+i+'" onclick="selectService('+i+')"><h3>'+s.name+'</h3><p>'+s.desc+'</p><p style="color:#dfe8f5">✓ '+s.includes+'</p><div class="price">₹'+s.price+'</div></div>').join("");
 }
 function selectVehicleType(type){
- selectedVehicleType=type;selected=null;
+ selectedVehicleType=type;selected=null;selectedAddons=[];renderAddons();
  document.querySelectorAll(".vehicle-type").forEach(x=>x.classList.toggle("selected",x.dataset.type===type));
  renderServices();
  const g=SERVICE_CATALOG[type];
- $("serviceHint").textContent=g.label+" selected • Choose the service below.";
+ $("serviceHint").textContent=g.label+" selected • Choose the service below, then optional add-ons.";
  $("bookingSummary").innerHTML="Choose a service to see the final amount.";
 }
 function selectService(i){
  if(!selectedVehicleType)return;
  const s=SERVICE_CATALOG[selectedVehicleType].services[i];
  selected={...s,vehicleType:selectedVehicleType,vehicleTypeLabel:SERVICE_CATALOG[selectedVehicleType].label};
- document.querySelectorAll(".service").forEach((x,n)=>x.classList.toggle("selected",n===i));
- $("msg").textContent=selected.name+" selected • ₹"+selected.price;
- $("bookingSummary").innerHTML="<b>Selected:</b> "+selected.vehicleTypeLabel+" — "+selected.name+" <strong style='float:right;color:var(--gold);font-size:18px'>₹"+selected.price+"</strong>";
+ document.querySelectorAll("#services .service").forEach((x,n)=>x.classList.toggle("selected",n===i));
+ renderAddons();updateBookingSummary();
+ $("msg").textContent=selected.name+" selected • ₹"+(selected.price+getAddonTotal());
 }
 async function loadSavedCustomer(){
  const email=$("email").value.trim().toLowerCase();
@@ -207,7 +243,7 @@ async function placeOrder(){
  btn.disabled=true;btn.textContent="Saving Booking…";$("msg").textContent="Submitting your booking. Our team will check the 25 KM service area and confirm or reject the order."; btn.textContent="Saving Booking…";$("msg").textContent="Creating your order securely…";
  let list=customers(),customer=list.find(c=>c.mobile===mobile);
  if(!customer){customer={id:"CUS"+Date.now(),name,email,mobile,address,orders:[]};list.push(customer)}else{customer.name=name;customer.mobile=mobile;customer.address=address}
- const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel,price:selected.price,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
+ const addonNames=ADDON_CATALOG.filter(a=>selectedAddons.includes(a.id)).map(a=>a.name);const finalPrice=selected.price+getAddonTotal();const order={id:"ORD"+Date.now(),service:selected.name+" — "+selected.vehicleTypeLabel+(addonNames.length?" + Add-ons: "+addonNames.join(", "):""),price:finalPrice,date,time:$("time").value,vehicle,address,payment:pay,status:"Booking Received",created:new Date().toISOString()};
  const cloudSaved=await syncOrderToCloud(order,name,email,mobile);
  if(cloudSaved)sendDaivikBookingAlert({orderId:order.id,name,service:order.service,price:order.price,date:order.date,time:order.time,vehicle:order.vehicle,type:"One-Time"});
  if(!cloudSaved){btn.disabled=false;btn.textContent="Place My Booking";$("msg").textContent="We could not save your booking to the server. Please check your internet connection and try again.";return}
