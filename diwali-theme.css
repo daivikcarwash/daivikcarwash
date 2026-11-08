@@ -1,0 +1,61 @@
+/* DDS Diwali visual theme — presentation only; no application logic changed */
+:root{
+  --diwali-gold:#e8bd4b;
+  --diwali-gold-soft:rgba(232,189,75,.22);
+  --diwali-glow:rgba(255,190,70,.16);
+}
+html{scroll-behavior:smooth}
+body{
+  background-color:#061425 !important;
+  background-image:
+    radial-gradient(ellipse at 12% 0%,rgba(218,154,48,.13),transparent 30%),
+    radial-gradient(ellipse at 92% 92%,rgba(184,89,35,.10),transparent 34%),
+    linear-gradient(135deg,#04101f 0%,#0a2037 54%,#061425 100%) !important;
+}
+html::before{
+  content:"";
+  position:fixed;
+  z-index:9998;
+  pointer-events:none;
+  top:0;left:0;right:0;height:17px;
+  background:
+    radial-gradient(circle at 9px 8px,#ffe7a0 0 3px,rgba(232,189,75,.62) 4px,transparent 7px)
+    0 0/52px 17px repeat-x;
+  border-top:2px solid rgba(232,189,75,.38);
+  filter:drop-shadow(0 2px 7px rgba(255,183,65,.5));
+  opacity:.9;
+}
+body::after{
+  content:"🪔";
+  position:fixed;
+  z-index:9997;
+  pointer-events:none;
+  right:13px;bottom:10px;
+  font-size:27px;line-height:1;
+  filter:drop-shadow(0 0 9px rgba(255,180,52,.8));
+  opacity:.9;
+}
+header,.top,.navbar,.nav,.site-header{
+  border-bottom-color:rgba(232,189,75,.42) !important;
+  box-shadow:0 5px 24px rgba(0,0,0,.16),0 1px 0 rgba(232,189,75,.10);
+}
+.card,.panel,.job,.stat,.item,.box,.section-card{
+  border-color:rgba(232,189,75,.24) !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 18px rgba(232,189,75,.035);
+}
+h1,h2,.brand,.gold,.eyebrow{
+  text-shadow:0 0 16px rgba(232,189,75,.16);
+}
+button:not(.red):not(.danger):not(.secondary):not(.blue),
+.btn:not(.red):not(.danger):not(.secondary):not(.blue),
+a.button:not(.red):not(.danger){
+  border-color:rgba(255,226,150,.55) !important;
+  box-shadow:0 5px 16px rgba(210,151,42,.18);
+}
+a:not(.btn):not(.button):hover{
+  text-decoration-color:rgba(232,189,75,.65);
+}
+@media(prefers-reduced-motion:no-preference){
+  html::before{animation:diwaliTwinkle 3.8s ease-in-out infinite alternate}
+  @keyframes diwaliTwinkle{from{opacity:.62}to{opacity:1}}
+}
