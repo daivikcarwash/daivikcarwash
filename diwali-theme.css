@@ -1,61 +1,126 @@
-/* DDS Diwali visual theme — presentation only; no application logic changed */
+/* DDS Premium Diwali — visual layer only. App logic and functionality remain untouched. */
 :root{
-  --diwali-gold:#e8bd4b;
-  --diwali-gold-soft:rgba(232,189,75,.22);
-  --diwali-glow:rgba(255,190,70,.16);
+  --diwali-gold:#e8c46a;
+  --diwali-gold-deep:#a97824;
+  --diwali-ink:#071525;
+  --diwali-cream:#fffaf0;
 }
 html{scroll-behavior:smooth}
 body{
-  background-color:#061425 !important;
+  background-color:#f5f1e8 !important;
   background-image:
-    radial-gradient(ellipse at 12% 0%,rgba(218,154,48,.13),transparent 30%),
-    radial-gradient(ellipse at 92% 92%,rgba(184,89,35,.10),transparent 34%),
-    linear-gradient(135deg,#04101f 0%,#0a2037 54%,#061425 100%) !important;
+    radial-gradient(ellipse at 8% 7%,rgba(220,170,76,.13),transparent 28%),
+    radial-gradient(ellipse at 94% 38%,rgba(13,43,67,.07),transparent 30%),
+    linear-gradient(180deg,#fbf8f0 0%,#f2eee5 100%) !important;
 }
-html::before{
-  content:"";
-  position:fixed;
-  z-index:9998;
-  pointer-events:none;
-  top:0;left:0;right:0;height:17px;
-  background:
-    radial-gradient(circle at 9px 8px,#ffe7a0 0 3px,rgba(232,189,75,.62) 4px,transparent 7px)
-    0 0/52px 17px repeat-x;
-  border-top:2px solid rgba(232,189,75,.38);
-  filter:drop-shadow(0 2px 7px rgba(255,183,65,.5));
-  opacity:.9;
+/* Hero: richer midnight-navy and warm festive glow, retaining the original car photo */
+header{
+  background-image:
+    radial-gradient(ellipse at 50% 5%,rgba(232,196,106,.20),transparent 38%),
+    linear-gradient(115deg,rgba(3,13,25,.91),rgba(7,28,48,.73) 52%,rgba(3,13,25,.88)),
+    url("https://images.unsplash.com/photo-1769641156628-52ed6dc1a951?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=85&w=2400") !important;
+  background-position:center,center,center 58% !important;
+  border-bottom:1px solid rgba(232,196,106,.5);
+  box-shadow:inset 0 -45px 80px rgba(3,13,25,.32),0 14px 45px rgba(5,20,35,.16);
 }
-body::after{
-  content:"🪔";
-  position:fixed;
-  z-index:9997;
-  pointer-events:none;
-  right:13px;bottom:10px;
-  font-size:27px;line-height:1;
-  filter:drop-shadow(0 0 9px rgba(255,180,52,.8));
-  opacity:.9;
+header:before{
+  width:540px;height:540px;top:-360px;
+  border-color:rgba(232,196,106,.24) !important;
+  box-shadow:0 0 0 70px rgba(232,196,106,.035),0 0 0 145px rgba(232,196,106,.025),0 0 65px rgba(232,196,106,.08) !important;
 }
-header,.top,.navbar,.nav,.site-header{
-  border-bottom-color:rgba(232,189,75,.42) !important;
-  box-shadow:0 5px 24px rgba(0,0,0,.16),0 1px 0 rgba(232,189,75,.10);
+header:after{
+  width:300px;height:300px;right:-145px;bottom:-210px;
+  background:radial-gradient(circle,rgba(232,170,75,.18),transparent 68%) !important;
 }
-.card,.panel,.job,.stat,.item,.box,.section-card{
-  border-color:rgba(232,189,75,.24) !important;
-  box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 18px rgba(232,189,75,.035);
+.logo{
+  border:2px solid var(--diwali-gold) !important;
+  box-shadow:0 0 0 7px rgba(232,196,106,.09),0 16px 55px rgba(0,0,0,.48) !important;
 }
-h1,h2,.brand,.gold,.eyebrow{
-  text-shadow:0 0 16px rgba(232,189,75,.16);
+header h1{
+  color:#fff8e8;
+  text-shadow:0 3px 24px rgba(0,0,0,.55),0 0 24px rgba(232,196,106,.22) !important;
 }
-button:not(.red):not(.danger):not(.secondary):not(.blue),
-.btn:not(.red):not(.danger):not(.secondary):not(.blue),
-a.button:not(.red):not(.danger){
-  border-color:rgba(255,226,150,.55) !important;
-  box-shadow:0 5px 16px rgba(210,151,42,.18);
+header p{color:#e4d8bd !important}
+.hero-book,.btn,.package-book{
+  background:linear-gradient(135deg,#f1d58b 0%,#c99b42 48%,#9b6c20 100%) !important;
+  color:#17202a !important;
+  border:1px solid rgba(255,239,190,.85) !important;
+  box-shadow:0 9px 28px rgba(165,116,34,.28),inset 0 1px 0 rgba(255,255,255,.48) !important;
 }
-a:not(.btn):not(.button):hover{
-  text-decoration-color:rgba(232,189,75,.65);
+.hero-call{
+  border-color:rgba(232,196,106,.65) !important;
+  background:rgba(5,19,34,.45) !important;
+  backdrop-filter:blur(8px);
 }
-@media(prefers-reduced-motion:no-preference){
-  html::before{animation:diwaliTwinkle 3.8s ease-in-out infinite alternate}
-  @keyframes diwaliTwinkle{from{opacity:.62}to{opacity:1}}
+nav{
+  background:rgba(4,17,31,.97) !important;
+  border-bottom:1px solid rgba(232,196,106,.42) !important;
+  box-shadow:0 8px 26px rgba(4,17,31,.16) !important;
+}
+nav a:hover,nav a:focus{
+  background:linear-gradient(135deg,rgba(232,196,106,.17),rgba(232,196,106,.06)) !important;
+  border-color:rgba(232,196,106,.45) !important;
+  color:#f3d58e !important;
+}
+section{position:relative}
+h2{
+  color:#10263b !important;
+  text-shadow:0 2px 14px rgba(193,145,55,.12) !important;
+}
+.box{
+  background:linear-gradient(145deg,#fffefa 0%,#fffaf0 100%) !important;
+  border:1px solid rgba(180,137,61,.25) !important;
+  border-radius:20px !important;
+  box-shadow:0 14px 38px rgba(18,34,49,.07),inset 0 1px 0 #fff !important;
+}
+.box:before{
+  width:4px !important;
+  background:linear-gradient(180deg,#f1d58b,#b47d28,#e8c46a) !important;
+  box-shadow:0 0 13px rgba(197,150,63,.22);
+}
+.service-item,.price-item,.package-card,.package,.contact-card,.review-box{
+  border-color:rgba(180,137,61,.22) !important;
+}
+.service-item,.price-item{
+  background:linear-gradient(135deg,#fffdf7,#f8f3e8) !important;
+}
+.price-item span,.package-head small,.daily-badge{
+  background:linear-gradient(135deg,#fff2c9,#f1dfaa) !important;
+  color:#75551b !important;
+}
+.package-card{
+  background:linear-gradient(145deg,#fffdf8,#f7f1e4) !important;
+}
+.package.popular,.daily-package{
+  border-color:rgba(190,143,52,.62) !important;
+  box-shadow:0 12px 30px rgba(166,119,37,.10) !important;
+}
+.daily-package{
+  background:radial-gradient(ellipse at 50% 0%,rgba(235,199,119,.20),transparent 65%),linear-gradient(135deg,#fffaf0,#fff) !important;
+}
+.contact-card{
+  background:linear-gradient(145deg,#fffdf8,#f8f3e9) !important;
+}
+.contact-action{
+  background:linear-gradient(120deg,#f8efd9,#fffaf0) !important;
+  border-color:rgba(180,137,61,.30) !important;
+}
+.social-row a{
+  background:#fffaf0 !important;
+  border-color:#d7b66d !important;
+  color:#8a641f !important;
+}
+footer{
+  background:#071525 !important;
+  color:#e9dfc8 !important;
+  border-top:1px solid rgba(232,196,106,.38);
+}
+button:not(.red):not(.danger):not(.secondary):not(.blue):focus-visible,
+a:focus-visible{
+  outline:2px solid #d4ad58;
+  outline-offset:3px;
+}
+@media(max-width:600px){
+  header{background-position:center,center,58% center !important}
+  .box{padding:23px 19px !important;border-radius:16px !important}
 }
